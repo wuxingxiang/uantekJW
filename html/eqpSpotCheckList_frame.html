@@ -1,0 +1,410 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>AUI快速完成布局</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    body{
+      background-color: #fff;
+    }
+
+    .checkItem{
+      padding: 0.5rem 0px;
+    }
+
+    .status{
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.15rem;
+      color: #fff;
+      font-size: 0.7rem;
+      min-width: 1.8rem;
+      text-align: center;
+    }
+
+    #inputView{
+      border: 1px solid #d9d9d9;
+      height: 1.7rem;
+      border-radius: 0.15rem;
+    }
+
+    #scanResualt{
+      height: 1.7rem;
+      line-height: 1.8rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      font-size: 0.8rem;
+      width: 100%;
+    }
+
+    #EqpNumInput{
+      position: absolute;
+      top: 0px;
+      left: 0.2rem;
+      right: 1rem;
+      bottom: 0rem;
+    }
+
+    input[type="text"]{
+      height: 1.7rem;
+      line-height: 1.7rem;
+    }
+
+  </style>
+</head>
+<body class="">
+  <section class="item_row" id="inputDiv">
+    <div class="item_row item_sub_left">
+      <div class="item_sub_right item_normal item_row" id="inputView" >
+        <div id="scanResualt" class="color_gray font_size_14 item_sub_nowrap font_size_16 item_sub_left">扫描设备二维码快速点检</div>
+        <input id="EqpNumInput" name='SNScan' autofocus="autofocus" class='align_center font_size_16' maxlength = '300' value="" type="text" oninput="OnInput(event,this)" onclick='SNClick();' placeholder="">
+      </div>
+    </div>
+
+
+  </section>
+
+  <section class="">
+    <div class="" id="item_list">
+
+    </div>
+  </section>
+
+
+  <!--doT template-->
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+        <div class="item_row checkItem" onclick="itemClick({{=index}});">
+          <div class="item_sub_left item_sub_nowrap pr8 font_size_16">{{=value.EqpCode}}</div>
+          {{? value.CheckDate}}
+             <div class="status color_bg_gray">{{=value.Status}}</div>
+          {{??}}
+             <div class="status color_bg_main">{{=value.Status}}</div>
+          {{?}}
+          <div class="separate_line"></div>
+        </div>
+    {{~}}
+ </script>
+</body>
+<script type="text/javascript" src="../script/api.js" ></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/upRefreshMore.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+    var itemList = [];
+    var LineId = '';
+    var ProcessId = '';
+    var EqpType = '';
+
+    var startDate = '';
+    var endDate = '';
+
+    var PageSize = 20;
+    var PageNum = 1;
+
+    apiready = function () {
+      var body = $api.dom('body');
+      $upRefresh.addHtml(body,'暂无需点检设备');
+      $showErrorDiv.addErrorHtml(body);
+      setdate();
+      keybordTap();
+      initEventListenner();
+      $upRefresh.analysisData(itemList,itemList);
+      loadItemList();
+    }
+
+    // 初始化事件监听
+    function initEventListenner() {
+      api.setRefreshHeaderInfo({
+          visible: true,
+          loadingImg: 'widget://image/refresh.png',
+          bgColor: '#fff',
+          textColor: '#8c9098',
+          textDown: '下拉刷新...',
+          textUp: '松开刷新...',
+          showTime: true
+      }, function(ret, err){
+        setTimeout(function () {
+          loadItemList();
+        }, 400);
+      });
+
+      api.addEventListener({
+        name:'tap'
+      }, function(ret, err){
+        SNClick();
+      });
+    }
+
+    function setdate() {
+      var myDate = new Date();
+      var year =  myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+      var month = myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+      if (month<10) {
+        month = '0'+month;
+      }
+      var day = myDate.getDate();        //获取当前日(1-31)
+
+      if (day<10) {
+        day = '0'+day;
+      }
+
+      startDate = year+'-'+month+'-'+day;
+      endDate = year+'-'+month+'-'+day;
+    }
+
+    function keybordTap() {
+      //回车事件绑定
+      $('#EqpNumInput').bind('keyup', function(event) {
+        if (event.keyCode == "13") {
+          if (event.target.value && event.target.value.length > 0) {
+            var scanStr = event.target.value;
+            console.log(JSON.stringify(scanStr));
+            event.target.value = '';
+            loadEqpInfo(scanStr);
+          }
+        }else {
+          var appType = api.getGlobalData({
+              key: 'APPTYPE'
+          });
+          if (appType == 'PDA') {
+            if (this.value.length == 1) {
+              this.value = '';
+            }
+          }
+        }
+      });
+    }
+
+    function SNClick() {
+
+      var input = $api.byId('EqpNumInput');
+      input.focus();
+      $api.attr(input,'readOnly',true);
+      setTimeout(function () {
+        input.removeAttribute("readOnly")//延迟移除readonly属性
+      }, 30);
+    }
+
+
+// ================数据请求============================
+    function loadItemList() {
+      SNClick();
+
+      PageNum = 1;
+      var parDic = {
+        LineId:LineId,
+        ProcessId:ProcessId,
+        EqpType:EqpType,
+        StartTime:startDate+' 00:00:00',
+        EndTime:endDate+' 23:59:59',
+        PageSize:PageSize,
+        PageNum:PageNum
+      }
+
+      GetEqpCheckList(parDic,function(ret){
+        api.refreshHeaderLoadDone();
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data) {
+            itemList = ret.data;
+          }
+          $upRefresh.analysisData(ret.data,itemList);
+          $showErrorDiv.loadSucceed();
+        }else {
+          $showErrorDiv.loadError();
+          api.toast({
+              msg: ret.info,
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+      },function(err){
+        api.refreshHeaderLoadDone();
+        $showErrorDiv.loadError();
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+    function loadMoreItemList() {
+      SNClick();
+      $upRefresh.loadMoreHeader();
+
+      PageNum ++;
+      var parDic = {
+        LineId:LineId,
+        ProcessId:ProcessId,
+        EqpType:EqpType,
+        StartTime:startDate+' 00:00:00',
+        EndTime:endDate+' 23:59:59',
+        PageSize:PageSize,
+        PageNum:PageNum
+      }
+
+      GetEqpCheckList(parDic,function(ret){
+        api.refreshHeaderLoadDone();
+        console.log(JSON.stringify(ret));
+        SNClick();
+        if (ret.code == 200) {
+          if (ret.data && ret.data.length > 0) {
+            itemList = itemList.concat(ret.data);
+          }
+          $upRefresh.analysisData(ret.data,itemList);
+          $showErrorDiv.loadSucceed();
+        }else {
+          $showErrorDiv.loadError();
+          api.toast({
+              msg: ret.info,
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+      },function(err){
+        api.refreshHeaderLoadDone();
+        $showErrorDiv.loadError();
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+    function loadEqpInfo(scanStr) {
+      var parDic = scanStr;
+      GetEqpPMTaskInfo(parDic,function(ret){
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data) {
+            var EqpObj = ret.data;
+            var scanResualt = $api.byId('scanResualt');
+            $api.css(scanResualt, 'color:#323232;');
+            scanResualt.innerHTML = EqpObj.EqpCode;
+
+            api.openWin({
+                name: 'eqpSpotCheck_nav',
+                url:  'eqpSpotCheck_win.html',
+                slidBackEnabled:false,
+                softInputMode:'pan',
+                pageParam:EqpObj,
+                animation: {
+                    type: 'movein',
+                    subType: 'from_right'
+                }
+            });
+          }else {
+            api.toast({
+                msg: ret.info,
+                duration: 1500,
+                location: 'middle'
+            });
+          }
+        }else {
+          api.toast({
+              msg: ret.info,
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+      },function(err){
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+// ================数据处理=========================
+   function setEqpType(_EqpType) {
+     EqpType = _EqpType
+   }
+
+   function setProcessId(_ProcessId) {
+     ProcessId = _ProcessId;
+   }
+
+   function setLineId(_LineId) {
+     console.log(_LineId);
+     LineId = _LineId;
+   }
+
+   function setStartDate(_startDate) {
+     startDate = _startDate
+   }
+
+   function setEndDate(_endDate) {
+     endDate = _endDate;
+   }
+
+   function focus() {
+     api.execScript({
+         name: 'eqpSpotCheckList_nav',
+         script: 'focus();'
+     });
+   }
+
+   function setInputValue(EqpCode) {
+     var scanResualt = $api.byId('scanResualt');
+     $api.css(scanResualt, 'color:#323232;');
+     scanResualt.innerHTML = EqpCode;
+   }
+
+// =================点击事件========================
+   function OnInput(event,tag) {
+     console.log(tag.value);
+    //  console.log(event.target.value);
+    var appType = api.getGlobalData({
+        key: 'APPTYPE'
+    });
+    if (appType == 'PDA') {
+      if (event.target.value.length == 1) {
+        event.target.value = '';
+      }
+    }
+
+   }
+
+   function itemClick(index) {
+     SNClick();
+     if (itemList.length <= index) {
+       return;
+     }
+     api.openWin({
+         name: 'eqpSpotCheck_nav',
+         url:  'eqpSpotCheck_win.html',
+         slidBackEnabled:false,
+         softInputMode:'pan',
+         pageParam:itemList[index],
+         animation: {
+             type: 'movein',
+             subType: 'from_right'
+         }
+     });
+   }
+
+   function saveBtnClick() {
+     loadItemList();
+   }
+
+   function loadError() {
+     loadItemList();
+   }
+
+</script>
+</html>

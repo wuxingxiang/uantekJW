@@ -1,0 +1,1345 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/addPhotos.css" />
+
+
+  <style type="text/css">
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      background-color: #fff;
+      padding-bottom: 1rem;
+    }
+
+    .selectItem {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.8rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    .statusBtn {
+      padding: 0.1rem 0.3rem;
+      padding-top: 0.2rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.6rem;
+      min-width: 1.8rem;
+      text-align: center;
+      display: none;
+    }
+
+
+
+    #image_show {
+      display: flex;
+      flex-flow: wrap row;
+    }
+
+    .selectIcon {
+      width: 1.5rem;
+      height: 1.5rem;
+      background: url(../image/common/common_unSelected_icon.png) no-repeat;
+      background-position: center;
+      background-size: 0.9rem;
+      margin-bottom: 0.1rem
+    }
+
+    .selected {
+      background-image: url(../image/common/common_select.png);
+    }
+
+    .unSelected {
+      background-image: url(../image/common/common_unSelected_icon.png);
+    }
+
+
+    input[type='tel'] {
+      height: 1.6rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      border: 1px solid #d9d9d9;
+    }
+
+    .inputView {
+      border: 1px solid #d9d9d9;
+      border-radius: 0.15rem;
+    }
+
+    input[type='text'] {
+      height: 1.6rem;
+      border-radius: 0.15rem;
+      padding: 0px 0.2rem;
+    }
+
+    input {
+      height: 1.6rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      line-height: 1.6rem;
+    }
+
+    .batchBtn {
+      background-color: #1eb1ed;
+      color: white;
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.15rem;
+    }
+
+    .itemTitle {
+      width: 3.6rem;
+    }
+
+    textarea {
+      height: 4rem;
+      width: 100%;
+      padding: 3px;
+      font-size: 0.8rem;
+      border: 1px solid #d9d9d9;
+      border-radius: 0.2rem;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.8rem;
+    }
+
+    .titleView {
+      background-color: #efefef;
+      padding: 0.3rem 0.8rem;
+    }
+
+    .searchBtn {
+      height: 1.6rem;
+      min-width: 3.6rem;
+      padding: 0px 0.6rem;
+      line-height: 1.7rem;
+      background-color: #1eb1ed;
+      border-radius: 0.15rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: white;
+      margin-left: 0.8rem;
+    }
+
+    #deleteIcon {
+      width: 1.6rem;
+      height: 1.6rem;
+      background: url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-size: 0.8rem;
+    }
+
+    #scanResualt {
+      width: 100%;
+      height: 1.7rem;
+      line-height: 1.7rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      font-size: 0.8rem;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    #scanInput {
+      position: absolute;
+      top: 0px;
+      left: 0.2rem;
+      right: 1rem;
+      bottom: 0rem;
+      padding-right: 1.2rem;
+    }
+
+    .tapDownBtn {
+      height: 1rem;
+      width: 1rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center;
+      background-size: 0.6rem;
+      z-index: 10000;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="pt12 item_normal" id="topView">
+    <div class="item_row item_sub_left">
+      <div class="font_size_16 mr8">备件</div>
+      <div class="inputView item_sub_left item_row">
+        <div id="scanResualt" class="color_gray">请扫描备件二维码</div>
+        <input name='scanInput' class='item_sub_center font_size_16' id="scanInput" autofocus maxlength='' value="" type="text"
+          oninput="OnInput(event,this)" onclick="SNClick(this);" placeholder="">
+      </div>
+    </div>
+  </section>
+
+  <section class="mt8 item_normal">
+    <div class="item_sub_left mt12 item_row">
+      <div class="font_size_16 mr8">名称</div>
+      <div class="inputView item_sub_left item_row">
+        <input class='item_sub_left font_size_16' id="nameInput" maxlength='' value="" type="text"
+          placeholder="请输入备件名称">
+      </div>
+    </div>
+    <div class="item_row mt12">
+      <div class="item_row item_sub_left">
+        <div class="selectItemView item_sub_left">
+          <div id='SpareType' class="selectItem item_sub_center color_darkgray item_sub_nowrap font_size_14"
+            onclick='itemSelect("SpareType");'>请选择备件类型</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="item_row" id="timeDiv">
+      <div class="item_row item_sub_left mt16 mr8" id="waringDate">
+        <div class="font_size_16 mr8">寿命</div>
+        <input class='item_sub_left font_size_16 inputView' id="lifeInput" maxlength='' value="1" type="tel"
+          placeholder="请输入寿命">
+      </div>
+
+      <div class="item_row item_sub_left mt16 ml8">
+        <div class="font_size_16 mr8">预警</div>
+        <input class='item_sub_left font_size_16 inputView' id="waringnInput" maxlength='' value="1" type="tel"
+          placeholder="请输入预警">
+      </div>
+    </div>
+
+    <div class="item_sub_left mt16">
+      <div class="itemTitle font_size_16">备注</div>
+      <textarea class='item_sub_left mt4' id="Description" name="txt" clos=",50" rows="5" maxlength="100" warp="virtual"
+        placeholder="请入备注内容"></textarea>
+    </div>
+  </section>
+
+  <section class="item_row item_center" id="bottomViewParent">
+    <div class="bottomView item_row" id="submitBtnView" style="width: 35%;">
+      <div class="bottomBtn color_bg_blue item_sub_center" onclick="submitBtnClick();">保存&入库</div>
+    </div>
+    <div class="separate_line_top"></div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/photosGet.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/PrintUtil.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+
+<script type="text/javascript">
+  var ItemModel = null;
+
+  var SpareTypeArr = [];
+  var SpareTypeObj = null;
+  var startDate = '';
+  var endDate = '';
+  var SpareSN = '';
+
+  var hasUpLoad = false;
+  apiready = function () {
+    var body = $api.dom('body');
+    loadBaseInfo();
+    keybordTap();
+    // setdate();
+
+    setViewHeight();
+  };
+
+  function setViewHeight() {
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType == 'PDA') {
+      
+      var submitBtnView = $api.byId('submitBtnView');
+      $api.css(submitBtnView,'width: 60%;');  
+    }
+  }
+
+  function setdate() {
+    var myDate = new Date();
+    var year = myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+    var month = myDate.getMonth() + 1;       //获取当前月份(0-11,0代表1月)
+    if (month < 10) {
+      month = '0' + month;
+    }
+    var day = myDate.getDate();        //获取当前日(1-31)
+
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    endDate = year + '-' + month + '-' + day;
+    startDate = $util.GetDateStr(endDate, 335);
+    endDate = $util.GetDateStr(endDate, 365);
+
+    var startDateDiv = $api.byId('startDate');
+    startDateDiv.innerHTML = startDate;
+
+    var endDateDiv = $api.byId('endDate');
+    endDateDiv.innerHTML = endDate;
+  }
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#MaterialInput').bind('keyup', function (event) {
+      if (event.keyCode == "13") {
+        loadMaterailInfo();
+      }
+    });
+
+    //回车事件绑定
+    $('#scanInput').bind('keyup', function (event) {
+      var currentScanStr = '';
+      var scanResualt = $api.byId('scanResualt');
+      if (event.keyCode == "13") {
+        if (event.target.value && event.target.value.length > 0) {
+          var scanValue = event.target.value;
+          var slpits = scanValue.split("\n");
+          if (slpits.length > 0) {
+            scanValue = slpits[slpits.length - 1];
+            scanResualt.innerHTML = scanValue;
+            event.target.value = '';
+          } else {
+            return;
+          }
+          loadsarePartInfo(scanValue);
+        }
+      }
+    });
+  }
+
+  function loadsarePartInfo(scanValue) {
+    setSpareSNText(scanValue);
+    return;
+    var parUrl = scanValue;
+    GetBinInfo(parUrl, function (ret) {
+      if (ret.code == 200) {
+        setSpareSNText(ret.data);
+        fillItemInfo(ret.data);
+      } else {
+        resetSpareTypeText();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      resetSpareTypeText();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadMaterailInfo() {
+    var MaterialInput = $api.byId('MaterialInput');
+    if (!MaterialInput.value || MaterialInput.value.length < 0) {
+      api.toast({
+        msg: '请先输入/扫码物料二维码',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    api.setFocus({
+      inputId: 'MaterialInput',
+      focus: false
+    });
+    var parDic = {
+      WarehouseId: WarehouseObj ? WarehouseObj.Key : '',
+      ConsumableCode: MaterialInput.value
+    };
+    GetOtherStorageConsumable(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        ItemModel = ret.data;
+        fillItemInfo();
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadItemArr(itemType, callBack) {
+    var parUrl = '';
+    GetSpareTypeList(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.Name;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: '暂无数据',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadWarehouseBinArr(WarehouseId, callBack) {
+    var parUrl = WarehouseId;
+    GetWarehouseBin(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.Value;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: '暂无数据',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+
+  function loadBaseInfo() {
+    var tempWarehouseObj = $api.getStorage('Warehouse');
+    if (tempWarehouseObj) {
+      WarehouseObj = tempWarehouseObj;
+      setWarehouse();
+      return;
+    }
+
+    // loadItemArr('Warehouse', function (itemArr) {
+    //   WarehouseArr = itemArr;
+    //   if (WarehouseArr.length > 0) {
+    //     WarehouseObj = WarehouseArr[0];
+    //     setWarehouse();
+    //   }
+    // });
+  }
+
+  function setWarehouse() {
+    var itemTypeDiv = $api.byId('Warehouse');
+    itemTypeDiv.innerHTML = WarehouseObj.Value;
+    $api.css(itemTypeDiv, 'color:#323232;');
+  }
+
+  
+  function loadRepairInfo() {
+
+    var parDic = api.pageParam.RepairId;
+    GetEqpRepairInfo(parDic, function (ret) {
+      if (ret.code == 200) {
+        RepairObj = ret.data;
+        fillInfo();
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+
+  function GetBatchSNData() {
+
+    if (!ItemModel) {
+      api.toast({
+        msg: '请先输入物料Code并查询',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+
+    var packingQtyInput = $api.byId('packingQtyInput');
+    var QtyInput = $api.byId('QtyInput');
+    if (!QtyInput.value || !$util.isIntNum(QtyInput.value)) {
+      api.toast({
+        msg: '入库数不能为空/输入不正确',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (QtyInput.value <= 0) {
+      api.toast({
+        msg: '入库数必须大于0',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    console.log(packingQtyInput.value);
+    console.log($util.isIntNum(packingQtyInput.value));
+
+    if (!packingQtyInput.value || !$util.isIntNum(packingQtyInput.value)) {
+      api.toast({
+        msg: '包装数量不能为空/输入不正确',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (packingQtyInput.value <= 0) {
+      api.toast({
+        msg: '包装数量必须大于0',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (packingQtyInput.value > QtyInput.value) {
+      api.toast({
+        msg: '包装数量不能大于入库数',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var parDic = {
+      PoNum: api.pageParam.StorageCode,
+      ItemNo: ItemModel.ConsumableProductCode,
+      TotalQty: QtyInput.value,
+      PackageNum: packingQtyInput.value
+    }
+    PostOtherStorageCreateLabelNo(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200 && ret.data) {
+
+        // PreinspectionCode = ret.data.PreinspectionCode;
+        refreshBatchNoList();
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+
+    });
+  }
+
+
+  function UploadData() {
+
+    var nameInput = $api.byId('nameInput');
+
+    var itemList = [{
+      BarcodeNo:SpareSN
+    }];
+    
+    var lifeInput = $api.byId('lifeInput');
+    var waringnInput = $api.byId('waringnInput');    
+
+    var parDic = {
+      SpareTypeId: SpareTypeObj.Id,
+      SpareName: nameInput.value,
+      Description: Description.value,
+      DesignLife:parseInt(lifeInput.value),
+      WarningLife:parseInt(waringnInput.value),
+      BarcodeList: itemList
+    }
+
+    SpareInStock(parDic, function (ret) {
+      if (ret.code == 200) {
+        cleanItemInfo();
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+      api.hideProgress();
+    }, function (err) {
+      api.toast({
+        msg: '入库失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+  // ===================逻辑处理===========================
+  function SNClick() {
+    var input = $api.byId('scanInput');
+    input.focus();
+    $api.attr(input, 'readOnly', true);
+    setTimeout(function () {
+      input.removeAttribute("readOnly")//延迟移除readonly属性
+    }, 30);
+  }
+
+  function OnInputBin(event, el) {
+    if (event.target.value.length == 1) {
+      event.target.value = '';
+    }
+  }
+
+  function fillItemInfo() {
+    if (!ItemModel) {
+      return;
+    }
+
+    var MaterialInput = $api.byId('MaterialInput');
+    $api.attr(MaterialInput, 'disabled', true);
+
+    var deleteIcon = $api.byId('deleteIcon');
+    deleteIcon.style.display = 'none';
+
+    var materialDiv = $api.byId('material');
+    materialDiv.innerHTML = ItemModel.ConsumableProductCode + '  ' + ItemModel.ConsumableProductName;
+
+    if (ItemModel.WarehouseId) {
+      var WarehouseDiv = $api.byId('Warehouse');
+      WarehouseDiv.innerHTML = ItemModel.WarehouseName;
+      $api.css(WarehouseDiv, 'color:#323232;');
+
+      WarehouseObj = {
+        Key: ItemModel.WarehouseId,
+        Code: ItemModel.WarehouseCode,
+        Value: ItemModel.WarehouseName
+      }
+    }
+
+    if (ItemModel.WarehouseBinId) {
+      TempLocationObj = {
+        Key: ItemModel.WarehouseBinId,
+        Code: ItemModel.WarehouseBinCode,
+        Value: ItemModel.WarehouseBinName
+      }
+      console.log(JSON.stringify(TempLocationObj));
+      setBinText();
+    } else {
+      if (!WarehouseObj) {
+        var itemTypeDiv = $api.byId('TempLocation');
+        itemTypeDiv.innerHTML = '请选择储位';
+        $api.css(itemTypeDiv, 'color:#555555;');
+        TempLocationObj = null;
+      }
+    }
+  }
+
+  function cleanItemInfo() {
+    
+    var scanResualt = $api.byId('scanResualt');
+    scanResualt.innerHTML = '请扫描备件二维码';
+    $api.css(scanResualt, 'color:#666666;');
+
+    SpareSN = '';
+    
+    var nameInput = $api.byId('nameInput');
+    nameInput.value = '';
+
+    var Description = $api.byId('Description');
+    Description.value = '';
+
+
+    var lifeInput = $api.byId('lifeInput');
+    lifeInput.value = '';
+
+    var waringnInput = $api.byId('waringnInput');
+    waringnInput.value = '';
+
+    resetSpareTypeText();
+  }
+
+  function setSpareSNText(SN) {
+    var scanResualt = $api.byId('scanResualt');
+    scanResualt.innerHTML = SN;
+    $api.css(scanResualt, 'color:#323232;');
+
+    SpareSN = SN;
+  }
+
+
+  function setSpareTypeText() {
+    var SpareType = $api.byId('SpareType');
+    SpareType.innerHTML = SpareTypeObj.Name;
+    $api.css(SpareType, 'color:#323232;');
+  }
+
+  function resetSpareTypeText() {
+    var SpareTypeDiv = $api.byId('SpareType');
+    SpareTypeDiv.innerHTML = "请选择备件类型";
+    $api.css(SpareTypeDiv, 'color:#666666;');
+    SpareTypeObj = null;
+  }
+
+  function refreshLeftBtn() {
+    api.execScript({
+      name: 'maintenanceEqp_nav',
+      script: 'refreshLeftBtn();'
+    });
+  }
+
+ 
+
+  function judgeTap() {
+    if (!SpareTypeObj) {
+      api.toast({
+        msg: '请先选择备件类型',
+        duration: 1500,
+        location: 'middle'
+      });
+      return false;
+    }
+
+    if ($util.isEmpty(SpareSN)) {
+      api.toast({
+        msg: '请扫描备件标签',
+        duration: 1500,
+        location: 'middle'
+      });
+      return false;
+    }
+
+    var nameInput = $api.byId('nameInput');
+    if ($util.isEmpty(nameInput.value)) {
+      api.toast({
+        msg: '请输入备件名称',
+        duration: 1500,
+        location: 'middle'
+      });
+      return false;
+    }
+    var lifeInput = $api.byId('lifeInput');
+    if (!$util.isIntNum(lifeInput.value) || lifeInput.value <=0) {
+      api.toast({
+        msg: '寿命次数必须大于0',
+        duration: 1500,
+        location: 'middle'
+      });
+      return false;
+    }
+
+    var waringnInput = $api.byId('waringnInput');    
+    if (!$util.isIntNum(waringnInput.value)  || lifeInput.value <=0) {
+      api.toast({
+        msg: '预警次数必须大于0',
+        duration: 1500,
+        location: 'middle'
+      });
+      return false;
+    }
+
+    console.log(waringnInput.value);
+    console.log(lifeInput.value);
+
+    if (parseInt(waringnInput.value) > parseInt(lifeInput.value)) {
+      api.toast({
+        msg: '预警次数必须小于寿命次数',
+        duration: 1500,
+        location: 'middle'
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  // ===================点击事件===========================
+  function deleteBtnClick() {
+    var MaterialInput = $api.byId('MaterialInput');
+    MaterialInput.value = '';
+  }
+
+  function OnInput(event, tag) {
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType == 'PDA') {
+      if (event.target.value.length == 1) {
+        event.target.value = '';
+      }
+    }
+
+  }
+
+  function chooseItemType() {
+    var winName = 'faultTypeList_nav';
+    var url = 'faultTypeList_win.html';
+
+    var type = api.pageParam.type;
+    switch (type) {
+      case 'fualt':
+        {
+          winName = 'faultTypeList_nav';
+          url = 'faultTypeList_win.html';
+        }
+        break;
+      case 'loss':
+        {
+          winName = 'standbyTypeList_nav';
+          url = 'standbyTypeList_win.html';
+        }
+        break;
+      case 'unknow':
+        {
+          winName = 'unKnowTypeList_nav';
+          url = 'unKnowTypeList_win.html';
+        }
+        break;
+      default:
+        {
+        }
+        break;
+    }
+
+    api.openWin({
+      name: winName,
+      url: url,
+      bgColor: '#ffffff',
+      pageParam: {
+        winName: 'commontItemDetail_nav',
+        frameName: 'commontItemDetail',
+        type: 'select',
+        code: currenTypeCode
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right',
+        duration: 300
+      }
+    });
+  }
+
+  function changeType(typeStr) {
+    var typeObj = JSON.parse(typeStr);
+    if (typeObj) {
+
+      currenTypeCode = typeObj.code;
+      var typeValueDiv = $api.byId('typeValue');
+
+      $api.css(typeValueDiv, 'color:#10131b');
+
+      typeValueDiv.innerHTML = typeObj.name;
+      currenTypeName = typeObj.name;
+    }
+  }
+
+  function addPhoto() {
+    api.actionSheet({
+      cancelTitle: '取消',
+      buttons: ['拍照', '从相册选择']
+    }, function (ret, err) {
+      if (ret) {
+        if (ret.buttonIndex == 1) {
+          $photosGet.takePhoto(pictures);
+        } else if (ret.buttonIndex == 2) {
+          $photosGet.pickPhoto(pictures);
+        }
+      }
+    });
+  }
+
+  function deleteImage(index) {
+    event.stopPropagation();
+
+    $photosGet.deleteImage(pictures, index);
+  }
+
+  function previewImage(index) {
+    event.stopPropagation();
+    $photosGet.previewImage(pictures, index);
+  }
+
+  function previewImage_show(index) {
+    $photosGet.previewImage(pictures_show, index);
+  }
+
+  function selectItemClick(tapType) {
+    currentSelectType = tapType;
+    var repairDiv = $api.byId('repair');
+    var discardDiv = $api.byId('discard');
+
+    switch (tapType) {
+      case 'R':
+        {
+          if ($api.hasCls(discardDiv, 'selected')) {
+            $api.removeCls(discardDiv, 'selected');
+            $api.addCls(discardDiv, 'unSelected');
+          }
+
+          if ($api.hasCls(repairDiv, 'unSelected')) {
+            $api.removeCls(repairDiv, 'unSelected');
+          }
+          $api.addCls(repairDiv, 'selected');
+        }
+        break;
+      case 'S':
+        {
+          if ($api.hasCls(repairDiv, 'selected')) {
+            $api.removeCls(repairDiv, 'selected');
+            $api.addCls(repairDiv, 'unSelected');
+          }
+
+          if ($api.hasCls(discardDiv, 'unSelected')) {
+            $api.removeCls(discardDiv, 'unSelected');
+          }
+          $api.addCls(discardDiv, 'selected');
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function controlBtnClick(tapType) {
+
+    var description = $api.byId('descInput');
+
+    if (!description.value) {
+      api.toast({
+        msg: '请输入维修内容',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (hasUpload == true) {
+      return;
+    }
+
+    uploadFileToLocatServer(pictures, 'EQM', function (updataSuccee) {
+      if (updataSuccee) {
+        UploadData();
+      } else {
+        api.hideProgress();
+        api.toast({
+          msg: '上传图片失败,请重试',
+          duration: 1000,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function itemSelect(itemType) {
+    this.itemType = itemType;
+    switch (itemType) {
+      case 'SpareType':
+        {
+          if (SpareTypeArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              SpareTypeArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(SpareTypeArr, function (flag, tempModel) {
+            if (flag == true) {
+              if (tempModel.Id) {
+                SpareTypeObj = tempModel;
+                setSpareTypeText();
+              } else {
+                resetSpareTypeText();
+              }
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'Warehouse':
+        {
+          if (WarehouseArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              WarehouseArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+          showSelector(WarehouseArr, function (flag, tempModel) {
+            if (flag == true) {
+              var itemTypeDiv = $api.byId(itemType);
+
+              if (tempModel.Value) {
+                itemTypeDiv.innerHTML = tempModel.Value;
+                $api.css(itemTypeDiv, 'color:#323232;');
+                if (WarehouseObj && WarehouseObj.Key != tempModel.Key) {
+                  reSetBinText();
+                  TempLocationArr = [];
+                }
+                WarehouseObj = tempModel;
+              } else {
+                itemTypeDiv.innerHTML = '请选择仓库';
+                $api.css(itemTypeDiv, 'color:#555555;');
+                WarehouseObj = null;
+              }
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+
+      case 'TempLocation':
+        {
+          if (!WarehouseObj) {
+            api.toast({
+              msg: '请先选择仓库',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+          if (TempLocationArr.length <= 0) {
+            loadWarehouseBinArr(WarehouseObj.Key, function (itemArr) {
+              TempLocationArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(TempLocationArr, function (flag, tempModel) {
+            if (flag == true) {
+              if (tempModel.Value) {
+                TempLocationObj = tempModel;
+                setBinText();
+              } else {
+                reSetBinText();
+              }
+
+              var scanInput = $api.byId('scanInput');
+              scanInput.value = '';
+
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  function showSelector(itemArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 6,
+        col: 1,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempModel = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          tempModel = ret.selectedInfo[0];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+    });
+  }
+
+  function chooseDate(dateType) {
+    var noteDate = startDate;
+    if (dateType == 'end') {
+      noteDate = endDate;
+    }
+    api.openPicker({
+      type: 'date',
+      date: noteDate,
+      minDate: '1970-01-01',
+      maxDate: '2030-01-01',
+      title: '选择日期'
+    }, function (ret, err) {
+      if (ret) {
+        var year = ret.year;
+        var month = ret.month;
+        if (month < 10) {
+          month = '0' + month;
+        }
+        var day = ret.day;
+        if (day < 10) {
+          day = '0' + day;
+        }
+        var selectDate = year + '-' + month + '-' + day;
+        if (dateType == 'start') {
+          if ($util.tabTime(selectDate, endDate)) {
+            api.toast({
+              msg: '预警日期不能大于寿命日期',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+          startDate = selectDate;
+          var startDateDiv = $api.byId('startDate');
+          startDateDiv.innerHTML = startDate;
+        } else {
+          if ($util.getTime(selectDate) < $util.getTime(startDate)) {
+            api.toast({
+              msg: '寿命日期不能小于预警日期',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+
+          endDate = selectDate;
+          var endDateDiv = $api.byId('endDate');
+          endDateDiv.innerHTML = endDate;
+        }
+      } else {
+        api.toast({
+          msg: '选择日期失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function createBatchNo() {
+    GetBatchSNData();
+  }
+
+  function refreshBatchNoList() {
+    var template = document.getElementById('template');
+    var itemListDiv = document.getElementById('item_list');
+    var Pagefn = doT.template(template.text);
+    itemListDiv.innerHTML = Pagefn(itemList);
+    //重新解析tapmode
+    api.parseTapmode();
+  }
+
+  function rightBtnClick() {
+    cleanItemInfo();
+  }
+
+  function submitBtnClick() {
+    if (judgeTap()) {
+      UploadData();
+    }
+  }
+
+  function connetBlu() {
+    var param = {
+
+    };
+    var resultCallback = function (ret, err) {
+      if (ret.Code == 100) {
+        api.showProgress({
+          title: '链接中...',
+          modal: true
+        });
+      }
+
+      if (ret.Code == 200) {
+        SDD = ret.data.SDD;
+        SDDName = ret.data.SDDName;
+        console.log("SDD===" + SDD);
+        console.log("SDDName===" + SDDName);
+
+        $api.setStorage('SDDInfo', {
+          'SDD': SDD,
+          'SDDName': SDDName
+        });
+
+        setBluSDDName();
+        api.hideProgress();
+        api.toast({
+          msg: '连接成功',
+          modal: true
+        })
+      }
+
+      if (ret.Code == 404) {
+        api.hideProgress();
+        api.toast({
+          msg: '连接失败！重试或重启打印机试试',
+          modal: true
+        });
+        console.log(4444444);
+      }
+    };
+    if (!TSCPrint) {
+      TSCPrint = api.require('TSCPrint');
+    }
+    TSCPrint.selectMacAddrass(param, resultCallback);
+  }
+
+  function setBluSDDName() {
+    var bluSDDNameDiv = $api.byId('bluSDDNameDiv');
+    bluSDDNameDiv.innerHTML = SDDName;
+  }
+
+
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+</script>
+
+</html>

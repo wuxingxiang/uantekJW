@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+      background-color: #f2f2f2;
+      width: 100%;
+      height: 100%;
+    }
+
+    header {
+      background-color: #efefef;
+    }
+
+    #title:after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background: #dcdee3;
+      right: 0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }
+
+    #saveBtn {
+      width: 60%;
+      height: 2.2rem;
+      text-align: center;
+      line-height: 2.2rem;
+      font-size: 0.8rem;
+      background-color: #1eb1ed;
+      border-radius: 1.1rem;
+      color: #fff;
+    }
+
+    #saveBtnView {
+      position: fixed;
+      bottom: 0px;
+      padding: 0.5rem 0.9rem;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .rightBtn {
+      padding: 0rem 0.4rem;
+      height: 1.4rem;
+      line-height: 1.5rem;
+      border-radius: 0.15rem;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.6rem;
+    }
+
+    #rightBtnView {
+      height: 100%;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <i class="back" tapmode onclick="api.closeWin();"></i>
+    <div id="title">设备保养</div>
+    <div id="rightBtnView" class='item_center' tapmode onclick="rightBtnClick();">
+      <div class="rightBtn color_bg_main">保养履历</div>
+    </div>
+  </header>
+
+  <section class='mt4 item_center' id="saveBtnView">
+    <div id="saveBtn" onclick="comfirmBtnClick();">提交</div>
+    <div class="separate_line_top"></div>
+  </section>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script//md5.js"></script>
+
+
+<script type="text/javascript">
+
+  apiready = function () {
+    api.parseTapmode();
+    var header = $api.dom('header');
+    // $api.fixStatusBar( $api.dom('header') );
+
+    var height = api.winHeight - header.offsetHeight;
+    var topY = header.offsetHeight;
+
+    var titleDiv = $api.byId('title');
+
+    var saveBtnView = $api.byId('saveBtnView');
+    var offset = $api.offset(saveBtnView);
+
+    api.openFrame({
+      name: 'maintainEqp',
+      url: 'maintainEqp_frame.html',
+      rect: {
+        x: 0,
+        y: topY,
+        w: api.winWidth,
+        h: height - offset.h
+      },
+      pageParam: api.pageParam,
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+    var btnView = $api.byId('saveBtn');
+    if (btnView) {
+      var appType = api.getGlobalData({
+          key: 'APPTYPE'
+      });
+      
+      if (appType != 'PDA') {
+        $api.css(btnView,'width:35%');
+      }
+    }
+
+  };
+
+  function comfirmBtnClick() {
+    api.execScript({
+      frameName: 'maintainEqp',
+      script: 'submitBtnClick();'
+    });
+  }
+
+  function rightBtnClick() {
+    api.openWin({
+      name: 'maintainRecordList_nav',
+      url: 'maintainRecordList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        EquipmentIds: api.pageParam.EqpId
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+</script>
+
+</html>

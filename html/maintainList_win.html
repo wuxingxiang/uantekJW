@@ -1,0 +1,371 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+      background-color: #fff;
+      width: 100%;
+      height: 100%;
+    }
+
+    header {
+      background-color: #efefef;
+    }
+
+    #saveBtn {
+      width: 1.9rem;
+      height: 22px;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      line-height: 22px;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.6rem;
+    }
+
+    .saveBtnView {
+      width: 3.5rem;
+      height: 44px;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+
+    .selectItemView {
+      box-sizing: border-box;
+    }
+
+    .selectItem {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.7rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <i class="back" tapmode onclick="api.closeWin();"></i>
+    <div id="title">保养列表</div>
+  </header>
+  <section class="item_row mt12">
+    <div class="item_row item_sub_left selectItemView mr8 font_size_14 pr6">
+      <div class="mr8">开始</div>
+      <div id='startDate' class="selectItem item_sub_center color_darkgray item_sub_nowrap"
+        onclick='chooseDate("start");'></div>
+    </div>
+
+    <div class="item_row item_sub_left selectItemView font_size_14">
+      <div class="mr8">结束</div>
+      <div id='endDate' class="selectItem item_sub_center color_darkgray item_sub_nowrap" onclick='chooseDate("end");'>
+      </div>
+    </div>
+  </section>
+
+  <section class="item_row mt10 pb8" id="selectView">
+    <div class="item_row item_sub_left" id="PADView">
+      <div class="selectItemView item_sub_left">
+        <div id='eqpSelected' class="selectItem item_sub_center color_darkgray item_sub_nowrap" onclick='selectedEqp();'>
+          请选择设备</div>
+      </div>
+    </div>
+
+    <div class="item_row item_sub_left ml12">
+      <div class="selectItemView item_sub_left">
+        <div id='MaintainStatus' class="selectItem item_sub_center color_darkgray item_sub_nowrap"
+          onclick='hasMaintained();'>未保养</div>
+      </div>
+    </div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+
+
+<script type="text/javascript">
+  var FacilityArr = [];
+  var ProductArr = [];
+
+  var FacilityObj = null;
+  var ProductObj = null;
+
+  var orderTypeArr = [];
+  var orderTypeObj = null;
+
+  var currentOrderNum = '';
+  var startDate = '';
+  var endDate = '';
+  var EqpSelectArr = [];
+
+  var frameName = 'maintainList';
+
+  apiready = function () {
+    api.parseTapmode();
+    var header = $api.dom('header');
+    // $api.fixStatusBar(header);
+    var titleView = $api.byId('title_view');
+    var topY = header.offsetTop + header.offsetHeight;
+
+    var selectView = $api.byId('selectView');
+    var offset = $api.offset(selectView);
+    var topY = offset.t + offset.h;
+    var height = api.winHeight - topY;
+
+    api.openFrame({
+      name: frameName,
+      url: 'maintainList_frame.html',
+      rect: {
+        x: 0,
+        y: topY,
+        w: api.winWidth,
+        h: height
+      },
+      pageParam: {
+      },
+      softInputMode: 'pan',
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+
+    setdate();
+  };
+
+  function setdate() {
+    var myDate = new Date();
+    var year = myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+    var month = myDate.getMonth() + 1;       //获取当前月份(0-11,0代表1月)
+    if (month < 10) {
+      month = '0' + month;
+    }
+    var day = myDate.getDate();        //获取当前日(1-31)
+
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    startDate = year + '-' + month + '-01';
+    endDate = year + '-' + month + '-' + day;
+
+    var startDateDiv = $api.byId('startDate');
+    startDateDiv.innerHTML = startDate;
+
+    var endDateDiv = $api.byId('endDate');
+    endDateDiv.innerHTML = endDate;
+  }
+
+  function chooseDate(dateType) {
+    var noteDate = startDate;
+    if (dateType == 'end') {
+      noteDate = endDate;
+    }
+    api.openPicker({
+      type: 'date',
+      date: noteDate,
+      minDate: '1970-01-01',
+      maxDate: '2030-01-01',
+      title: '选择日期'
+    }, function (ret, err) {
+      if (ret) {
+        var year = ret.year;
+        var month = ret.month;
+        if (month < 10) {
+          month = '0' + month;
+        }
+        var day = ret.day;
+        if (day < 10) {
+          day = '0' + day;
+        }
+        var selectDate = year + '-' + month + '-' + day;
+        if (dateType == 'start') {
+          if ($util.tabTime(selectDate, endDate)) {
+            api.toast({
+              msg: '开始日期不能大于结束日期',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+          startDate = selectDate;
+          var startDateDiv = $api.byId('startDate');
+          startDateDiv.innerHTML = startDate;
+
+          api.execScript({
+            frameName: frameName,
+            script: "setStartDate('" + startDate + "');"
+          });
+
+          api.execScript({
+            frameName: frameName,
+            script: "loadItemList();"
+          });
+
+        } else {
+          if ($util.getTime(selectDate) < $util.getTime(startDate)) {
+            api.toast({
+              msg: '结束日期不能小于开始日期',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+
+          endDate = selectDate;
+          var endDateDiv = $api.byId('endDate');
+          endDateDiv.innerHTML = endDate;
+          api.execScript({
+            frameName: frameName,
+            script: "setEndDate('" + endDate + "');"
+          });
+
+          api.execScript({
+            frameName: frameName,
+            script: "loadItemList();"
+          });
+        }
+      } else {
+        api.toast({
+          msg: '选择日期失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function selectedEqp() {
+    api.openWin({
+      name: 'eqpSelectedList_nav',
+      url: 'eqpSelectedList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName: frameName + '_nav',
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function selectedItem(itemStr) {
+    var tempItem = JSON.parse(itemStr);
+    var itemTypeDiv = $api.byId('eqpSelected');
+    itemTypeDiv.innerHTML = tempItem.EqpName ;
+    $api.css(itemTypeDiv, 'color:#323232;');
+    api.execScript({
+      frameName: frameName,
+      script: "setEqpIds('" + tempItem.Id + "');"
+    });
+
+    api.execScript({
+      frameName: frameName,
+      script: "loadItemList();"
+    });
+  }
+
+  function selectItems(itemListStr) {
+    var eqpArr = JSON.parse(itemListStr);
+    fillEqpSelected(eqpArr);
+  }
+
+  function fillEqpSelected(eqpArr) {
+    var html = '';
+    var EqpIds = '';
+    if (eqpArr && eqpArr.length > 0) {
+      eqpArr.forEach(function (val, index) {
+        if (html) {
+          html += '，';
+        }
+        html += val.EqpCode;
+
+        if (EqpIds) {
+          EqpIds += ',';
+        }
+        EqpIds += val.Id;
+      });
+    }
+
+    var eqpSelected = $api.byId('eqpSelected');
+    $api.css(eqpSelected, 'color:#323232;');
+
+    if (html.length <= 0) {
+      html = '请选择设备';
+      $api.css(eqpSelected, 'color:#8c9098;');
+    }
+
+    eqpSelected.innerHTML = html;
+
+    api.execScript({
+      frameName: frameName,
+      script: "setEqpIds('" + EqpIds + "');"
+    });
+
+    api.execScript({
+      frameName: frameName,
+      script: "loadItemList();"
+    });
+  }
+
+  function hasMaintained() {
+    api.actionSheet({
+      cancelTitle: '取消',
+      buttons: ['已保养', '未保养']
+    }, function (ret, err) {
+      if (ret) {
+        var Maintained = true;
+        var MaintainStatus = $api.byId('MaintainStatus');
+
+        if (ret.buttonIndex == 1) {
+          Maintained = true;
+          MaintainStatus.innerHTML = '已保养';
+        } else if (ret.buttonIndex == 2) {
+          Maintained = false;
+          MaintainStatus.innerHTML = '未保养';
+        }
+        if (ret.buttonIndex == 1 || ret.buttonIndex == 2) {
+          api.execScript({
+            frameName: frameName,
+            script: "setHasMaintained(" + Maintained + ");"
+          });
+
+          api.execScript({
+            frameName: frameName,
+            script: "loadItemList();"
+          });
+        }
+      }
+    });
+  }
+
+</script>
+
+</html>

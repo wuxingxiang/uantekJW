@@ -1,0 +1,536 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    .order_item {
+      padding: 0.5rem 0px;
+      position: relative;
+    }
+
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .detailData {
+      padding: 0.5rem 0.3rem;
+      position: relative;
+    }
+
+    .status {
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #f94d7e;
+      font-size: 0.6rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+
+
+    #item_list {}
+  </style>
+</head>
+
+<body>
+
+  <section id="item_list">
+
+  </section>
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+        <div class="font_size_14 order_item" onclick="itemClick({{=index}});">
+          <div class="item_row">
+            <div class="item_sub_left item_sub_nowrap font_size_16 mr6">{{=value.OrderNo}}</div>
+            <div class="status">{{=value.StatusName}}</div>
+          </div>
+
+          <div class="item_row color_darkgray mt4" style='align-items: flex-start;'>
+            <div class="mr8">产品:</div>
+            <div class="item_sub_left pr12">{{=value.Product}}</div>
+          </div>
+
+          <div class="item_row color_darkgray mt4">
+            <div class="item_row item_sub_left mr8">
+              <div class="">工序：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.Process}}</div>
+            </div>
+          </div>
+
+          <div class="item_row color_darkgray mt4">
+            <div class="item_sub_left color_darkgray font_size_14">数量：{{=value.Qty}}</div>
+            <div class="item_sub_right color_darkgray">完成数：{{=value.CompleteQty}}</div>
+          </div>
+
+          <div class="item_row color_darkgray mt4">
+            <div class="">计划时间：</div>
+            <div class="">{{=value.PlanDate}}</div>
+          </div>
+          <div class="separate_line"></div>
+        </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefreshMore.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var PageNum = 1;
+  var PageSize = 20;
+  var itemList = [];
+
+  var ProductId = '';
+  var ProcessId = '';
+  var startDate = '';
+  var endDate = '';
+
+  var OrderNum = '';
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无工单数据');
+    $showErrorDiv.addErrorHtml(body);
+
+    initEventListenner();
+    // setdate();
+    loadItemList();
+    addTemplate();
+  }
+
+  function setdate() {
+    var myDate = new Date();
+    var year = myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+    var month = myDate.getMonth() + 1;       //获取当前月份(0-11,0代表1月)
+    if (month < 10) {
+      month = '0' + month;
+    }
+    var day = myDate.getDate();        //获取当前日(1-31)
+
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    endDate = year + '-' + month + '-' + day;
+    startDate = $util.GetDateStr(endDate, -2);
+  }
+
+
+  function addTemplate() {
+    var template = $api.byId('template');
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+    if (appType != 'PDA') {
+      var html =
+        '{{~it:value:index}}' +
+        '<div class="item_row font_size_14 order_item detailData" onclick="itemClick({{=index}});">' +
+        '<div class="item_sub_left pl6">{{=value.OrderNo}}</div>' +
+        '<div class="item_sub_left pl4 pr4">{{=value.Product}}</div>' +
+        '<div class="item_sub_center pl4 pr4">{{=value.Process}}</div>' +
+        '<div class="align_center pl4 pr4" id="count">{{=value.Qty}}</div>' +
+        '<div class="align_center pl4 pr4" id="completeCount">{{=value.CompleteQty}}</div>' +
+        '<div class="timeDiv pl4">{{=value.PlanDate}}</div>' +
+        '<div class="statusView color_main pl4">{{=value.StatusName}}</div>' +
+        '<div class="separate_line"></div>' +
+
+        '</div>' +
+        '{{~}}';
+
+      template.innerHTML = html;
+    }
+
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+        loadItemList();
+        api.refreshHeaderLoadDone();
+      }, 400);
+    });
+  }
+
+
+  function loadItemList() {
+    var orderNumInput = $api.byId('orderNumInput');
+    PageNum = 1;
+
+    var StartTime = '';
+    if (startDate) {
+      StartTime = startDate + ' 00:00:00';
+    }
+    var EndTime = '';
+    if (EndTime) {
+      EndTime = endDate + ' 00:00:00';
+    }
+
+    var parDic = {
+      OrderNo: OrderNum,
+      StartTime: startDate ? startDate + ' 00:00:00' : '1970-01-01 00:00:00',
+      EndTime: endDate ? endDate + ' 23:59:59' : '2200-01-01 23:59:59',
+      // StartTime:StartTime,
+      // EndTime:EndTime,
+      ProductId: ProductId,
+      ProcessId: ProcessId,
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+
+    Getorderslist(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      itemList = [];
+      if (ret.code == 200) {
+        if (ret.data) {
+          if ($util.isArray(ret.data)) {
+            itemList = ret.data;
+            itemList.forEach(function (val, index, arr) {
+              if (!val.CompleteQty) {
+                val.CompleteQty = 0;
+              }
+              switch (val.Status) {
+                case 'Recived':
+                  {
+                    val.StatusName = '下达';
+                  }
+                  break;
+                case 'Freed':
+                  {
+                    val.StatusName = '释放';
+                  }
+                  break;
+                case 'Release':
+                  {
+                    val.StatusName = '确认';
+                  }
+                  break;
+                case 'Pause':
+                  {
+                    val.StatusName = '挂起';
+                  }
+                  break;
+                case 'WIP':
+                  {
+                    val.StatusName = '在工';
+                  }
+                  break;
+                case 'Finish':
+                  {
+                    val.StatusName = '完工';
+                  }
+                  break;
+                case 'Close':
+                  {
+                    val.StatusName = '关闭';
+                  }
+                  break;
+                default:
+                  {
+                    val.StatusName = '未知';
+                  }
+
+                  break;
+              };
+            });
+          }
+        }
+        $upRefresh.analysisData(itemList, itemList);
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadMoreItemList() {
+    $upRefresh.loadMoreHeader();
+    api.refreshHeaderLoadDone();
+
+    PageNum++;
+    var parDic = {
+      OrderNo: OrderNum,
+      StartTime: startDate ? startDate + ' 00:00:00' : '1970-01-01 00:00:00',
+      EndTime: endDate ? endDate + ' 23:59:59' : '2200-01-01 23:59:59',
+      ProductId: ProductId,
+      ProcessId: ProcessId,
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+
+    Getorderslist(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if ($util.isArray(ret.data)) {
+          if (ret.data && ret.data.length > 0) {
+            ret.data.forEach(function (val, index, arr) {
+              if (!val.CompleteQty) {
+                val.CompleteQty = 0;
+              }
+              switch (val.Status) {
+                case 'Recived':
+                  {
+                    val.StatusName = '下达';
+                  }
+                  break;
+                case 'Freed':
+                  {
+                    val.StatusName = '释放';
+                  }
+                  break;
+                case 'Release':
+                  {
+                    val.StatusName = '确认';
+                  }
+                  break;
+                case 'Pause':
+                  {
+                    val.StatusName = '挂起';
+                  }
+                  break;
+                case 'WIP':
+                  {
+                    val.StatusName = '在工';
+                  }
+                  break;
+                case 'Finish':
+                  {
+                    val.StatusName = '完工';
+                  }
+                  break;
+                case 'Close':
+                  {
+                    val.StatusName = '关闭';
+                  }
+                  break;
+                default:
+                  val.StatusName = '未知';
+                  break;
+              };
+            });
+            itemList = itemList.concat(ret.data);
+          }
+        }
+        $showErrorDiv.loadSucceed();
+        $upRefresh.analysisData(ret.data, itemList);
+      } else {
+        PageNum--;
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      PageNum--;
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  // ================数据处理=========================
+  function setStartDate(_startDate) {
+    startDate = _startDate
+  }
+
+  function setEndDate(_endDate) {
+    endDate = _endDate;
+  }
+  function setProductId(_ProductId) {
+    ProductId = _ProductId;
+
+  }
+
+  function setProcessId(_ProcessId) {
+    ProcessId = _ProcessId;
+  }
+
+  function setOrderNum(_OrderNum) {
+    OrderNum = _OrderNum;
+  }
+
+  // ================点击事件=========================
+
+  function saveBtnClick() {
+    loadItemList();
+  }
+
+  function itemClick(index) {
+    console.log(index);
+    api.actionSheet({
+      cancelTitle: '取消',
+      buttons: ['工单投入', '工单完成']
+    }, function (ret, err) {
+      if (ret) {
+        var tempModel = itemList[index];
+
+        if (ret.buttonIndex == 1 || ret.buttonIndex == 2) {
+          var DevotStr = '';
+          var FinishStr = '';
+          var showHint = true;
+
+          switch (tempModel.Status) {
+            case 'Recived':
+              {
+                DevotStr = '该工单未确认，无法投入';
+                FinishStr = '该工单未确认，无法完成';
+              }
+              break;
+            case 'Release':
+              {
+                FinishStr = '该工单未投入，无法完成';
+                if (ret.buttonIndex == 1) {
+                  showHint = false;
+                  api.openWin({
+                    name: 'OrderDevot_nav',
+                    url: 'OrderDevot_win.html',
+                    slidBackEnabled: false,
+                    pageParam: tempModel,
+                    animation: {
+                      type: 'movein',
+                      subType: 'from_right'
+                    }
+                  });
+                }
+              }
+              break;
+            case 'Pause':
+              {
+                DevotStr = '该工单挂起，无法投入';
+                FinishStr = '该工单挂起，无法完成';
+              }
+              break;
+            case 'WIP':
+              {
+                showHint = false;
+                if (ret.buttonIndex == 2) {
+                  api.openWin({
+                    name: 'OrderComplete_nav',
+                    url: 'OrderComplete_win.html',
+                    slidBackEnabled: false,
+                    pageParam: itemList[index],
+                    animation: {
+                      type: 'movein',
+                      subType: 'from_right'
+                    }
+                  });
+                }
+
+                if (ret.buttonIndex == 1) {
+                  api.openWin({
+                    name: 'OrderDevot_nav',
+                    url: 'OrderDevot_win.html',
+                    slidBackEnabled: false,
+                    pageParam: tempModel,
+                    animation: {
+                      type: 'movein',
+                      subType: 'from_right'
+                    }
+                  });
+                }
+              }
+              break;
+            case 'Finish':
+              {
+                DevotStr = '该工单已完成，无法投入';
+                FinishStr = '该工单已完成，无法完成';
+              }
+              break;
+            case 'Close':
+              {
+                DevotStr = '该工单已结束，无法投入';
+                FinishStr = '该工单已结束，无法完成';
+              }
+              break;
+            default:
+              break;
+          };
+
+          if (showHint) {
+            if (ret.buttonIndex == 1) {
+              api.toast({
+                msg: DevotStr,
+                duration: 1500,
+                location: 'middle'
+              });
+            } else {
+              api.toast({
+                msg: FinishStr,
+                duration: 1500,
+                location: 'middle'
+              });
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+
+</html>

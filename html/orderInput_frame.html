@@ -1,0 +1,829 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/addPhotos.css" />
+
+
+  <style type="text/css">
+    html,
+    body {
+      min-height: 100%;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    body {
+      background-color: #fff;
+    }
+
+    #inputView {
+      border: 1px solid #d9d9d9;
+      height: 1.7rem;
+      border-radius: 0.15rem;
+      padding-left: 0.2rem;
+    }
+
+    #scanResualt {
+      height: 1.7rem;
+      line-height: 1.7rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      font-size: 0.8rem;
+    }
+
+    #orderNoInput {
+      position: absolute;
+      top: 0px;
+      left: 0.2rem;
+      right: 1rem;
+      bottom: 0rem;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    input[type="text"] {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      text-align: center;
+      padding-right: 1.2rem;
+    }
+
+    input::-webkit-input-placeholder {
+      line-height: 1.6rem;
+    }
+
+
+    .selectItem {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.8rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    .leftTitle {
+      width: 3.6rem;
+    }
+
+    textarea {
+      height: 5rem;
+      width: 100%;
+      padding: 3px;
+      font-size: 0.8rem;
+      border: 1px solid #d9d9d9;
+      border-radius: 0.2rem;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.8rem;
+    }
+
+    #UNPDAView {
+      display: none;
+    }
+
+    #PADView {
+      display: none;
+    }
+
+    .tapDownBtn {
+      height: 100%;
+      width: 1rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center;
+      background-size: 0.6rem;
+      z-index: 10000;
+    }
+
+
+    .selectIcon {
+      width: 1.4rem;
+      height: 1.4rem;
+      background: url(../image/common/common_unSelected_icon.png) no-repeat;
+      background-position: center;
+      background-size: 0.8rem;
+      margin-right: 0.2rem;
+    }
+
+    .selected {
+      background-image: url(../image/common/common_select.png);
+    }
+
+    .unSelected {
+      background-image: url(../image/common/common_unSelected_icon.png);
+    }
+
+    .itemTitle {
+      width: 4rem;
+    }
+  </style>
+</head>
+
+<body>
+  <section class="" id="topView">
+    <div class="item_sub_left pt12">
+      <div class="item_row item_sub_left mb12">
+        <div class="font_size_16 leftTitle">扫描工单</div>
+        <div class="item_sub_right item_normal item_row" id="inputView">
+          <div id="scanResualt" class="color_gray font_size_16 item_sub_nowrap font_size_16 item_sub_left">请选择/扫描工单二维码
+          </div>
+          <div class="tapDownBtn"></div>
+          <input id="orderNoInput" name='SNScan' autofocus="autofocus" class='item_sub_right font_size_16'
+            maxlength='300' value="" type="text" oninput="OnInput(event,this)" onclick='SNClick();' placeholder="">
+          <div tapmode class="tapView" onclick="tapDownBtnClick();"></div>
+          <!-- 请输入SN -->
+        </div>
+      </div>
+      <div class="item_row color_darkgray mt16">
+        <div class="font_size_16 itemTitle">生产机型：</div>
+        <div class="font_size_16 color_darkgray item_sub_nowrap" id="deviceType"></div>
+      </div>
+      <div class="item_row color_darkgray mt8">
+        <div class="font_size_16 itemTitle">计划数量：</div>
+        <div class="font_size_16 color_darkgray" id="planQty"></div>
+      </div>
+
+      <div class="item_row color_darkgray mt8">
+        <div class="font_size_16 itemTitle">计划日期：</div>
+        <div class="font_size_16 item_sub_left item_sub_nowrap color_darkgray" id="planTime"></div>
+      </div>
+
+      <div class="item_row color_darkgray mt8">
+        <div class="font_size_16 itemTitle">在工状态：</div>
+        <div class="font_size_16 item_sub_left item_sub_nowrap color_darkgray" id="State"></div>
+      </div>
+    </div>
+
+    <div class="item_sub_left pt12" id="FacilityView">
+      <div class="item_row item_sub_left mb12" id="">
+        <div class="font_size_16 mr8" id="title">产线</div>
+        <div class="selectItem item_sub_center color_darkgray" id="Facility" onclick="itemSelect('Facility')">请选择产线
+        </div>
+      </div>
+      <div class="item_row color_darkgray mt16">
+        <div class="font_size_16 itemTitle">在产工单：</div>
+        <div class="font_size_16 color_darkgray" id="orderWorking"></div>
+      </div>
+      <div class="item_row color_darkgray mt8">
+        <div class="font_size_16 itemTitle">在工机型：</div>
+        <div class="font_size_16 color_darkgray" id="deviceWorking"></div>
+      </div>
+
+      <div class="item_row color_darkgray mt8">
+        <div class="font_size_16 itemTitle">工单数量：</div>
+        <div class="font_size_16 item_sub_left  item_sub_nowrap color_darkgray" id="orderQty"></div>
+      </div>
+
+      <div class="item_row color_darkgray mt8">
+        <div class="font_size_16 itemTitle">完成数量：</div>
+        <div class="font_size_16 item_sub_left item_sub_nowrap color_darkgray" id="completeQty"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="item_row item_center" id="bottomViewParent">
+    <div class="bottomView item_row" id="submitBtnView" style="width: 60%;">
+      <div class="bottomBtn color_bg_blue item_sub_center" onclick="submitBtnClick();">提交</div>
+    </div>
+    <div class="separate_line_top"></div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<!-- <script type="text/javascript" src="../script/aliyun-oss-sdk.min.js"></script> -->
+<!-- <script type="text/javascript" src="../script/ossRequst.js"></script> -->
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/photosGet.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var currenTypeCode = '';
+  var currenTypeName = '';
+
+  var navName = 'faultList_nav';
+  var frameName = 'faultList';
+
+  var filePath = 'fault';
+
+  var orderModel = null;
+  var EqpArr = new Array;
+  var pictures = new Array;
+
+  var FacilityObj = null;
+  var FacilityArr = new Array;
+
+  var Urgency = 1;
+  var hasUpload = false;
+
+  apiready = function () {
+    var body = $api.dom('body');
+    betrothScreen();
+    keybordTap();
+  };
+
+  function betrothScreen() {
+    var topView = $api.byId('topView');
+    var FacilityView = $api.byId('FacilityView');
+
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType == 'PDA') {
+      if ($api.hasCls(topView, 'item_row')) {
+        $api.removeCls(topView, 'item_row');
+      }
+    } else {
+      $api.addCls(topView, 'item_row');
+      $api.addCls(FacilityView, 'ml20');
+
+      var submitBtnView = $api.byId('submitBtnView');
+      if (submitBtnView) {
+        $api.css(submitBtnView, 'width:35%');
+      }
+    }
+  }
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#orderNoInput').bind('keyup', function (event) {
+      var currentScanStr = '';
+      if (event.keyCode == "13") {
+        if (event.target.value && event.target.value.length > 0) {
+
+          var scanStr = event.target.value;
+          console.log(JSON.stringify(scanStr));
+          event.target.value = '';
+          loadOrderInfo(scanStr);
+        }
+      } else {
+        var appType = api.getGlobalData({
+          key: 'APPTYPE'
+        });
+        if (appType == 'PDA') {
+          if (this.value.length == 1) {
+            this.value = '';
+          }
+        }
+      }
+    });
+
+    $("#orderNoInput").bind("keyup blur", function () {
+      console.log(22222);
+      // 。。。
+    });
+  }
+
+  // ===========数据请求==========
+  function loadOrderInfo(scanStr) {
+    var parDic = scanStr;
+    isLoading = true;
+    // var parUrl = '&EqpId='+scanStr;
+    GetOrderInfo(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data) {
+          fillOrderInfo(ret.data);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadUrgencyArr() {
+    loadItemArr('Urgency', function (itemArr) {
+      if (itemArr.length > 0) {
+        showUrgencyView(itemArr);
+      }
+    });
+  }
+
+  function showUrgencyView(itemArr) {
+    var html = '<div class="font_size_16 mr24 " id="title">紧急程度</div>';
+    var selectedClass = 'selected';
+
+    for (var i = 0; i < itemArr.length; i++) {
+      if (i != 0) {
+        selectedClass = 'unSelected';
+      }
+      html +=
+        '<div class="item_sub_center mr20"  onclick="selectItemClick(' + itemArr[i].Key + ',this);">' +
+        '<div class="item_row">' +
+        '<div class="selectIcon ' + selectedClass + ' operationType"></div>' +
+        '<div class="font_size_16">' + itemArr[i].Value + '</div>' +
+        '</div>' +
+        '</div>'
+    }
+
+    var UrgencyView = $api.byId('UrgencyView');
+    UrgencyView.innerHTML = html;
+  }
+
+  function loadItemArr(itemType, callBack) {
+    var parUrl = itemType;
+    GetSeletItemList(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.Value;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadFacilityOrderInfo(FacilityId, callBack) {
+    var parUrl = FacilityId;
+    GetFacilityOrder(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        callBack(ret.data);
+      } else {
+        fillLineInfo(null);
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+        fillLineInfo(null);
+      }
+    }, function (err) {
+      fillLineInfo(null);
+      api.toast({
+        msg: '获取产线信息失败，请重新获取',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+
+  function loadEqpArr(callBack) {
+    var parDic = {
+      EqpType: '',
+      LineId: '',
+      ProcessId: '',
+      PageSize: 30,
+      PageNum: 1
+    }
+
+    GetEqplist(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = va;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UploadData() {
+    var userInfo = $api.getStorage('userInfoJW');
+
+    var parDic = {
+      WorkOrderNo: orderModel.OrderNo,
+      FacilityId: FacilityObj.Key,
+      Operator: userInfo.userid
+    }
+
+    PostOrderChangeFacility(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        fillOrderInfo(null);
+        fillLineInfo(null);
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+      api.hideProgress();
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+
+  // ===============逻辑处理/数据填充=======================
+
+  function selectedItem(itemStr) {
+    var tempItem = JSON.parse(itemStr);
+    console.log(itemStr);
+    if (tempItem) {
+      if (orderModel && tempItem.OrderNo != orderModel.OrderNo) {
+        fillLineInfo(null);
+      }
+
+      orderModel = {
+        Id: tempItem.Id,
+        OrderNo: tempItem.OrderNo,
+        WOQty: tempItem.Qty,
+        PlanDay: tempItem.PlanDate,
+        WOState: tempItem.StatusName,
+        ProductName: tempItem.Product,
+      }
+      fillOrderInfo(orderModel);
+    }
+  }
+
+  function fillOrderInfo(itemModel) {
+    var scanResualt = $api.byId('scanResualt');
+    var deviceTypeDiv = $api.byId('deviceType');
+    var planQtyDiv = $api.byId('planQty');
+    var planTimeDiv = $api.byId('planTime');
+    var StateDiv = $api.byId('State');
+
+    if (itemModel) {
+      deviceTypeDiv.innerHTML = itemModel.ProductName;
+      planQtyDiv.innerHTML = itemModel.WOQty;
+      planTimeDiv.innerHTML = itemModel.PlanDay;
+      StateDiv.innerHTML = itemModel.WOState;
+
+      $api.css(scanResualt, 'color:#323232;');
+      scanResualt.innerHTML = itemModel.OrderNo;
+    } else {
+      scanResualt.innerHTML = '请选择/扫描工单';
+      $api.css(scanResualt, 'color:#9d9d9d;');
+
+      deviceTypeDiv.innerHTML = '';
+      planQtyDiv.innerHTML = '';
+      planTimeDiv.innerHTML = '';
+      StateDiv.innerHTML = '';
+    }
+
+    orderModel = itemModel;
+  }
+
+  function fillLineInfo(itemModel) {
+    var itemTypeDiv = $api.byId('Facility');
+    var orderWorkingDiv = $api.byId('orderWorking');
+    var deviceWorkingDiv = $api.byId('deviceWorking');
+    var orderQtyDiv = $api.byId('orderQty');
+    var completeQtyDiv = $api.byId('completeQty');
+
+    if (itemModel) {
+      itemTypeDiv.innerHTML = itemModel.Value;
+      $api.css(itemTypeDiv, 'color:#323232;');
+
+      if (itemModel.detail) {
+        orderWorkingDiv.innerHTML = itemModel.detail.WorkOrderNo;
+        deviceWorkingDiv.innerHTML = itemModel.detail.ProductName;
+        orderQtyDiv.innerHTML = itemModel.detail.WOQty;
+        completeQtyDiv.innerHTML = itemModel.detail.FinishQty;
+      } else {
+        orderWorkingDiv.innerHTML = '';
+        deviceWorkingDiv.innerHTML = '';
+        orderQtyDiv.innerHTML = '';
+        completeQtyDiv.innerHTML = '';
+      }
+    } else {
+      itemTypeDiv.innerHTML = '请选择产线';
+      $api.css(itemTypeDiv, 'color:#666666;');
+      orderWorkingDiv.innerHTML = '';
+      deviceWorkingDiv.innerHTML = '';
+      orderQtyDiv.innerHTML = '';
+      completeQtyDiv.innerHTML = '';
+    }
+    FacilityObj = itemModel;
+  }
+
+  // ==============================================
+  function OnInput(event, tag) {
+    console.log(tag.value);
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+    if (appType == 'PDA') {
+      if (event.target.value.length == 1) {
+        event.target.value = '';
+      }
+    }
+  }
+
+  function SNClick() {
+    var input = $api.byId('orderNoInput');
+    input.focus();
+    $api.attr(input, 'readOnly', true);
+    setTimeout(function () {
+      input.removeAttribute("readOnly")//延迟移除readonly属性
+    }, 30);
+  }
+
+  function tapDownBtnClick() {
+    event.stopPropagation();
+    api.openWin({
+      name: 'orderSelectedList_nav',
+      url: 'orderSelectedList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName: api.winName,
+        frameName: api.frameName
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function itemSelect(itemType) {
+    switch (itemType) {
+      case 'Facility':
+        {
+          if (!orderModel) {
+            api.toast({
+              msg: '请先选择/扫描工单',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+
+          if (FacilityArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              FacilityArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(FacilityArr, function (flag, tempModel) {
+            if (flag == true) {
+              loadFacilityOrderInfo(tempModel.Key, function (result) {
+                tempModel.detail = result;
+                fillLineInfo(tempModel);
+              });
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'Eqp':
+        {
+          if (EqpArr.length <= 0) {
+            loadEqpArr(function (itemArr) {
+              EqpArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+          showSelector(EqpArr, function (flag, tempModel) {
+            if (flag == true) {
+              var itemTypeDiv = $api.byId('scanResualt');
+              itemTypeDiv.innerHTML = tempModel.EqpName;
+              $api.css(itemTypeDiv, 'color:#323232;');
+              orderModel = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function addPhoto() {
+    api.actionSheet({
+      cancelTitle: '取消',
+      buttons: ['拍照', '从相册选择']
+    }, function (ret, err) {
+      if (ret) {
+        if (ret.buttonIndex == 1) {
+          $photosGet.takePhoto(pictures);
+        } else if (ret.buttonIndex == 2) {
+          $photosGet.pickPhoto(pictures);
+        }
+      }
+    });
+  }
+
+  function deleteImage(index) {
+    event.stopPropagation();
+    $photosGet.deleteImage(pictures, index);
+  }
+
+  function previewImage(index) {
+    event.stopPropagation();
+    $photosGet.previewImage(pictures, index);
+  }
+
+  function showSelector(itemArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 8,
+        col: 1,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempModel = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          var index = ret.selectedInfo.length;
+          tempModel = ret.selectedInfo[index - 1];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+
+      // if (ret.eventType != 'onChange') {
+      //   setTimeout(function () {
+      //     SNClick();
+      //   }, 200);
+      // }
+    });
+  }
+
+  function submitBtnClick() {
+    if (!orderModel) {
+      api.toast({
+        msg: '请选择/扫描工单',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (!FacilityObj) {
+      api.toast({
+        msg: '请选择产线',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (FacilityObj.detail && FacilityObj.detail.WorkOrderNo && FacilityObj.detail.FacilityState == 'Toggle') {
+      api.confirm({
+        title: '提示',
+        msg: '产线正在进行工单换型任务,是否继续投入',
+        buttons: ['确认', '取消']
+      }, function (subret, err) {
+        if (subret.buttonIndex == 1) {
+          UploadData();
+        }
+      });
+      return;
+    }
+
+    UploadData();
+  }
+
+  function resetBtnClick() {
+    fillLineInfo(null);
+    fillOrderInfo(null);
+  }
+
+</script>
+
+</html>

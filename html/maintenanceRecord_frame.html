@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>AUI快速完成布局</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../css/addPhotos.css" />
+
+
+    <style type="text/css">
+    html,body{min-height: 100%;padding: 0px;margin: 0px;}
+    body{
+        background-color: #fff;
+        padding-bottom: 0.5rem;
+    }
+
+    .selectItem{
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.8rem;
+      background:  url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color:#efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+
+    .statusBtn{
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.6rem;
+      min-width: 1.8rem;
+      text-align: center;
+    }
+
+    textarea
+    {
+      height: 5rem;
+      width: 100%;
+      padding: 2px 3px;
+      font-size: 0.8rem;
+      border: 1px solid #d9d9d9;
+      border-radius: 0.2rem;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.8rem;
+      padding: 2px 3px;
+    }
+
+    #image_show{
+      display:flex;
+    	flex-flow: wrap row;
+    }
+
+    .selectIcon{
+      width: 1.5rem;
+      height: 1.5rem;
+      background:  url(../image/common/common_select.png) no-repeat;
+      background-position: center;
+      background-size: 0.9rem;
+      margin-bottom: 0.1rem
+    }
+
+    .selected{
+      background-image:  url(../image/common/common_select.png);
+    }
+
+    .unSelected{
+      background-image:  url(../image/common/common_unSelected_icon.png);
+    }
+
+
+
+
+    </style>
+</head>
+<body>
+  <section>
+
+    <div class="item_row mt8" style="align-items: flex-start;" >
+      <div class="font_size_16 item_sub_left color_darkgray" id="description"></div>
+    </div>
+
+    <div class="item_row mt12" style="align-items: flex-start;" >
+      <div class="font_size_14 item_sub_right color_gray" id="title">维修时间：</div>
+      <div class="font_size_14 color_gray " id="RepairTime"></div>
+    </div>
+  </section>
+
+  <section>
+    <div id="images_show">
+      <div class="image_list_title font_size_14">维修图片</div>
+      <div id="imagesView_show" class="image_lists pb8">
+      </div>
+    </div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/ossRequst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/photosGet.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+
+<script type="text/javascript">
+    var pictures = new Array;
+    var pictures_show = new Array;
+
+    apiready = function(){
+      RepairObj = api.pageParam;
+      fillInfo();
+    };
+
+    function fillInfo() {
+      if (!RepairObj) {
+        return;
+      }
+      var description = $api.byId('description');
+      if (RepairObj.Content) {
+        description.innerHTML = RepairObj.Content;
+      }else {
+        description.innerHTML = '未填写维修内容';
+      }
+
+      if (RepairObj.RecordDate) {
+        var RepairTime = $api.byId('RepairTime');
+        RepairTime.innerHTML = RepairObj.RecordDate;
+      }
+
+      var images_show = $api.byId('images_show');
+
+      if (RepairObj.ImageList && RepairObj.ImageList.length > 0) {
+        pictures_show = api.pageParam.ImageList;
+        var body = $api.dom('body');
+        var imageNode_show = $api.byId('imagesView_show');
+        $photosGet.addShowPhotoHtml(body,imageNode_show);
+        $photosGet.refreshImageView_Show(pictures_show);
+      }else {
+        images_show.style.display = 'none';
+      }
+    }
+
+
+// ===================逻辑处理===========================
+   function refreshLeftBtn() {
+     api.execScript({
+       name: 'maintenanceEqp_nav',
+       script: 'refreshLeftBtn();'
+     });
+   }
+// ===================点击事件===========================
+    function addPhoto() {
+      api.actionSheet({
+          cancelTitle: '取消',
+          buttons: ['拍照','从相册选择']
+      }, function(ret, err){
+          if( ret ){
+            if (ret.buttonIndex == 1) {
+              $photosGet.takePhoto(pictures);
+            }else if (ret.buttonIndex == 2) {
+              $photosGet.pickPhoto(pictures);
+            }
+          }
+      });
+    }
+
+    function deleteImage(index){
+      event.stopPropagation();
+
+      $photosGet.deleteImage(pictures,index);
+    }
+
+    function previewImage(index){
+      event.stopPropagation();
+      $photosGet.previewImage(pictures,index);
+    }
+
+    function previewImage_show(index) {
+      $photosGet.previewImage(pictures_show,index);
+    }
+
+    function fnLoadimage(el) {
+      $showErrorDiv.fnLoadimage(el);
+    }
+
+</script>
+</html>

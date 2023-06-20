@@ -1,0 +1,736 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+      background-color: #fff;
+      width: 100%;
+      height: 100%;
+    }
+
+    header {
+      background-color: #efefef;
+    }
+
+    #saveBtn {
+      width: 2.2rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+      border-radius: 0.15rem;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.6rem;
+    }
+
+    .saveBtnView {
+      height: 100%;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+
+    .itemView {
+      height: 100%;
+      padding-left: 0.5rem;
+    }
+
+    .selectItem {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.7rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    input {
+      font-size: 0.7rem;
+    }
+
+    input[type="tel"] {
+      height: 1.4rem;
+      text-align: center;
+    }
+
+    #orderNumInput {}
+
+    .inputView {
+      border: 1px solid #d9d9d9;
+      height: 1.4rem;
+      text-align: center;
+      border-radius: 0.15rem;
+    }
+
+    .detailData {
+      height: 2rem;
+      background-color: #eeeeee;
+      padding: 0px 0.3rem;
+    }
+
+    .flex-wrap {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+    }
+
+    .flex-vertical {
+      -webkit-box-orient: vertical;
+      -webkit-flex-flow: column;
+      flex-flow: column;
+    }
+
+    #badnessView {
+      overflow: hidden;
+      overflow-y: scroll;
+      flex: 1;
+      display: flex;
+    }
+
+    /* 设置滚动条的样式 */
+    ::-webkit-scrollbar {
+      width: 0px;
+    }
+
+    /* 滚动条滑块 */
+    ::-webkit-scrollbar-thumb {
+      background: #fff;
+    }
+
+    #addBtn {
+      width: 1.5rem;
+      height: 1.5rem;
+      background-size: contain;
+      background: url(../image/common/common_right_add_btn.png) no-repeat;
+      background-position: center;
+      background-size: 1.4rem;
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+    }
+
+    #badnessView :last-child .separate_line {
+      /* display: none; */
+    }
+
+    .operat {
+      padding: 0.3rem;
+      /*text-align: center;*/
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .badnessEmpty {
+      height: 9rem;
+      width: 100%;
+    }
+
+    .subtractBtn {
+      height: 1.2rem;
+      width: 1.2rem;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 0.8rem;
+    }
+
+    .item_sub_wrap {
+      -webkit-line-clamp: 2;
+    }
+
+    .item_title {
+      width: 2.2rem;
+      font-size: 0.7rem;
+    }
+
+    .searchBtnView {
+      width: 6rem;
+    }
+
+    .searchBtn {
+      width: 3rem;
+      padding: 0.2rem 0.5rem;
+      text-align: center;
+      background-color: #1eb1ed;
+      border-radius: 0.15rem;
+      font-size: 0.7rem;
+      color: #fff;
+    }
+
+    .serial {
+      width: 2rem;
+      min-height: 1rem;
+    }
+
+    .SNNum {
+      width: 8.5rem;
+    }
+
+    .badnessName {
+      width: 4.6rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .orderNum {
+      width: 6rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .product {
+      width: 5.4rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .line {
+      width: 3.2rem;
+    }
+
+    .operation {
+      width: 2.6rem;
+    }
+
+    .defectDate {
+      width: 6.4rem;
+    }
+
+    #item_list {}
+
+    #emptyDiv {
+      height: 100%;
+    }
+
+    #badnessRecord {
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .selectItemView {
+      box-sizing: border-box;
+    }
+
+    input {
+      height: 1.4rem;
+    }
+
+    .closeBtn {
+      width: 1.4rem;
+      height: 1.4rem;
+      background: url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-size: 0.7rem;
+    }
+
+    input::-webkit-input-placeholder {
+      line-height: 1rem;
+    }
+
+    #PADView {
+      display: none;
+    }
+
+    #itemTitle {
+      display: none;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <i class="back" tapmode onclick="api.closeWin();"></i>
+    <div id="title">工单列表</div>
+  </header>
+
+  <section class="item_row mt12">
+    <div class="item_row item_sub_left mr8">
+      <div class="item_sub_right inputView item_row">
+        <input id="orderNumInput" class='item_sub_center font_size_14' value="" type="tel" placeholder="请输入工单号"
+          onkeydown="onkeyDown(event);">
+        <!-- <div class="closeBtn" onclick="cleanOrderInput();"></div> -->
+      </div>
+    </div>
+
+    <div class="item_row item_sub_left selectItemView mr8 font_size_12">
+      <div id='startDate' class="selectItem item_sub_center color_darkgray item_sub_nowrap"
+        onclick='chooseDate("start");'>开始时间</div>
+    </div>
+
+    <div class="item_row item_sub_left selectItemView font_size_12">
+      <div id='endDate' class="selectItem item_sub_center color_darkgray item_sub_nowrap" onclick='chooseDate("end");'>
+        结束时间</div>
+    </div>
+  </section>
+  <section class="item_row mt10 pb10" id="topView">
+    <div class="item_row item_sub_left">
+      <div class="selectItemView item_sub_left">
+        <div id='Product' class="selectItem item_sub_center color_darkgray item_sub_nowrap"
+          onclick='itemSelect("Product");'>请选择机型</div>
+      </div>
+    </div>
+
+    <div class="item_row item_sub_left ml8">
+      <div class="selectItemView item_sub_left">
+        <div id='Process' class="selectItem item_sub_center color_darkgray item_sub_nowrap"
+          onclick='itemSelect("Process");'>请选择工序</div>
+      </div>
+    </div>
+    <div class="separate ml8" id="PADView"></div>
+  </section>
+
+  <section class="mt16" id="itemTitle">
+    <div class="item_row font_size_16 order_item detailData">
+      <div class="item_sub_left font_size_16 pl6">工单</div>
+      <div class="item_sub_left font_size_16 pl4 pr4">产品</div>
+      <div class="item_sub_center font_size_16 pl4 pr4">工序</div>
+      <div class="align_center font_size_16 pl4 pr4" id="count">数量</div>
+      <div class="align_center font_size_16 pl4 pr4" id="completeCount">完成数</div>
+      <div class="timeDiv font_size_16 pl4">计划时间</div>
+      <div class="statusView font_size_16 pl4">状态</div>
+    </div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+
+
+<script type="text/javascript">
+  var startDate = '';
+  var endDate = '';
+
+  var ProcessObj = null;
+  var ProductObj = null;
+
+  var ProcessArr = [];
+  var ProductArr = [];
+
+  apiready = function () {
+    api.parseTapmode();
+    var header = $api.dom('header');
+    // $api.fixStatusBar(header);
+    var titleView = $api.byId('title_view');
+    var topY = header.offsetTop + header.offsetHeight;
+
+    var topView = $api.byId('topView');
+    var offset = $api.offset(topView);
+
+    topY = offset.t + offset.h;
+
+    var template = $api.byId('template');
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType != 'PDA') {
+      var PADView = $api.byId('PADView');
+      PADView.style.display = 'block';
+
+      var itemTitle = $api.byId('itemTitle');
+      itemTitle.style.display = 'block';
+
+      var itemTitleOffset = $api.offset(itemTitle);
+      topY = itemTitleOffset.t + itemTitleOffset.h;
+    }
+
+    height = api.winHeight - topY;
+
+    api.openFrame({
+      name: 'orderSelectedList',
+      url: 'orderSelectedList_frame.html',
+      rect: {
+        x: 0,
+        y: topY,
+        w: api.winWidth,
+        h: height
+      },
+      pageParam: api.pageParam,
+      softInputMode: 'pan',
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+
+    keybordTap();
+  };
+  function addTemplate() {
+
+  }
+
+  function setdate() {
+    var myDate = new Date();
+    var year = myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+    var month = myDate.getMonth() + 1;       //获取当前月份(0-11,0代表1月)
+    if (month < 10) {
+      month = '0' + month;
+    }
+    var day = myDate.getDate();        //获取当前日(1-31)
+
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    endDate = year + '-' + month + '-' + day;
+    startDate = $util.GetDateStr(endDate, -2);
+
+    var startDateDiv = $api.byId('startDate');
+    startDateDiv.innerHTML = startDate;
+
+    var endDateDiv = $api.byId('endDate');
+    endDateDiv.innerHTML = endDate;
+  }
+
+  function loadItemArr(itemType, callBack) {
+    var parUrl = itemType;
+    GetSeletItemList(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.Value;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: '暂无数据',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+
+  // =================点击事件======================
+
+  function entersearch() {
+    var event = window.event || arguments.callee.caller.arguments[0];
+    if (event.keyCode == 13) {
+      alert("进入搜索")
+    }
+  }
+
+  function onkeyDown(event) {
+    if (event.keyCode == "9") {
+      if (event.target.value && event.target.value.length > 0) {
+        api.execScript({
+          frameName: 'orderSelectedList',
+          script: "setOrderNum('" + event.target.value + "');"
+        });
+
+        api.execScript({
+          frameName: 'orderSelectedList',
+          script: "loadItemList();"
+        });
+        api.execScript({
+          frameName: 'orderSelectedRepairList',
+          script: "loadItemList();"
+        });
+      }
+    }
+  }
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#orderNumInput').bind('keyup', function (event) {
+      console.log(JSON.stringify(event.target.value));
+      if (event.keyCode == "13") {
+        api.execScript({
+          frameName: 'orderSelectedList',
+          script: "setOrderNum('" + event.target.value + "');"
+        });
+
+        api.execScript({
+          frameName: 'orderSelectedList',
+          script: "loadItemList();"
+        });
+      }
+    });
+
+
+  }
+
+
+  function chooseDate(dateType) {
+    var noteDate = startDate;
+    if (dateType == 'end') {
+      noteDate = endDate;
+    }
+
+    api.openPicker({
+      type: 'date',
+      date: noteDate,
+      minDate: '1970-01-01',
+      maxDate: '2100-01-01',
+      title: '选择日期'
+    }, function (ret, err) {
+      if (ret) {
+        var year = ret.year;
+        var month = ret.month;
+        if (month < 10) {
+          month = '0' + month;
+        }
+        var day = ret.day;
+        if (day < 10) {
+          day = '0' + day;
+        }
+        var selectDate = year + '-' + month + '-' + day;
+        if (dateType == 'start') {
+          if ($util.tabTime(selectDate, endDate)) {
+            api.toast({
+              msg: '开始日期不能大于结束日期',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+          startDate = selectDate;
+          var startDateDiv = $api.byId('startDate');
+          startDateDiv.innerHTML = startDate;
+
+          api.execScript({
+            frameName: 'orderSelectedList',
+            script: "setStartDate('" + startDate + "');"
+          });
+
+        } else {
+          if ($util.getTime(selectDate) < $util.getTime(startDate)) {
+            api.toast({
+              msg: '结束日期不能小于开始日期',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+
+          endDate = selectDate;
+          var endDateDiv = $api.byId('endDate');
+          endDateDiv.innerHTML = endDate;
+          api.execScript({
+            frameName: 'orderSelectedList',
+            script: "setEndDate('" + endDate + "');"
+          });
+        }
+
+        api.execScript({
+          frameName: 'orderSelectedList',
+          script: "loadItemList();"
+        });
+      } else {
+        api.toast({
+          msg: '选择日期失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function itemSelect(itemType) {
+    switch (itemType) {
+      case 'Product':
+        {
+          if (ProductArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              ProductArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+          showSelector(ProductArr, function (flag, tempModel) {
+            if (flag == true) {
+              var ProductDiv = $api.byId('Product');
+              ProductDiv.innerHTML = tempModel.Value;
+              $api.css(ProductDiv, 'color:#323232;');
+              ProductObj = tempModel;
+              api.execScript({
+                frameName: 'orderSelectedList',
+                script: "setProductId('" + tempModel.Key + "');"
+              });
+
+              api.execScript({
+                frameName: 'orderSelectedList',
+                script: "loadItemList();"
+              });
+
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'Process':
+        {
+          if (ProcessArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              ProcessArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(ProcessArr, function (flag, tempModel) {
+            if (flag == true) {
+              var ProcessDiv = $api.byId('Process');
+              ProcessDiv.innerHTML = tempModel.Value;
+              $api.css(ProcessDiv, 'color:#323232;');
+              ProcessObj = tempModel;
+              api.execScript({
+                frameName: 'orderSelectedList',
+                script: "setProcessId('" + tempModel.Key + "');"
+              });
+
+              api.execScript({
+                frameName: 'orderSelectedList',
+                script: "loadItemList();"
+              });
+
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function showSelector(itemArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 6,
+        col: 1,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempModel = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          tempModel = ret.selectedInfo[0];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+    });
+  }
+
+  function saveBtnClick() {
+
+  }
+
+</script>
+
+</html>

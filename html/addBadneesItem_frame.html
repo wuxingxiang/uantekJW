@@ -1,0 +1,403 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    html,
+    body {
+      background-color: transparent;
+    }
+
+    .main {
+      height: 100%;
+      width: 100%;
+      position: relative;
+    }
+
+    .contentView {
+      border-radius: 0.3rem;
+      background-color: #fff;
+      padding: 0.8rem 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    #closebtn {
+      position: absolute;
+      top: -0.7rem;
+      right: -0.7rem;
+      height: 1.6rem;
+      width: 1.6rem;
+      background: url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 1.4rem;
+    }
+
+    #hintBtn {
+      position: absolute;
+      height: 40px;
+      width: 40px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 40px;
+    }
+
+    .selectItem {
+      height: 1.5rem;
+      line-height: 1.5rem;
+      width: 12rem;
+      font-size: 0.8rem;
+      text-align: center;
+      background: #efefef;
+      border-radius: 0.15rem;
+    }
+
+    .itemText {
+      width: 85px;
+      font-size: 0.8rem;
+    }
+
+    .btnItem {
+      flex: 1;
+      margin: 0.5rem 0.8rem;
+      color: #fff;
+      background-color: #1eb1ed;
+      border-radius: 0.2rem;
+      height: 1.5rem;
+      line-height: 1.6rem;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    .leftT {
+      background-image: url(../image/badness/hintLeftT.png);
+      top: 0rem;
+      left: -38px;
+    }
+
+    .leftB {
+      background-image: url(../image/badness/hintLeftB.png);
+      bottom: 0rem;
+      left: -38px;
+    }
+
+    .rightT {
+      background-image: url(../image/badness/hintRightT.png);
+      top: 0rem;
+      right: -38px;
+    }
+
+    .rightB {
+      background-image: url(../image/badness/hintRightB.png);
+      bottom: 0rem;
+      right: -38px;
+    }
+
+    input[type="tel"] {
+      border: 1px solid #d9d9d9;
+      height: 1.5rem;
+      line-height: 1.5rem;
+      font-size: 0.7rem;
+      text-align: center;
+      border-radius: 0.15rem;
+    }
+
+    input {
+      /*width: 150px;*/
+    }
+
+    .subtractBtn {
+      height: 1.4rem;
+      width: 1.4rem;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 1.1rem;
+    }
+
+    .addBtn {
+      background-image: url(../image/common/common_add.png);
+      margin-left: 0.6rem;
+    }
+
+    .reduce {
+      background-image: url(../image/common/common_reduce.png);
+      margin-right: 0.6rem;
+    }
+
+    .cancellBtn {
+      background-color: #efefef;
+      color: #323232;
+    }
+
+    textarea {
+      height: 3rem;
+      width: 100%;
+      font-size: 0.7rem;
+      border: 1px solid #bdbdbd;
+      border-radius: 0.2rem;
+      text-align: left;
+      margin-top: 0.5rem;
+    }
+
+    #countInput {
+      width: 4rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main item_sub_center">
+    <div class="contentView" id="contentDiv">
+
+      <div class="item_row mt4">
+        <div class="mr12 itemText">不良类型</div>
+        <div class="selectItem  color_darkgray item_sub_center" onclick="selectDefect(this);" id="DefectDiv">请选择不良类型
+        </div>
+      </div>
+
+      <div class="item_row mt20">
+        <div class="mr12 itemText">数量</div>
+        <div class="subtractBtn reduce" onclick="subtractBtnClick('reduce');"></div>
+
+        <input id="countInput" class='align_center font_size_16' maxlength='5' value="1" type="tel"
+          onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"
+          onBlur="inputEnd(this)" placeholder="请输入数量">
+        <div class="subtractBtn addBtn" onclick="subtractBtnClick('add');"></div>
+      </div>
+
+      <!-- <textarea id="remarkInput" name="txtarea" value='' maxlength = '100' placeholder="在此输入备注信息"></textarea> -->
+
+      <div class="item_row mt8">
+        <div class="btnItem cancellBtn" onclick="cancellBtnClick();">取消</div>
+        <div class="btnItem" onclick="comfirmBtnClick();">确定</div>
+      </div>
+
+      <div id="hintBtn" class='leftT' onclick="hideMask();"></div>
+    </div>
+
+  </div>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/canvas2image.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+
+<script type="text/javascript">
+
+  var DefectArr = [];
+  var DefectObj = null;
+
+  apiready = function () {
+    if (api.pageParam.itemModel) {
+      DefectObj = api.pageParam.itemModel;
+      fillDefectInfo();
+    }
+  }
+
+  function fillDefectInfo() {
+    var DefectDiv = $api.byId('DefectDiv');
+    DefectDiv.innerHTML = DefectObj.DefectName;
+
+    var countInput = $api.byId('countInput');
+    countInput.value = DefectObj.DefectQty;
+  
+  }
+
+  function loadDefectcodeList(callBack) {
+    var parUrl = '';
+    Getdefectcodelist(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          callBack(ret.data);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+
+  // ======================点击事件==============================
+
+  function hideMask() {
+    api.closeFrame();
+
+  }
+
+
+  function comfirmBtnClick() {
+    if (!DefectObj) {
+      api.toast({
+        msg: '请先选择不良类型',
+        duration: 1500,
+        location: 'middle'
+      });
+
+      return;
+    }
+
+    var countInput = $api.byId('countInput');
+    if (!countInput || countInput.value <= 0) {
+      api.toast({
+        msg: '数量必须大于0',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+    DefectObj.DefectQty =  countInput.value;
+    DefectObj.CreateDate = $util.getCurrentTime();
+    
+    api.execScript({
+      frameName: api.pageParam.frameName,
+      script: "addBadness('" + JSON.stringify(DefectObj)+"',"+ api.pageParam.add+ ','+api.pageParam.index+");"
+    });
+    api.closeFrame();
+  }
+
+  function cancellBtnClick() {
+    api.closeFrame();
+  }
+
+  function selectDefect(tag) {
+
+    if (DefectArr.length <= 0) {
+      loadDefectcodeList(function (itemArr) {
+        DefectArr = $util.parseTreeData(itemArr, 'DefectId', 'ParentId', '0', 'DefectName');
+        if (DefectArr.length > 0) {
+          selectDefect(tag);
+        }
+      });
+      return;
+    }
+
+    var depth = $util.getDepth(DefectArr);
+    console.log(depth);
+
+    showSelector(DefectArr, depth, function (flag, itemModel) {
+      if (flag) {
+        if (tag) {
+          tag.innerHTML = itemModel.DefectName;
+        }
+        DefectObj = itemModel;
+      }
+    });
+  }
+
+  function showSelector(tempArr, column, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: tempArr,
+      layout: {
+        row: 6,
+        col: column,
+        height: 48,
+        size: 14,
+        sizeActive: 14,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      if (ret && ret.eventType == 'ok') {
+        var tempModel;
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          var index = ret.selectedInfo.length;
+          tempModel = ret.selectedInfo[index - 1];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+    });
+  }
+
+  function inputEnd(el) {
+    if (!el.value || el.value.length <= 1) {
+      el.value = 1;
+    }
+  }
+
+  function subtractBtnClick(type) {
+    var countInput = $api.byId('countInput');
+    if (type == 'add') {
+      countInput.value = parseInt(countInput.value) + 1;
+    } else {
+      countInput.value -= 1;
+      if (countInput.value <= 1) {
+        countInput.value = 1;
+      }
+    }
+  }
+
+
+</script>
+
+</html>

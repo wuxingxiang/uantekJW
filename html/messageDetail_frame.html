@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../css/addPhotos.css" />
+
+    <style type="text/css">
+    body{
+      background-color: #fff;
+    }
+
+    #time
+    {
+      text-align:right;
+      font-size: 0.6rem;
+      padding-top: 0.3rem;
+      color: #8c9098;
+    }
+
+    .content{
+      background-color: #fff;
+      padding: 0.5rem 0px;
+    }
+
+    #detaitContent
+    {
+      font-size:0.7rem;
+      padding-bottom: 0.2rem;
+      word-break:break-all;
+    }
+
+    .bottomBtn{
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      background-color: #f94d7e;
+      margin-left: 0.5rem;
+      color: #fff;
+      font-size: 0.6rem;
+    }
+    .sep_view{
+      height: 10rpx;
+    }
+
+    #image_content{
+      margin-top: 0.5rem;
+    }
+
+    #userInfo{
+      display: none;
+    }
+
+    </style>
+</head>
+<body>
+  <section class="font_size_16 color_black mt12">
+    <div class="" id="messageTitle"></div>
+  </section>
+
+  <section class="notic mt8">
+    <div id="detaitContent" class="font_size_14 color_darkgray"></div>
+    <div id="time" class="mt8"></div>
+  </section>
+
+    <!-- <section class="image_list_content ">
+
+    </section> -->
+</body>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/photosGet.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+
+<script type="text/javascript">
+
+  apiready = function(){
+     fillInfo();
+  };
+
+  function fillInfo() {
+    var messageTitle = $api.byId('messageTitle');
+    messageTitle.innerHTML = api.pageParam.MsgTitle;
+
+    var newsContentDiv = $api.byId('detaitContent');
+    newsContentDiv.innerHTML = api.pageParam.MsgContent;
+
+    var timeDiv = $api.byId('time');
+    timeDiv.innerHTML = api.pageParam.SendTime;
+  }
+
+</script>
+</html>

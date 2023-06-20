@@ -1,0 +1,859 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style>
+    body{
+      margin: 0px;
+      padding: 0px;
+      background-color: #fff;
+      width: 100%;
+      height: 100%;
+    }
+
+    /*#title:after{
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom:0;
+      background: #dcdee3;
+      right:0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }*/
+
+    .topView{
+      /*padding: 0rem 0.9rem;*/
+    }
+
+    .selectItem{
+      height: 1.3rem;
+      line-height: 1.3rem;
+      font-size: 0.7rem;
+      background:  url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.1rem;
+      background-size: 0.6rem;
+      background-color:#efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    input[type="text"]{
+      height: 1.4rem;
+      text-align: center;
+    }
+
+    .detailData{
+      height: 2rem;
+      background-color: #eeeeee;
+      padding: 0px 0.3rem;
+    }
+
+    .flex-wrap{ display: -webkit-box;	display: -webkit-flex;	display: flex; }
+    .flex-vertical{ -webkit-box-orient: vertical;-webkit-flex-flow: column;flex-flow: column;}
+
+    .rightBtnView{
+      height: 2.2rem;
+      width: 6rem;
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      padding-right: 0.8rem;
+    }
+
+    .saveBtn{
+      height: 1.4rem;
+      width: 4.4rem;
+      text-align: center;
+      line-height: 1.4rem;
+      font-size: 0.7rem;
+      background-color: #1eb1ed;
+      color: #fff;
+      border-radius: 0.1rem;
+    }
+
+    header{
+      background-color: #efefef;
+      /*height: 64px;*/
+    }
+
+    #SNResualt{
+      border: 1px solid #d9d9d9;
+      height: 1.4rem;
+      line-height: 1.4rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      width: 100%;
+    }
+
+    #SNNumInput{
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+    }
+
+    .selectItem{
+      height: 1.3rem;
+      line-height: 1.3rem;
+      font-size: 0.7rem;
+      background:  url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.1rem;
+      background-size: 0.6rem;
+      background-color:#efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+      color: #8c9098;
+    }
+
+    input[type="text"]{
+      height: 1.4rem;
+      text-align: center;
+    }
+
+
+    #orderNumInputView{
+      border: 1px solid #d9d9d9;
+      font-size: 0.7rem;
+    }
+
+
+    #orderNumInput{
+
+    }
+
+    .inputView{
+      /*border: 1px solid #d9d9d9;*/
+      height: 1.4rem;
+      text-align: center;
+      border-radius: 0.15rem;
+    }
+
+    .detailData{
+      height: 1.8rem;
+      background-color: #eeeeee;
+      padding: 0px 0.4rem;
+    }
+
+    .flex-wrap{ display: -webkit-box;	display: -webkit-flex;	display: flex; }
+    .flex-vertical{ -webkit-box-orient: vertical;-webkit-flex-flow: column;flex-flow: column;}
+
+    #badnessView{
+      overflow: hidden;
+      overflow-y:scroll;
+      flex: 1;
+      display: flex;
+    }
+
+    /* 设置滚动条的样式 */
+    ::-webkit-scrollbar {
+      width:0px;
+    }
+    /* 滚动条滑块 */
+    ::-webkit-scrollbar-thumb {
+      background:#fff;
+    }
+
+    #addBtn{
+      width: 1.5rem;
+      height: 1.5rem;
+      background-size: contain;
+      background:  url(../image/common/common_right_add_btn.png) no-repeat;
+      background-position: center;
+      background-size: 1.4rem;
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+    }
+
+    #badnessView :last-child .separate_line{
+      /* display: none; */
+    }
+    .operat{
+      padding: 0.3rem;
+      /*text-align: center;*/
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .badnessEmpty{
+      height: 9rem;
+      width: 100%;
+    }
+
+    #countInput{
+      margin-left: 0.3rem;
+      margin-right: 0.3rem;
+    }
+
+    .subtractBtn{
+      height: 1.2rem;
+      width: 1.2rem;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 0.8rem;
+    }
+
+    .item_sub_wrap{
+      -webkit-line-clamp: 2;
+    }
+
+    .item_title{
+      width: 2.2rem;
+      font-size: 0.7rem;
+    }
+
+    .searchBtnView{
+      width: 6rem;
+      margin-right: 1rem;
+    }
+
+    .searchBtn{
+      width: 3rem;
+      padding: 0.2rem 0.5rem;
+      text-align: center;
+      background-color: #1eb1ed;
+      border-radius: 0.15rem;
+      font-size: 0.7rem;
+      color: #fff;
+    }
+
+    .serial{
+      width: 2rem;
+      min-height: 1rem;
+    }
+
+    .SNNum{
+      -webkit-line-clamp: 1;
+      padding: 0.4rem 0rem;
+    }
+
+    .badnessName{
+      width: 4.6rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .orderNum{
+      width: 6rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .product{
+      width: 5.4rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .line{
+      width: 3.2rem;
+    }
+
+    .operation{
+      width: 2.6rem;
+    }
+
+    .defectDate{
+      width: 6.4rem;
+    }
+
+    #emptyDiv{
+      height: 90%;
+    }
+
+    #badnessRecord{
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .selectItemView{
+      box-sizing: border-box;
+    }
+
+    input{
+      height: 1.4rem;
+    }
+    .closeBtn{
+      width: 1.4rem;
+      height: 1.4rem;
+      background:  url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-size: 0.7rem;
+    }
+
+    .selectIcon{
+      width: 1.4rem;
+      height: 1.4rem;
+      background:  url(../image/common/search_icon.png) no-repeat;
+      background-position: center;
+      background-size: 0.7rem;
+    }
+
+    input::-webkit-input-placeholder {
+        line-height: 1.1rem;
+    }
+
+    .deleteBtn{
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.1rem;
+      background-color: #f94d7e;
+      font-size: 0.5rem;
+      color: #fff;
+      margin-left: 1rem;
+    }
+
+    #orderListView{
+      position: absolute;
+      top: 1.4rem;
+      left: 0px;
+      width: 100%;
+      max-height: 16rem;
+      background-color: #efefef;
+      z-index: 1000;
+      border-bottom-left-radius: 0.15rem;
+      border-bottom-right-radius: 0.15rem;
+      /*display: none;*/
+      overflow-y: scroll;
+    }
+
+    </style>
+
+</head>
+<body>
+    <header>
+      <i class="back" tapmode onclick="api.closeWin();"></i>
+      <div id="title">补码录入</div>
+      <div class="rightBtnView item_row" onclick="saveBtnClick();">
+        <div class="separate"></div>
+        <div class="saveBtn">录入</div>
+      </div>
+    </header>
+
+    <section class="item_row pt12">
+      <div class="item_row item_sub_left mr24">
+        <div class="item_title">工单</div>
+        <div class="item_sub_right item_row" id="orderNumInputView">
+          <!-- <div id='Order' class="selectItem item_sub_center color_darkgray item_sub_nowrap" onclick='chooseOrderList();'>请输入工单号</div> -->
+
+          <input id="orderNumInput" class='item_sub_right font_size_14' oninput="onInputChange(this);" autofocus="autofocus" value="" type="text" onBlur="inputEnd(this)" placeholder="请输入工单号">
+          <div class="selectIcon" onclick="chooseOrderList();"></div>
+        </div>
+      </div>
+
+      <div class="item_row item_sub_left" style="flex:0.7;">
+        <div class="item_row item_sub_left ml4">
+          <div class="item_title align_right pr4">产线</div>
+          <div class="selectItemView pl4 item_sub_left">
+            <div id='Facility' class="selectItem item_sub_center color_darkgray item_sub_nowrap" onclick='chooseFacility();'>请选择产线</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="item_row mt10" id="">
+      <div class="item_row item_sub_left mr4" style="flex:0.58;">
+        <div class="item_title">SN</div>
+        <div class="item_sub_right inputView item_row">
+          <div id="SNResualt" class="color_gray font_size_14">请扫描SN码</div>
+          <input id="SNNumInput" name='SNScanInput' class='item_sub_right font_size_14' maxlength = '' value="" type="text"  oninput="OnInput(event,this)" onclick='SNClick();' placeholder="">
+        </div>
+      </div>
+
+      <!-- <div class="searchBtnView item_row" style="flex:0.7;">
+        <div class="separate"></div>
+        <div class="searchBtn" onclick="searchBtnClick();">录入</div>
+      </div> -->
+    </section>
+
+    <section id="hint_view">
+      <div class="item_row detailData font_size_16 color_black mt16">
+        <div class="item_sub_left mr4">SN信息录入</div>
+      </div>
+    </section>
+
+
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+
+
+<script type="text/javascript">
+    var itemList = [];
+    var FacilityObj = null;
+    var FacilityArr = [];
+    var OrderList = [];
+    var OrderObj = null;
+    var canDelete = false;
+
+    apiready = function(){
+        api.parseTapmode();
+        var header = $api.dom('header');
+        // $api.fixStatusBar(header);
+
+        var hintView = $api.byId('hint_view');
+        var height =  api.winHeight- hintView.offsetTop - hintView.offsetHeight;
+        var topY = hintView.offsetTop + hintView.offsetHeight;
+
+        api.openFrame({
+            name: 'replenishBadness',
+            url:  'replenishBadness_frame.html',
+            rect: {
+              x: 0,
+              y: topY,
+              w: api.winWidth,
+              h: height
+            },
+            pageParam: {
+
+            },
+            softInputMode:'pan',
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: false,
+            hScrollBarEnabled: false,
+        });
+        keybordTap();
+
+        setTimeout(function () {
+          api.setFocus({
+            inputId: 'orderNumInput',
+            focus: true
+          });
+        }, 400);
+    };
+
+    function keybordTap() {
+      //回车事件绑定
+      $('#SNNumInput').bind('keyup', function(event) {
+        if (event.keyCode == "13") {
+          // console.log(event.target.value);
+          if (event.target.value && event.target.value.length > 0) {
+            var SNResualt = $api.byId('SNResualt');
+            // SNResualt.innerHTML = event.target.value;
+            $api.css(SNResualt, 'color:#323232;');
+            var SNStr = event.target.value;
+
+            console.log(JSON.stringify(SNStr));
+
+            var slpits = SNStr.split("\n");
+            if (slpits.length > 0) {
+              SNStr = slpits[slpits.length - 1];
+              SNResualt.innerHTML = slpits[slpits.length - 1];
+              event.target.value = '';
+            }else {
+              return;
+            }
+
+            api.execScript({
+                frameName: 'replenishBadness',
+                script: "loadSNInfo('"+SNStr+"');"
+            });
+          }
+        }
+      });
+
+      // js如下：
+    $("#orderNumInput").keypress(function(e){
+        var key = $.trim($(this).val());
+        if(e.keyCode === 13) {
+          chooseOrderList();
+            //  搜索工作
+        }
+    });
+
+      // var timeoutId = 0;
+      //   $('#orderNumInput').off('keyup').on('keyup', function (event) {
+      //       clearTimeout(timeoutId);
+      //       timeoutId = setTimeout(function () {
+      //           chooseOrderList();
+      //       }, 1000);
+      //   });
+    }
+
+    // ===========数据请求==========
+
+    function loadOrderArr(callBack) {
+      var orderNumInputDiv = $api.byId('orderNumInput');
+      var keyword = '';
+      if (orderNumInputDiv) {
+        keyword = orderNumInputDiv.value;
+      }
+      var parUrl = '&data='+keyword;
+      Orderslist(parUrl,function(ret){
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data && ret.data.length > 0) {
+            var tempArr = ret.data;
+            if (tempArr && tempArr.length) {
+              tempArr.forEach(function (val,index,arr) {
+                val.name = val.WorkOrderNo;
+              });
+            }
+            callBack(tempArr);
+          }else {
+            api.toast({
+                msg: ret.info,
+                duration: 1500,
+                location: 'middle'
+            });
+          }
+        }else {
+          api.toast({
+              msg: '获取失败',
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+
+      },function(err){
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+    function loadFacilityArr(callBack) {
+      var parUrl = ''
+      Linesinfo(parUrl,function(ret){
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data && ret.data.length > 0) {
+            callBack(ret.data);
+          }else {
+            api.toast({
+                msg: ret.info,
+                duration: 1500,
+                location: 'middle'
+            });
+          }
+        }else {
+          api.toast({
+              msg: '加载失败',
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+
+      },function(err){
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+// =========================================
+
+   function setRequestDic(parDicStr) {
+     parDic = JSON.parse(parDicStr);
+     loadItemList(true);
+   }
+
+   var timeoutId = 0;
+   function onInputChange(tag) {
+     console.log(2222);
+     clearTimeout(timeoutId);
+     timeoutId = setTimeout(function () {
+       if (tag && tag.value.length > 0) {
+         chooseOrderList();
+       }
+     }, 1000);
+   }
+
+   function OnInput(event,el) {
+     if (el.value.length > 0) {
+       var SNResualt = $api.byId('SNResualt');
+       SNResualt.innerHTML = '';
+     }
+     return;
+   }
+
+
+   function tapstart(event) {
+     canDelete = true;
+   }
+
+   function tapMove(event) {
+     canDelete = false;
+   }
+
+   function deleteBtnClick(LotSN) {
+     if (canDelete == false) {
+       return;
+     }
+
+     canDelete = true;
+     var deleteIndex = 0;
+     console.log(JSON.stringify(itemList));
+     itemList.forEach(function (val,index,arr) {
+       if (val.SN == LotSN) {
+         deleteIndex = index;
+       }
+     });
+
+
+     if (itemList.length > deleteIndex) {
+       itemList.splice(deleteIndex,1);
+       SNClick();
+     }
+
+     $upRefresh.analysisData(itemList,itemList);
+     console.log(deleteIndex);
+     return;
+
+     if (itemList.length > 0) {
+       var emptyDiv = $api.byId('emptyDiv');
+       if (emptyDiv) {
+         emptyDiv.style.display = 'none';
+       }
+     }
+   }
+
+   function inputEnd(tag) {
+     SNClick();
+     $('orderNumInput').blur();
+
+   }
+
+   function SNClick() {
+     var input = $api.byId('SNNumInput');
+     input.focus();
+     $api.attr(input,'readOnly',true);
+     setTimeout(function () {
+       input.removeAttribute("readOnly")//延迟移除readonly属性
+     }, 80);
+   }
+
+   function chooseOrderList() {
+
+     var orderNumInputView = $api.byId('orderNumInputView');
+     var offset = $api.offset(orderNumInputView);
+     var top = offset.t+offset.h;
+     var width = offset.w;
+
+     var orderNumInput = $api.byId('orderNumInput');
+     SNClick();
+     api.openFrame({
+         name: 'orderList_mask',
+         url: 'orderList_mask_frame.html',
+         rect: {
+             x: 0,
+             y: top,
+             w: api.winWidth,
+             h: api.winHeight - top
+         },
+         pageParam: {
+             width: orderNumInput.offsetWidth,
+             keyWord:orderNumInput.value
+         },
+         bounces: false,
+         reload:true,
+         bgColor: 'rgba(0,0,0,0)',
+         vScrollBarEnabled: true,
+         hScrollBarEnabled: true
+     });
+
+     return;
+     if (OrderList.length <= 0) {
+       loadOrderArr(function(itemArr) {
+         if (itemArr) {
+           OrderList = itemArr;
+           if (OrderList.length > 0) {
+             chooseOrderList();
+           }
+         }
+       });
+       return;
+     }
+
+     var template = document.getElementById('template');
+     var itemListDiv = document.getElementById('orderListView');
+     var Pagefn = doT.template(template.text);
+     itemListDiv.innerHTML = Pagefn(OrderList);
+     //重新解析tapmode
+     api.parseTapmode();
+
+     $('orderNumInput').blur();
+
+    //  var depth = $util.getDepth(OrderList);
+    //  showSelector(OrderList,depth,function (flag,resualtModel) {
+    //    if (flag) {
+    //      OrderObj = resualtModel;
+    //      $api.setStorage('Order', resualtModel);
+    //      var OrderDiv =$api.byId('Order');
+    //      OrderDiv.innerHTML = resualtModel.WorkOrderNo;
+    //      $api.css(OrderDiv, 'color:#323232;');
+    //    }
+    //  });
+  }
+
+
+   function chooseFacility() {
+     if (FacilityArr.length <= 0) {
+       loadFacilityArr(function(itemArr) {
+         if (itemArr) {
+           FacilityArr = $util.parseTreeData(itemArr,'Id','ParentId','0','Name');
+           if (FacilityArr.length > 0) {
+             chooseFacility();
+           }
+         }
+       });
+       return;
+     }
+
+     var depth = $util.getDepth(FacilityArr);
+     showSelector(FacilityArr,depth,function (flag,FacilityModel) {
+       if (flag) {
+         FacilityObj = FacilityModel;
+         $api.setStorage('Facility', FacilityModel);
+         var FacilityDiv =$api.byId('Facility');
+         FacilityDiv.innerHTML = FacilityModel.Name;
+         $api.css(FacilityDiv, 'color:#323232;');
+       }
+     });
+  }
+
+ function showSelector(itemArr,depth,callBack) {
+   var UIActionSelector = api.require('UIActionSelector');
+   if (!UIActionSelector) {
+     return;
+   }
+
+   UIActionSelector.open({
+              datas: itemArr,
+              layout: {
+                  row: 8,
+                  col: depth,
+                  height: 44,
+                  size: 16,
+                  sizeActive: 16,
+                  rowSpacing: 0,
+                  colSpacing: 0,
+                  maskBg: 'rgba(0,0,0,0.2)',
+                  bg: '#fff',
+                  color: '#8c9098',
+                  colorActive: '#10131b',
+                  colorSelected: '#10131b'
+              },
+              animation: true,
+              cancel: {
+                  text: '取消',
+                  size: 18,
+                  w: 80,
+                  h: 35,
+                  bgActive: '#8c9098',
+                  colorActive: '#fff',
+                  color: '#555555',
+                  bg: '#d9d9d9'
+              },
+              ok: {
+                  text: '确定',
+                  size: 18,
+                  w: 80,
+                  h: 35,
+                  color: '#fff',
+                  bg: '#1eb1ed',
+                  colorActive: '#fff',
+                  bgActive: '#8c9098',
+              },
+              title: {
+                  text: '请选择',
+                  size: 18,
+                  h: 60,
+                  bg: '#fff',
+                  color: '#10131b'
+              },
+              fixedOn: api.frameName
+          }, function(ret, err) {
+             console.log(JSON.stringify(ret));
+             var tempModel = null;
+
+             if (ret&&ret.eventType =='ok') {
+               if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+                 var index = ret.selectedInfo.length;
+                 tempModel = ret.selectedInfo[index -1];
+                 callBack(true,tempModel);
+               }else{
+                  callBack(false,tempModel);
+               }
+             }
+
+             SNClick();
+          });
+    }
+
+    function focus() {
+      api.setFocus({
+        inputId: 'test',
+        focus: true
+      });
+      SNClick();
+    }
+
+    function saveBtnClick() {
+      SNClick();
+      if (!OrderObj) {
+        api.toast({
+            msg: '请先选择工单',
+            duration: 1500,
+            location: 'middle'
+        });
+
+        return;
+      }
+
+      if (!FacilityObj) {
+        api.toast({
+            msg: '请先选择产线',
+            duration: 1500,
+            location: 'middle'
+        });
+
+        return;
+      }
+
+      console.log(OrderObj.WorkOrderNo);
+
+      api.execScript({
+          frameName: 'replenishBadness',
+          script: "uploadSNData('"+OrderObj.WorkOrderNo+"'"+",'"+FacilityObj.Id+"');"
+      });
+
+    }
+
+    function selectedOrder(OrderStr) {
+      var tempObj = JSON.parse(OrderStr);
+      if (tempObj) {
+        OrderObj = tempObj
+        var orderNumInput = $api.byId('orderNumInput');
+        orderNumInput.value = OrderObj.WorkOrderNo;
+      }else {
+        OrderObj = null;
+      }
+      SNClick();
+    }
+
+    function setKeyBordHide() {
+      // $api.byId('orderNumInput').blur();
+      SNClick();
+    }
+
+
+
+</script>
+</html>

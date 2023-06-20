@@ -1,0 +1,346 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    body {
+      height: 100vh;
+      width: 100vw;
+      margin: 0px;
+      padding: 0px;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .content_view {
+      width: 70vw;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 5px rgba(0, 1, 0, .3);
+      background-color: #1eb1ed;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-flex-flow: column;
+      flex-flow: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 0px;
+    }
+
+    input[type="text"] {
+      height: 1.6rem;
+      width: 50%;
+      background-color: #fff;
+      border-radius: 0.1rem;
+      padding: 0rem 0.2rem;
+      font-size: 0.7rem;
+
+      /*border: 1px solid #dfdfdf;*/
+    }
+
+    input[type="tel"] {
+      height: 1.6rem;
+      /*width: 10rem;*/
+      background-color: #fff;
+      border-radius: 0.1rem;
+      padding: 0rem 0.2rem;
+      font-size: 0.7rem;
+      /*border: 1px solid #dfdfdf;*/
+    }
+
+    .item_row {
+      width: 100%;
+    }
+
+    input[type="password"] {
+      height: 1.6rem;
+      width: 60%;
+      background-color: #fff;
+      border-radius: 0.1rem;
+      padding: 0rem 0.2rem;
+      font-size: 0.7rem;
+
+      /*border: 1px solid #dfdfdf;*/
+    }
+
+    input[type="tel"]::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.7rem;
+    }
+
+    input[type="text"]::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.7rem;
+    }
+
+    input[type="password"]::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.7rem;
+    }
+
+    .loginBtn {
+      width: 10rem;
+      height: 2rem;
+      border-radius: 1rem;
+      line-height: 2rem;
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #1eb1ed;
+      background-color: #fff;
+    }
+
+    #configBtn{
+      position:absolute;
+      top: 0rem;
+      right: 0rem;
+      width: 3rem;
+      height: 3rem;
+      background-image: url(../image/home/set_icon.png);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 1.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content_view font_size_14">
+    <div class="item_row pr20 pl20">
+      <div class="font_size_14 mr12 color_whith">账号</div>
+      <input id="username" class="item_sub_left" oninput="if(value.length>11)value=value.slice(0,11)" type="text"
+        placeholder="请输入账号">
+    </div>
+
+    <div class="item_row mt16 pr20 pl20">
+      <div class="font_size_14 mr12 color_whith">密码</div>
+      <input id="password" class="item_sub_left input_view" type="password" placeholder="请输入密码">
+    </div>
+
+    <div class="loginBtn" tapmode="highlight" onclick="login();">登录</div>
+  </div>
+
+  <div id="configBtn" tapmode="" onclick="configRequstUrl();"></div>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/md5.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+
+<script type="text/javascript">
+  var ip = '';
+  var agree = true;
+
+  apiready = function () {
+    var header = $api.byId('header');
+    api.addEventListener({
+      name: 'keyback'
+    }, function (ret, err) {
+
+    });
+  };
+  // =============================================
+
+  function closeWin() {
+    api.closeWin();
+  }
+
+  function forgetPassword() {
+    api.openWin({
+      name: 'forgetPassWord',
+      url: 'forgetPassWord.html',
+      slidBackEnabled: false,
+      pageParam: {
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function registBtnClick() {
+    api.openWin({
+      name: 'regist',
+      url: 'regist_frame.html',
+      slidBackEnabled: false,
+      allowEdit: true,
+      pageParam: {
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function codeLoginBtnClick() {
+    api.openWin({
+      name: 'login_code',
+      url: 'login_code.html',
+      slidBackEnabled: false,
+      allowEdit: true,
+      pageParam: {
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function login() {
+    var account = $api.dom('#username').value;
+    var password = $api.dom('#password').value;
+    var ClientId = $api.getStorage('gtClient');
+    if (!ClientId || ClientId.length <= 0) {
+      ClientId = '0000000000';
+    }
+
+    if (account.length <= 0) {
+      api.toast({
+        msg: '请先输入帐号',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (password.length <= 0) {
+      api.toast({
+        msg: '请先输入密码',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var GUid = api.systemType + $util.guid();
+    $api.setStorage('GUid', GUid);
+    api.setGlobalData({
+      key: 'Mark',
+      value: GUid
+    });
+
+    console.log(password);
+    if (account.length > 0 & password.length > 0) {
+      password = hex_md5(password);
+      var parameterDic = {
+        'username': account,
+        'password': password,
+        'clientid': ClientId
+      };
+
+
+      UserLogin(parameterDic, function (ret) {
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data) {
+            $api.setStorage('userInfoJW', ret.data);
+            $api.setStorage('MQTTInfoJW', {
+              'userName': account,
+              'password': password,
+              'clientId': ret.data.userid,
+              "HostUrl":  getMQTTUrl(),
+              "topIc":'UQ/'+ret.data.userid
+            });
+          }
+          api.toast({
+            msg: '登录成功',
+            global: true,
+            duration: 1500,
+            location: 'middle'
+          });
+
+          api.sendEvent({
+            name: 'loginSucceed',
+            extra: ret.data
+          });
+
+          setTimeout(function () {
+            api.closeToWin({
+              name: 'root'
+            });
+          }, 300);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      }, function (err) {
+        var hintMessage = '登录失败，请重新登录';
+        if (err && err.body && err.body.ErrorMessage) {
+          hintMessage = err.body.ErrorMessage;
+        }
+
+        api.toast({
+          msg: hintMessage,
+          duration: 1500,
+          location: 'middle'
+        });
+      });
+    }
+  }
+
+  function showUserProtocol() {
+    api.openWin({
+      name: 'web_nav',
+      url: 'web_fram_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        link: 'https://service.uaniot.com:8002/Pricacy',
+        linkTitle: '用户协议'
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function chooseConceal() {
+    var agreeBtnDiv = $api.byId('agreeBtn');
+
+    if (agree) {
+      $api.addCls(agreeBtnDiv, 'unagree');
+      $api.removeCls(agreeBtnDiv, 'agree');
+      console.log(234242);
+      agree = false;
+    } else {
+      $api.addCls(agreeBtnDiv, 'agree');
+      $api.removeCls(agreeBtnDiv, 'unagree');
+
+      agree = true;
+      console.log(111111);
+    }
+  }
+
+  function configRequstUrl() {
+    api.openWin({
+      name: 'editHtml_nav',
+      url: 'editHtml_win.html',
+      slidBackEnabled: false,
+      softInputMode: 'pan',
+      pageParam: {
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+</script>
+</html>

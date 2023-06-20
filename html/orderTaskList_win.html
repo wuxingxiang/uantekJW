@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+      background-color: #f2f2f2;
+      width: 100%;
+      height: 100%;
+    }
+
+
+    #title:after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background: #dcdee3;
+      right: 0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }
+
+    #moreBtn {
+      width: 43px;
+      height: 2.2rem;
+      line-height: 2.2rem;
+      color: #1e8ae7;
+      text-align: right;
+      position: absolute;
+      bottom: 0px;
+      right: 16px;
+      /*background:  url(../image/common/common_right_add_btn.png) no-repeat;
+      background-position: center right;
+      background-repeat: no-repeat;
+      background-size: 15px;*/
+
+    }
+
+    #saveBtn {
+      width: 12rem;
+      height: 2.2rem;
+      text-align: center;
+      line-height: 2.2rem;
+      font-size: 0.8rem;
+      background-color: #1eb1ed;
+      border-radius: 1.1rem;
+      color: #fff;
+    }
+
+    #saveBtnView {
+      position: fixed;
+      bottom: 0px;
+      padding: 0.5rem 0.9rem;
+      width: 100%;
+      z-index: 1000;
+    }
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <i class="back" tapmode onclick="api.closeWin();"></i>
+    <div id="title">任务查看</div>
+    <!-- <div id="moreBtn" tapmode onclick="comfirmBtnClick();">提交</div> -->
+  </header>
+  <!-- <section class='mt4 item_sub_center' id="saveBtnView">
+      <div id="saveBtn"  onclick="saveBtnClick();">提交</div>
+      <div class="separate_line_top"></div>
+    </section> -->
+
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script//md5.js"></script>
+
+
+<script type="text/javascript">
+
+  var frameName = 'orderTaskList';
+  apiready = function () {
+    api.parseTapmode();
+    var header = $api.dom('header');
+    // $api.fixStatusBar( $api.dom('header') );
+
+    var height = api.winHeight - header.offsetHeight;
+    var topY = header.offsetHeight;
+
+    // var saveBtnView = $api.byId('saveBtnView');
+    // var offset = $api.offset(saveBtnView);
+
+    api.openFrame({
+      name: frameName,
+      url: frameName + '_frame.html',
+      rect: {
+        x: 0,
+        y: topY,
+        w: api.winWidth,
+        h: height
+      },
+      pageParam: api.pageParam,
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+  };
+
+  function comfirmBtnClick() {
+
+    api.execScript({
+      frameName: 'toolChangeList',
+      script: 'saveBtnClick();'
+    });
+
+  }
+
+  function saveBtnClick() {
+    api.execScript({
+      frameName: 'toolChangeList',
+      script: 'saveBtnClick();'
+    });
+
+  }
+
+
+</script>
+
+</html>

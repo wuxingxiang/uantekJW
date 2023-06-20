@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>AUI快速完成布局</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body{
+      background-color: transparent;
+      height: 100%;
+      position: relative;
+    }
+
+    #item_list{
+      margin-left: 3rem;
+      width: 20rem;
+      background-color: #ccffff;
+    }
+
+    .orderItem{
+      height: 1.6rem;
+      font-size: 0.7rem;
+      color: #323232;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+
+  <section class='' id="item_list">
+
+  </section>
+
+  <!--doT template-->
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+        <div class="item_sub_center orderItem" onclick='selectItem({{=index}});'>
+          <div class="item_sub_wrap">{{=value.WorkOrderNo}}</div>
+          <div class="separate_line"></div>
+        </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js" ></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+
+<script type="text/javascript">
+
+    var itemList = [];
+
+    apiready = function () {
+      var item_list = $api.byId('item_list');
+      var width = api.pageParam.width;
+      if (!width) {
+        width = 200;
+      }
+      $api.css(item_list, 'width:'+api.pageParam.width+'px;');
+      loadOrderList();
+
+      var body = $api.dom('body');
+      // 第二种 监听点击事件
+      body.addEventListener('click', function(){
+        api.closeFrame();
+      });
+    }
+    // 初始化事件监听
+    function initEventListenner() {
+      api.setRefreshHeaderInfo({
+          visible: true,
+          loadingImg: 'widget://image/refresh.png',
+          bgColor: '#fff',
+          textColor: '#8c9098',
+          textDown: '下拉刷新...',
+          textUp: '松开刷新...',
+          showTime: true
+      }, function(ret, err){
+        setTimeout(function () {
+          loadItemList(false);
+        }, 400);
+      });
+    }
+
+    function loadOrderArr(callBack) {
+      var keyword = api.pageParam.keyWord;
+      var parUrl = '&data='+keyword;
+      console.log(parUrl);
+      Orderslist(parUrl,function(ret){
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data) {
+            if (ret.data.length > 0) {
+              var tempArr = ret.data;
+              callBack(tempArr);
+            }else {
+              api.toast({
+                  msg: '暂无相关工单',
+                  duration: 1500,
+                  location: 'middle'
+              });
+            }
+          }else {
+            api.toast({
+                msg: ret.info,
+                duration: 1500,
+                location: 'middle'
+            });
+          }
+        }else {
+          api.toast({
+              msg: '获取失败',
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+
+      },function(err){
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+    function loadOrderList() {
+      if (itemList.length <= 0) {
+        loadOrderArr(function(itemArr) {
+          if (itemArr) {
+            itemList = itemArr;
+            if (itemList.length > 0) {
+              loadOrderList();
+            }
+          }
+        });
+        return;
+      }
+
+      if (itemList.length <= 0 ) {
+        api.execScript({
+            name: 'replenishBadness_nav',
+            script: "selectedOrder('');"
+        });
+        api.closeFrame();
+        return;
+      }
+
+      var template = document.getElementById('template');
+      var itemListDiv = document.getElementById('item_list');
+      var Pagefn = doT.template(template.text);
+      itemListDiv.innerHTML = Pagefn(itemList);
+      //重新解析tapmode
+      api.parseTapmode();
+
+     //  var depth = $util.getDepth(OrderList);
+     //  showSelector(OrderList,depth,function (flag,resualtModel) {
+     //    if (flag) {
+     //      OrderObj = resualtModel;
+     //      $api.setStorage('Order', resualtModel);
+     //      var OrderDiv =$api.byId('Order');
+     //      OrderDiv.innerHTML = resualtModel.WorkOrderNo;
+     //      $api.css(OrderDiv, 'color:#323232;');
+     //    }
+     //  });
+   }
+
+// =========================================
+
+   function selectItem(index) {
+     if (index < itemList.length) {
+       var orderItem = itemList[index];
+       api.execScript({
+           name: 'replenishBadness_nav',
+           script: "selectedOrder('"+JSON.stringify(orderItem)+"');"
+       });
+
+       api.closeFrame();
+     }
+   }
+
+   function hideMask() {
+     api.closeFrame();
+   }
+
+   function loadError() {
+     loadItemList(true);
+   }
+
+
+</script>
+</html>

@@ -1,0 +1,359 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style>
+    body{
+      margin: 0px;
+      padding: 0px;
+      background-color: #fff;
+      width: 100%;
+      height: 100%;
+    }
+
+    header{
+      background-color: #efefef;
+    }
+
+    #saveBtn{
+      width: 2.2rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+      border-radius: 0.15rem;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.6rem;
+    }
+
+    .saveBtnView{
+      height: 100%;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+
+    .itemView{
+      height: 100%;
+      padding-left: 1rem;
+    }
+
+    .selectItem{
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.7rem;
+      background:  url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color:#efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    input{
+      font-size: 0.7rem;
+    }
+
+    input[type="tel"]{
+      height: 1.4rem;
+      text-align: center;
+    }
+
+    #orderNumInput{
+    }
+
+    .inputView{
+      border: 1px solid #d9d9d9;
+      height: 1.4rem;
+      text-align: center;
+      border-radius: 0.15rem;
+    }
+
+    .detailData{
+      background-color: #eeeeee;
+      padding: 0.4rem 0rem;
+    }
+
+    .flex-wrap{ display: -webkit-box;	display: -webkit-flex;	display: flex; }
+    .flex-vertical{ -webkit-box-orient: vertical;-webkit-flex-flow: column;flex-flow: column;}
+
+    #badnessView{
+      overflow: hidden;
+      overflow-y:scroll;
+      flex: 1;
+      display: flex;
+    }
+
+    /* 设置滚动条的样式 */
+    ::-webkit-scrollbar {
+      width:0px;
+    }
+    /* 滚动条滑块 */
+    ::-webkit-scrollbar-thumb {
+      background:#fff;
+    }
+
+    #addBtn{
+      width: 1.5rem;
+      height: 1.5rem;
+      background-size: contain;
+      background:  url(../image/common/common_right_add_btn.png) no-repeat;
+      background-position: center;
+      background-size: 1.4rem;
+      position: absolute;
+      top: -0.5rem;
+      right: -0.5rem;
+    }
+
+    #badnessView :last-child .separate_line{
+      /* display: none; */
+    }
+    .operat{
+      padding: 0.3rem;
+      /*text-align: center;*/
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .badnessEmpty{
+      height: 9rem;
+      width: 100%;
+    }
+
+    .subtractBtn{
+      height: 1.2rem;
+      width: 1.2rem;
+      background-position: center;
+	    background-repeat: no-repeat;
+      background-size: 0.8rem;
+    }
+
+    .item_sub_wrap{
+      -webkit-line-clamp: 2;
+    }
+
+    .item_title{
+      width: 2.2rem;
+      font-size: 0.7rem;
+    }
+
+    .searchBtnView{
+      width: 6rem;
+    }
+
+    .searchBtn{
+      width: 3rem;
+      padding: 0.2rem 0.5rem;
+      text-align: center;
+      background-color: #1eb1ed;
+      border-radius: 0.15rem;
+      font-size: 0.7rem;
+      color: #fff;
+    }
+
+    .serial{
+      width: 2rem;
+      min-height: 1rem;
+    }
+
+    .SNNum{
+      width: 8.5rem;
+    }
+
+    .badnessName{
+      width: 4.6rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .orderNum{
+      width: 6rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .product{
+      width: 5.4rem;
+      /*overflow-x: scroll;*/
+    }
+
+    .line{
+      width: 3.2rem;
+    }
+
+    .operation{
+      width: 2.6rem;
+    }
+
+    .defectDate{
+      width: 6.4rem;
+    }
+
+    #item_list{
+
+    }
+    #emptyDiv{
+      height: 100%;
+    }
+
+    #badnessRecord{
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .selectItemView{
+      box-sizing: border-box;
+    }
+
+    input{
+      height: 1.4rem;
+    }
+    .closeBtn{
+      width: 1.4rem;
+      height: 1.4rem;
+      background:  url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-size: 0.7rem;
+    }
+
+    input::-webkit-input-placeholder {
+        line-height: 1.1rem;
+    }
+
+
+    #itemTitle{
+
+    }
+
+    #count{
+      width: 4rem;
+    }
+    #completeCount{
+      width: 4rem;
+    }
+
+    #template{
+      display:
+    }
+
+    .timeDiv{
+      width: 6rem;
+      text-align: center;
+    }
+
+    .statusView{
+      width: 3.5rem;
+      text-align: center;
+    }
+
+    .EqpCode{
+      width: 3rem;
+    }
+
+    .repair{
+      width: 5rem;
+    }
+
+    .selectItemView{
+      box-sizing: border-box;
+    }
+
+    .selectItem{
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.7rem;
+      background:  url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color:#efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    #orderInfo{
+      position: relative;
+    }
+
+
+    </style>
+
+</head>
+<body>
+    <header>
+      <i class="back" tapmode onclick="api.closeWin();"></i>
+      <div id="title">修理履历</div>
+    </header>
+
+    <section id="orderInfo" class="mt8">
+      <div class="item_row color_darkgray font_bold font_size_16 mt4 color_main">
+        <div class="font_size_16 color_main">工单：</div>
+        <div class="item_sub_left font_size_16 pr12 color_main" id="OrderNo"></div>
+      </div>
+
+      <div class="item_row item_sub_left font_bold font_size_16 mt8 pb10 color_main">
+        <div class="font_size_16 color_main">产品：</div>
+        <div class="item_sub_nowrap font_size_16 item_sub_left color_main" id="Product"></div>
+      </div>
+      <div class="separate_line"></div>
+    </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+
+
+<script type="text/javascript">
+    var startDate = '';
+    var endDate = '';
+
+    var OrderObj = null;
+    apiready = function(){
+        api.parseTapmode();
+        var header = $api.dom('header');
+
+        var orderInfo = $api.byId('orderInfo');
+        var offset = $api.offset(orderInfo);
+        var topY = offset.t+ offset.h+1;
+        height = api.winHeight- topY;
+
+        api.openFrame({
+            name: 'repairRecordList',
+            url:  'repairRecordList_frame.html',
+            rect: {
+              x: 0,
+              y: topY,
+              w: api.winWidth,
+              h: height
+            },
+            pageParam: api.pageParam,
+            softInputMode:'pan',
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: false,
+            hScrollBarEnabled: false,
+        });
+
+        fillOrderInfo();
+    };
+    function fillOrderInfo() {
+
+      var ProductDiv = $api.byId('Product');
+      ProductDiv.innerHTML = api.pageParam.Product;
+
+      var OrderNoDiv = $api.byId('OrderNo');
+      OrderNoDiv.innerHTML = api.pageParam.OrderNo;
+    }
+
+</script>
+</html>

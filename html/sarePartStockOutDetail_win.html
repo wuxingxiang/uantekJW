@@ -1,0 +1,227 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+      background-color: #f2f2f2;
+      width: 100%;
+      height: 100%;
+    }
+
+
+    #title:after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background: #dcdee3;
+      right: 0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }
+
+    #moreBtn {
+      width: 43px;
+      height: 44px;
+      line-height: 44px;
+      color: #1e8ae7;
+      text-align: right;
+      position: absolute;
+      bottom: 0px;
+      right: 16px;
+      /*background:  url(../image/common/common_right_add_btn.png) no-repeat;
+      background-position: center right;
+      background-repeat: no-repeat;
+      background-size: 15px;*/
+
+    }
+
+    #bottomView {
+      position: fixed;
+      bottom: 0px;
+      padding: 0.6rem 0px;
+      width: 100%;
+      box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .controlBtn {
+      height: 2rem;
+      line-height: 2rem;
+      border-radius: 1rem;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .controlBtn_bg_C {
+      background-color: #1eb1ed;
+    }
+
+    #bottomView:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #dcdee3;
+      right: 0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }
+
+    #saveBtn {
+      width: 2.2rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.6rem;
+    }
+
+    #saveBtnView {
+      width: 4.5rem;
+      height: 44px;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+
+    .btnView {
+      width: 60%;
+      padding: 0px 0.7rem;
+      box-sizing: border-box;
+      margin: auto;
+    }
+
+    #repair {
+      display: none;
+    }
+
+    #comfirmView {
+      display: flex;
+    }
+    
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <i class="back" tapmode onclick="api.closeWin();"></i>
+    <div id="title">备件出库</div>
+
+    <div class="item_row" id="rightButtonView">
+      <div class="rightButtonParent item_center" tapmode onclick="rightBtnClick();">
+        <div class="rightButton color_bg_darkgray">重置</div>
+      </div>
+    </div>
+  </header>
+
+  <section class="" id="bottomView">
+    <div class="item_row pl12 pr12">
+      <!-- <div class="btnView item_row">
+        <div class="controlBtn controlBtn_bg_C item_sub_center" onclick="printBtnClick();">打印标签</div>
+      </div> -->
+      <div class="btnView item_row">
+        <div class="controlBtn controlBtn_bg_C item_sub_center" onclick="submitBtnClick();" id="leftTapBtn">保存&出库</div>
+      </div>
+    </div>
+    <div class="separate_line_top"></div>
+  </section>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script//md5.js"></script>
+
+
+<script type="text/javascript">
+  var leftBtnType = 'Agree';
+  var Status = '';
+  var frameName = 'sarePartStockOutDetail';
+  apiready = function () {
+    api.parseTapmode();
+    var header = $api.dom('header');
+    // $api.fixStatusBar( $api.dom('header') );
+
+    var height = api.winHeight - header.offsetHeight;
+    var topY = header.offsetHeight;
+
+    var bottomView = $api.byId('bottomView');
+    var offset = $api.offset(bottomView);
+
+    var titleDiv = $api.byId('title');
+    api.openFrame({
+      name: frameName,
+      url: frameName + '_frame.html',
+      rect: {
+        x: 0,
+        y: topY,
+        w: api.winWidth,
+        h: height - offset.h
+      },
+      pageParam: api.pageParam,
+      bounces: false,
+      bgColor: 'rgba(255,255,255,1)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+
+    var btnView = $api.dom('.btnView');
+    if (btnView) {
+      var appType = api.getGlobalData({
+          key: 'APPTYPE'
+      });
+      
+      if (appType != 'PDA') {
+        $api.css(btnView,'width:35%');
+      }
+    }
+  };
+
+
+  function printBtnClick() {
+    api.execScript({
+      frameName: frameName,
+      script: "printBtnClick();"
+    });
+  }
+
+  function submitBtnClick(status) {
+    api.execScript({
+      frameName: frameName,
+      script: "submitBtnClick();"
+    });
+  }
+
+  function rightBtnClick(status) {
+    api.execScript({
+      frameName: frameName,
+      script: "rightBtnClick();"
+    });
+  }
+
+</script>
+
+</html>

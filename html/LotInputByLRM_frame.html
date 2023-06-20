@@ -1,0 +1,1014 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    .selectHintIcon {
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.15rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      padding-right: 0.8rem;
+      height: 1.6rem;
+      line-height: 1.6rem;
+      border-radius: 0.1rem;
+      text-align: center;
+    }
+
+    textarea {
+      height: 3.4rem;
+      width: 100%;
+      font-size: 0.7rem;
+      border: 1px solid #bdbdbd;
+      border-radius: 0.2rem;
+      text-align: left;
+      margin-top: 0.5rem;
+    }
+
+    input[type="tel"] {
+      border: 1px solid #d9d9d9;
+      height: 1.6rem;
+      line-height: 1.6rem;
+      text-align: center;
+      border-radius: 0.15rem;
+    }
+
+    #badnessContent {
+      width: 100%;
+    }
+
+    textarea {
+      /*caret-color:red;*/
+      /* 光标的颜色*/
+      text-shadow: 0px 0px 0px transparent;
+      /* 文本颜色 */
+    }
+
+    .wrapper {
+      height: 2.4rem;
+    }
+
+    .deleteBtn {
+      width: 60px;
+      background-color: #ff0000;
+      z-index: 1000;
+    }
+
+    .container {
+      height: 2.4rem;
+      padding: 0px 0rem;
+    }
+
+    #orderNumList {
+      position: absolute;
+      left: 0px;
+      top: 1.4rem;
+      right: 1.3rem;
+      background-color: #efefef;
+      z-index: 100;
+      border-bottom-left-radius: 0.2rem;
+      border-bottom-right-radius: 0.2rem;
+      overflow-y: scroll;
+      border: 1px solid #8c9098;
+      display: none;
+    }
+
+    .tapDownView {
+      height: 1.5rem;
+    }
+
+    .badness_item {
+      width: 20%;
+      height: 1.8rem;
+      margin: 0.5rem 0px;
+      padding: 0rem 0.6rem;
+      float: left;
+    }
+
+    .badness_title {
+      height: 2.2rem;
+      line-height: 2.2rem;
+      /*width: 100%;*/
+      background-color: #fff;
+      font-size: 0.8rem;
+      border-radius: 0.3rem;
+      text-align: center;
+    }
+
+    .active {
+      background-color: #d9d9d9;
+    }
+
+    .unifyDeleteBtn {
+      margin-left: 1rem;
+      border-radius: 0.2rem;
+      background-color: #1eb1ed;
+      color: #fff;
+      font-size: 0.6rem;
+      padding: 0.2rem 0.5rem;
+      text-align: center;
+    }
+
+    .selectedBtn {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 1rem;
+      height: 100%;
+      font-size: 0.5rem;
+      background-image: url(../image/common/common_select_bg_btn.png);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 0.8rem;
+    }
+
+    #orderNumInputView {
+      border: 1px solid #d9d9d9;
+      font-size: 0.7rem;
+      padding: 0px 3px;
+    }
+
+    #orderInfo {
+      z-index: 10000;
+    }
+
+    .addBtn {
+      width: 4rem;
+      height: 2.4rem;
+      background-image: url(../image/common/common_right_add_btn.png);
+      background-position: center right;
+      background-repeat: no-repeat;
+      -webkit-background-size: 1rem;
+      background-size: 1rem;
+    }
+
+    input[type="tel"] {
+      border: 1px solid #d9d9d9;
+      font-size: 0.7rem;
+      padding: 0px 3px;
+      width: 4rem;
+      height: 1.6rem;
+      line-height: 1.6rem;
+    }
+
+    #inputView {
+      border: 1px solid #d9d9d9;
+      height: 1.7rem;
+      border-radius: 0.15rem;
+      padding-left: 0.2rem;
+    }
+
+    #scanResualt {
+      height: 1.7rem;
+      line-height: 1.7rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      font-size: 0.7rem;
+    }
+
+    .tapDownBtn {
+      height: 100%;
+      width: 1rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center;
+      background-size: 0.6rem;
+      z-index: 10000;
+    }
+
+    #EqpNumInput {
+      position: absolute;
+      top: 0px;
+      left: 0.2rem;
+      right: 1rem;
+      bottom: 0rem;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    input[type="text"] {
+      height: 1.5rem;
+      line-height: 1.5rem;
+      text-align: center;
+      padding-right: 1.2rem;
+    }
+
+    input::-webkit-input-placeholder {
+      line-height: 1.6rem;
+    }
+
+
+
+    .selectItemView {
+      box-sizing: border-box;
+    }
+
+    .selectItem {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.7rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    #item_list {
+      height: 100%;
+      overflow-y: scroll;
+    }
+
+    .itemTitle {
+      width: 3.2rem;
+    }
+
+    .QueryBtn {
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.15rem;
+      font-size: 0.7rem;
+      background-color: #1eb1ed;
+      color: #fff
+    }
+
+    .leftTitle {
+      width: 2.2rem;
+    }
+  </style>
+</head>
+
+<body class="">
+
+  <section class="item_normal pt20">
+    <div class="item_row item_sub_left">
+      <div class="font_size_16 leftTitle">Lot</div>
+      <div class="item_normal item_sub_left inputView item_row">
+        <input id="lotInput" autofocus="autofocus" class='font_size_16' value="" type="text" placeholder="请输入/扫描Lot">
+        <div class="deleteIcon" onclick="deleteBtnClick();"></div>
+      </div>
+      <div class="QueryBtn ml20" onclick="loadItemInfo(false);">查询</div>
+    </div>
+  </section>
+
+  <section class="" id="orderInfo">
+    <div class="">
+      <div class="item_row item_sub_left mt16">
+        <div class="font_size_16 leftTitle">设备</div>
+        <div class="item_sub_right item_normal item_row" id="inputView">
+          <div id="scanResualt" class="color_gray font_size_14 item_sub_nowrap font_size_16 item_sub_left">请扫描设备二维码</div>
+          <!-- <div class="tapDownBtn"></div> -->
+
+          <input id="EqpNumInput" name='SNScan' autofocus="autofocus" class='item_sub_right font_size_16'
+            maxlength='300' value="" type="text" oninput="OnInput(event,this)" onclick='SNClick();' placeholder="">
+          <!-- <div tapmode class="tapView" onclick="tapDownBtnClick();"></div> -->
+          <!-- 请输入SN -->
+        </div>
+      </div>
+
+      <!-- <div class="item_row item_sub_left mt16">
+        <div class="font_size_16 leftTitle " id="title">工程</div>
+        <div class="selectItem item_sub_center color_darkgray" id="Process" onclick="itemSelect('Process')">请选择工程</div>
+      </div> -->
+    </div>
+
+    <!-- <div class="" id="selectedView">
+      <div class="item_row item_sub_left mt12">
+        <div class="font_size_16 mr12">不良代码</div>
+        <div class="item_sub_center selectItem" id="DefectType" tapmode onclick="itemSelect('DefectType')">请选择不良代码</div>
+      </div>
+    </div>
+
+    <div class="mt8">
+      <textarea id="Description" name="txt" clos=",50" rows="5" maxlength="200" warp="virtual"
+        placeholder="请输入备注（最多200字）"></textarea>
+    </div> -->
+  </section>
+
+  <section class="item_row item_center" id="bottomViewParent">
+    <div class="bottomView item_row" id="submitBtnView" style="width: 60%;">
+      <div class="bottomBtn color_bg_blue item_sub_center" onclick="UpLoadData();">提交</div>
+    </div>
+    <div class="separate_line_top"></div>
+  </section>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+  var lotModel = null;
+
+  var ProcessObj = { "Key": "1e3fe3f0-be96-4fdb-8506-c442ceb5407f", "Value": "GC8003-阻值测量", "Code": "GC8003" };
+  var ProcessArr = [];
+
+  var EqupmentObj = {"CompleteQty":0,"Id":"3e9b781e-30c2-4ecd-b997-a3450ba54f5f","EqpCode":"RM01","EqpName":"RM01","OrderNo":null,"Status":"未知"};
+
+  var isLoading = false;
+
+  var hasShow = false;
+  var canTap = true;
+
+  var eqpArr = new Array;
+
+  var hasUpload = false;
+
+  apiready = function () {
+    isLoading = false;
+    var body = $api.dom('body');
+    keybordTap();
+
+    var btnView = $api.byId('submitBtnView');
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType != 'PDA') {
+      $api.css(btnView, 'width:35%');
+    }
+    // fillProcess();
+    fillEqpInfo();
+  }
+
+  function initEventListenner() {
+    api.addEventListener({
+      name: 'tap'
+    }, function (ret, err) {
+      console.log(222);
+    });
+  }
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#lotInput').bind('keyup', function (event) {
+      console.log(JSON.stringify(event.target.value));
+      var currentScanStr = '';
+      if (event.keyCode == "13") {
+        loadItemInfo(true);
+      }
+    });
+
+    //回车事件绑定
+    $('#EqpNumInput').bind('keyup', function (event) {
+      var currentScanStr = '';
+      var scanResualt = $api.byId('scanResualt');
+      if (event.keyCode == "13") {
+        if (event.target.value && event.target.value.length > 0) {
+
+          var scanStr = event.target.value;
+          console.log(JSON.stringify(scanStr));
+          event.target.value = '';
+
+          currentInput = currentScanStr;
+          loadEqpInfo(scanStr);
+        }
+      } else {
+        var appType = api.getGlobalData({
+          key: 'APPTYPE'
+        });
+        if (appType == 'PDA') {
+          if (this.value.length == 1) {
+            this.value = '';
+          }
+        }
+      }
+    });
+  }
+
+  function loadItemInfo(scan) {
+    var lotInput = $api.byId('lotInput');
+    if ($util.isEmpty(lotInput.value)) {
+      api.toast({
+        msg: '请输入/扫描Lot',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var parDic = lotInput.value;
+    lotInput.value = '';
+
+    isLoading = true;
+    GetLotInfo(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data) {
+          lotModel = ret.data;
+          fillItemInfo();
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadItemArr(itemType, callBack) {
+    var parDic = itemType;
+    GetSeletItemList(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.Value;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: '暂无数据',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadFacilityArr(callBack) {
+    var parUrl = {
+      Code: "AssemblyLine"
+    };
+
+    GetMap(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.data.length > 0) {
+          var tempArr = ret.data.data;
+          FacilityArr = tempArr;
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: '暂无数据',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadEqpInfo(scanStr) {
+    var parDic = scanStr;
+    isLoading = true;
+    // var parUrl = '&EqpId='+scanStr;
+    GetEqpInfo(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data) {
+          EqupmentObj = ret.data;
+          fillEqpInfo();
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadDefectcodeList(callBack) {
+    var parUrl = '';
+    Getdefectcodelist(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          callBack(ret.data);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UpLoadData() {
+    if (!lotModel) {
+      api.toast({
+        msg: '请输入/扫描Lot',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (!EqupmentObj) {
+      api.toast({
+        msg: '请扫描选择设备',
+        duration: 1500,
+        location: 'middle',
+      });
+      return;
+    }
+    var userInfo = $api.getStorage('userInfoJW');
+    console.log(JSON.stringify(userInfo))
+    var parDic = {
+      LotName: lotModel.LotName,
+      ProcessCodeR: lotModel.CurrentProcessCode?lotModel.CurrentProcessCode:"GC8000",
+      ProcessCode:lotModel.ProcessCode?lotModel.ProcessCode:'GC8003',
+      Operator: userInfo.workerCode,
+      EqupmentCode: EqupmentObj.EqpCode
+    }
+
+    LotInputLRM(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      var hint = '作业失败';
+      if (ret.data) {
+        if (ret.data.resresult == 'OK') {
+          cleanItemInfo();
+        }
+
+        if (ret.data.resvalue) {
+          hint = ret.data.resvalue;
+        }
+      }
+
+      api.toast({
+        msg: hint,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+      api.hideProgress();
+    }, function (err) {
+      api.toast({
+        msg: '作业失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+
+  // =============逻辑处理============================
+  function refreshDefect() {
+
+    var template = document.getElementById('badnessTemplate');
+    var itemListDiv = document.getElementById('badnessItemView');
+    var Pagefn = doT.template(template.text);
+    itemListDiv.innerHTML = Pagefn(commonDefectArr);
+    //重新解析tapmode
+    api.parseTapmode();
+  }
+
+  function selectBadnessItem(index) {
+    event.stopPropagation();
+  }
+
+  function tapDownBtnClick() {
+    event.stopPropagation();
+
+    api.openWin({
+      name: 'eqpSelectedList_nav',
+      url: 'eqpSelectedList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName: api.winName,
+        frameName: api.frameName
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+    // itemSelect('Eqp');
+  }
+
+  // ==========数据填充===========================
+  function selectedItem(itemStr) {
+    var tempItem = JSON.parse(itemStr);
+    if (tempItem) {
+      EqupmentObj = tempItem;
+      fillEqpInfo();
+    }
+  }
+
+  function cleanItem(itemNode, hintText) {
+    var itemNodeDiv = $api.byId(itemNode);
+    itemNodeDiv.innerHTML = hintText;
+    $api.css(itemNodeDiv, 'color:#8c9098;');
+  }
+
+  function fillItemInfo() {
+    var lotInput = $api.byId('lotInput');
+    lotInput.value = lotModel.LotName;
+  }
+
+  function cleanItemInfo() {
+    lotModel = null;
+    var lotInput = $api.byId('lotInput');
+    lotInput.value = '';
+
+    // ProcessObj = null;
+    // cleanItem('Process', '请选择工程');
+
+    // EqupmentObj = null;
+    // cleanItem('scanResualt', '请扫描设备二维码');
+  }
+
+  function fillProcess() {
+    var ProcessDiv = $api.byId('Process');
+    ProcessDiv.innerHTML = ProcessObj.name;
+    $api.css(ProcessDiv, 'color:#323232;');
+  }
+
+  function fillEqpInfo() {
+    var scanResualt = $api.byId('scanResualt');
+    $api.css(scanResualt, 'color:#323232;');
+    scanResualt.innerHTML = EqupmentObj.EqpName;
+  }
+
+  // ================点击=========================
+  function SNClick() {
+
+    var input = $api.byId('EqpNumInput');
+    input.focus();
+    $api.attr(input, 'readOnly', true);
+    setTimeout(function () {
+      input.removeAttribute("readOnly")//延迟移除readonly属性
+    }, 30);
+  }
+
+  function tapDownBtnClick() {
+    event.stopPropagation();
+    api.openWin({
+      name: 'eqpSelectedList_nav',
+      url: 'eqpSelectedList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName: api.winName,
+        frameName: api.frameName,
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+    //  itemSelect('Eqp');
+  }
+
+  function itemSelect(itemType) {
+    switch (itemType) {
+      case 'DefectType':
+        {
+          if (DefaultArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              DefaultArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(DefaultArr, function (flag, tempModel) {
+            if (flag == true) {
+              var itemTypeDiv = $api.byId(itemType);
+              itemTypeDiv.innerHTML = tempModel.Value;
+              $api.css(itemTypeDiv, 'color:#323232;');
+              DefaultObj = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'Process':
+        {
+          if (ProcessArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              ProcessArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(ProcessArr, function (flag, tempModel) {
+            if (flag == true) {
+              ProcessObj = tempModel;
+              fillProcess();
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function sortDefect(items) {
+    if (items.length > 0) {
+      commonDefectArr = items;
+      commonDefectArr.sort(function (a, b) {
+        a.selected = false;
+        return a.Seq - b.Seq
+      });
+    }
+  }
+
+  // =========================================
+  function onInputChange(el, index) {
+    if (!el.value.match(/^[\+\-]?\d*?\.?\d*?$/)) {
+      if (!el.t_value) {
+        el.t_value = '';
+      }
+      el.value = el.t_value;
+    } else {
+      if (!el.value || el.value.match(/^[\+\-]?\d*?\.?\d*?$/)) {
+        el.t_value = el.value;
+      }
+    }
+
+    if (el.value.match(/^(?:[\+\-]?\d+(?:\.\d+)?)?$/)) el.o_value = el.value;
+  }
+
+  function inputEnd(tag, index) {
+    if ($util.isEmpty(tag.value) || !$util.isIntNum(tag.value) || !tag.value || tag.value <= 0) {
+      console.log($util.isIntNum(tag.value));
+      console.log(tag.value);
+
+      tag.value = 1;
+    }
+
+    itemList[index].DefectQty = tag.value;
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function OnInput(event, tag) {
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+    if (appType == 'PDA') {
+      if (event.target.value.length == 1) {
+        event.target.value = '';
+      }
+    }
+  }
+
+  function onOrderInputChange(tag) {
+
+  }
+
+  function touchstartF(event) {
+    $slideDelete.touchstartF(event);
+  };
+
+  function touchmoveF(event, e) {
+    canSelected = false;
+    $slideDelete.touchmoveFWithLeft(event, e, -80);
+  };
+
+
+  function toDelete(index, event, tag) {
+
+    if (itemList.length > index) {
+      itemList.splice(index, 1);
+      $upRefresh.analysisData(itemList, itemList);
+    }
+
+  }
+
+  function selectDefect(tag, index) {
+    event.stopPropagation();
+
+    if (itemList.length <= index) {
+      return;
+    }
+
+    if (DefectArr.length <= 0) {
+      loadDefectcodeList(function (itemArr) {
+        //  DefectArr = itemArr;
+        //  itemArr.forEach(function (val, index, arr) {
+        //    val.name = val.DefectName;
+        //  });
+
+        DefectArr = $util.parseTreeData(itemArr, 'DefectId', 'ParentId', '0', 'DefectName');
+        //  sortDefect(DefectArr);
+
+        console.log(JSON.stringify(DefectArr));
+
+        if (DefectArr.length > 0) {
+          selectDefect(tag, index);
+        }
+      });
+      return;
+    }
+
+    var depth = $util.getDepth(DefectArr);
+    console.log(depth);
+
+    showSelector(DefectArr, depth, function (flag, defectModel) {
+      if (flag) {
+        if (tag) {
+          itemList[index].DefectCode = defectModel.DefectCode;
+          itemList[index].DefectName = defectModel.DefectName;
+          itemList[index].DefectId = defectModel.DefectId;
+          $upRefresh.analysisData(itemList, itemList);
+        }
+      }
+    });
+
+  }
+
+  function showSelector(tempArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: tempArr,
+      layout: {
+        row: 6,
+        col: 1,
+        height: 48,
+        size: 14,
+        sizeActive: 14,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempName = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          var index = ret.selectedInfo.length;
+          tempModel = ret.selectedInfo[index - 1];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+    });
+  }
+
+  function addBtnClick() {
+    var tempItem = {
+      DefectId: '',
+      DefectName: '请选择不良项目',
+      DefectQty: 1
+    }
+    itemList.push(tempItem);
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function deleteBtnClick() {
+    var lotInput = $api.byId('lotInput');
+    lotInput.value = '';
+  }
+
+  function rightBtnClick() {
+    cleanItemInfo();
+  }
+
+  function saveBtnClick() {
+    UpLoadData();
+  }
+
+  function loadError() {
+    loadItemList(true);
+  }
+
+</script>
+
+</html>

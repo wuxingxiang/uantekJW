@@ -1,0 +1,310 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    .order_item {
+      padding: 0.5rem 0px;
+      position: relative;
+    }
+
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .detailData {
+      padding: 0.5rem 0.3rem;
+      position: relative;
+    }
+
+    .status {
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #9d9d9d;
+      font-size: 0.6rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section id="item_list">
+
+  </section>
+  <!-- <div class="status">{{=value.StatusName}}</div> -->
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+      <div class="font_size_14 order_item">
+        <div class="font_size_14">
+          <div class="item_row">
+            <div class="item_sub_left item_sub_nowrap font_size_16 mr6">{{=value.SpareName}}</div>
+          </div>
+          <div class="item_row color_darkgray mt6">
+            <div class="item_row color_darkgray item_sub_left mr4">
+              <div class="">SN：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.BarcodeNo}}</div>
+            </div>
+            <div class="item_row color_darkgray item_sub_left ml4" style='flex:0.9;'>
+              <div class="">类型：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.SpareTypeName}}</div>
+            </div>
+          </div>
+
+          <div class="item_row color_darkgray mt8">
+            <div class="item_sub_right">入库时间：</div>
+              <div class="item_sub_nowrap">{{=value.CreationTime}}</div>
+          </div>
+        </div>
+        <div class="separate_line"></div>
+      </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefreshMore.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var PageNum = 1;
+  var PageSize = 20;
+  var itemList = [];
+
+  var SpareTypeId = '';
+  var SpareTypeName = '';
+
+  var startDate = '';
+  var endDate = '';
+
+  var Material = '';
+  var SN = '';
+
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无数据');
+    $showErrorDiv.addErrorHtml(body);
+    $upRefresh.analysisData(itemList, itemList);
+
+    initEventListenner();
+    // setdate();
+    loadItemList();
+    // addTemplate();
+  }
+
+  function addTemplate() {
+    var template = $api.byId('template');
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+    if (appType != 'PDA') {
+      var html =
+        '{{~it:value:index}}' +
+        '<div class="item_row font_size_14 order_item detailData" onclick="itemClick({{=index}});">' +
+        '<div class="item_sub_left pl6">{{=value.OrderNo}}</div>' +
+        '<div class="item_sub_left pl4 pr4">{{=value.Product}}</div>' +
+        '<div class="item_sub_center pl4 pr4">{{=value.Process}}</div>' +
+        '<div class="align_center pl4 pr4" id="count">{{=value.Qty}}</div>' +
+        '<div class="align_center pl4 pr4" id="completeCount">{{=value.CompleteQty}}</div>' +
+        '<div class="timeDiv pl4">{{=value.PlanDate}}</div>' +
+        '<div class="statusView color_main pl4">{{=value.StatusName}}</div>' +
+        '<div class="separate_line"></div>' +
+
+        '</div>' +
+        '{{~}}';
+
+      template.innerHTML = html;
+    }
+
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+        loadItemList();
+        api.refreshHeaderLoadDone();
+      }, 400);
+    });
+  }
+
+
+  function loadItemList() {
+    PageNum = 1;
+    var parDic = {
+      SpareName: SpareTypeName,
+      SpareTypeId: SpareTypeId,
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+
+    SpareStockListGet(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      itemList = [];
+      if (ret.code == 200) {
+        if (ret.data) {
+          itemList = ret.data;
+        }
+        $upRefresh.analysisData(itemList, itemList);
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadMoreItemList() {
+    $upRefresh.loadMoreHeader();
+    api.refreshHeaderLoadDone();
+
+    PageNum++;
+    var parDic = {
+      SpareName: SpareTypeName,
+      SpareTypeId: SpareTypeId,
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+
+    SpareStockListGet(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          itemList = itemList.concat(ret.data);
+        }
+        $showErrorDiv.loadSucceed();
+        $upRefresh.analysisData(ret.data, itemList);
+      } else {
+        PageNum--;
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      PageNum--;
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  // ================数据处理=========================
+  function setSN(_SN) {
+    SN = _SN
+  }
+
+  function setSpareName(_SpareTypeName) {
+    SpareTypeName = _SpareTypeName;
+  }
+
+  function setLocationId(_LocationId) {
+    LocationId = _LocationId;
+  }
+
+  function setWarehouseId(_WarehouseId) {
+    WarehouseId = _WarehouseId;
+  }
+
+  function setOrderNum(_OrderNum) {
+    OrderNum = _OrderNum;
+  }
+
+  function setSpareTypeId(_StockTypeId) {
+    SpareTypeId = _StockTypeId;
+  }
+
+  // ================点击事件=========================
+
+  function saveBtnClick() {
+    loadItemList();
+  }
+
+  function itemClick(index) {
+    var itemModel = itemList[index];
+    api.openFrame({
+      name: 'sarePartSNDetail',
+      url: 'sarePartSNDetail_frame.html',
+      rect: {
+        marginTop: 0, // main页面距离win顶部的高度
+        marginBottom: 0, // main页面距离win底部的高度
+        w: 'auto' // main页面的宽度 自适应屏幕宽度
+      },
+      reload:true,
+      pageParam: itemModel,
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0.3)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+
+</html>

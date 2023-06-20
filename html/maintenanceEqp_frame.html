@@ -1,0 +1,638 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/addPhotos.css" />
+
+
+  <style type="text/css">
+    html,
+    body {
+      min-height: 100%;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    body {
+      background-color: #fff;
+      padding-bottom: 0.5rem;
+    }
+
+    .selectItem {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.8rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    .statusBtn {
+      padding: 0.1rem 0.3rem;
+      padding-top: 0.2rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.6rem;
+      min-width: 1.8rem;
+      text-align: center;
+      display: none;
+    }
+
+    textarea {
+      height: 5rem;
+      width: 100%;
+      padding: 2px 3px;
+      font-size: 0.8rem;
+      border: 1px solid #d9d9d9;
+      border-radius: 0.2rem;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.8rem;
+      padding: 2px 3px;
+    }
+
+    #image_show {
+      display: flex;
+      flex-flow: wrap row;
+    }
+
+    .selectIcon {
+      width: 1.5rem;
+      height: 1.5rem;
+      background: url(../image/common/common_unSelected_icon.png) no-repeat;
+      background-position: center;
+      background-size: 0.9rem;
+      margin-bottom: 0.1rem
+    }
+
+    .selected {
+      background-image: url(../image/common/common_select.png);
+    }
+
+    .unSelected {
+      background-image: url(../image/common/common_unSelected_icon.png);
+    }
+  </style>
+</head>
+
+<body>
+  <section>
+    <div class="item_row pt20" style="">
+      <div class="leftTitle font_size_16" id="title">设备：</div>
+      <div class="item_sub_left font_size_16 pr8 color_darkgray" id="EqpDiv"></div>
+      <div class="statusBtn" id="Status"></div>
+    </div>
+
+    <div class="item_row mt8" style="">
+      <div class="font_size_16 leftTitle" id="title">故障类型：</div>
+      <div class="font_size_16 item_sub_left item_sub_nowrap color_darkgray" id="fault"></div>
+    </div>
+
+    <div class="item_row mt8" style="">
+      <div class="font_size_16 leftTitle" id="title">紧急程度：</div>
+      <div class="font_size_16 item_sub_left item_sub_nowrap color_darkgray" id="Urgent"></div>
+    </div>
+
+    <div id="images_show">
+      <div class="image_list_title font_size_14">故障图片</div>
+      <div id="imagesView_show" class="image_lists pb8">
+      </div>
+    </div>
+
+    <div class="item_row mt8" style="align-items: flex-start;">
+      <div class="font_size_16" id="title">故障描述：</div>
+      <div class="font_size_16 item_sub_left color_darkgray" id="description"></div>
+    </div>
+
+    <div class="item_row mt12" style="align-items: flex-start;">
+      <div class="font_size_14 item_sub_right color_gray" id="title">报修时间：</div>
+      <div class="font_size_14 color_gray " id="RepairTime"></div>
+    </div>
+  </section>
+
+  <!-- <section class="item_row mt8">
+    <div class="font_size_16">处理：</div>
+    <div class="item_row mr16"  onclick="selectItemClick('R');">
+      <div class="item_title font_size_16">维修记录</div>
+      <div id='repair' class="selectIcon selected"></div>
+    </div>
+
+    <div class="item_row font_size_16 pl20" onclick="selectItemClick('S');">
+      <div class="font_size_16">维修完成</div>
+      <div id='discard' class="selectIcon unSelected"></div>
+    </div>
+  </section> -->
+
+  <section class="mt20" id="descView">
+    <div class="font_size_16 leftTitle mb4" id="title">备注</div>
+    <div class="item_row">
+      <textarea id="descInput" class="item_sub_left" name="txt" clos=",50" rows="5" maxlength="100" warp="virtual"
+        placeholder="请入最多100个字内的描述"></textarea>
+      <div class="separate Hide" style="flex: 0.6;"></div>
+    </div>
+  </section>
+
+  <section id="image_content">
+    <div class="image_list_title">上传图片（最多9张）</div>
+    <div id="imagesView_take" class="image_lists">
+
+    </div>
+  </section>
+
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/photosGet.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+
+<script type="text/javascript">
+  var pictures = new Array;
+  var pictures_show = new Array;
+  var RepairObj = null;
+
+  var currentSelectType = 'R';
+  var hasUpload = false;
+  apiready = function () {
+    var body = $api.dom('body');
+    $showErrorDiv.addErrorHtml(body);
+    betrothScreen();
+    loadRepairInfo();
+  };
+
+  function betrothScreen() {
+
+    var separateView = $api.dom('.separate');
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType != 'PDA') {
+      separateView.style.display = 'block';
+      var imagesView = $api.byId('image_content');
+      imagesView.style.display = 'none';
+    } else {
+      var body = $api.dom('body');
+      var imagesNode = $api.byId('imagesView_take');
+      $photosGet.addPhotoHtml(body, imagesNode);
+    }
+  }
+
+  function fillInfo() {
+    if (!RepairObj) {
+      return;
+    }
+    var EqpDiv = $api.byId('EqpDiv');
+    EqpDiv.innerHTML = RepairObj.EqpCode;
+
+    var Urgent = $api.byId('Urgent');
+    Urgent.innerHTML = RepairObj.UrgentLevel;
+
+    console.log(JSON.stringify(RepairObj));
+
+    var status = $api.byId('Status');
+    var statusStr = '待确认';
+    switch (RepairObj.Status) {
+      case 'Repair':
+        {
+          statusStr = '待确认';
+        }
+        break;
+      case 'Reject':
+        {
+          statusStr = '已驳回';
+        }
+        break;
+      case 'Agree':
+        {
+          statusStr = '已确认';
+        }
+        break;
+      case 'Working':
+        {
+          statusStr = '维修中';
+        }
+        break;
+      case 'Finish':
+        {
+          statusStr = '已维修';
+        }
+        break;
+      default:
+        {
+          statusStr = '待确认';
+        }
+        break;
+    };
+
+    status.innerHTML = statusStr;
+    status.style.display = 'block';
+    if (RepairObj.Status == 'Reject' || RepairObj.Status == 'Finish') {
+      $api.css(status, 'color:#323232;background-color:#d9d9d9;');
+    } else {
+      $api.css(status, 'color:#fff;background-color:#f94d7e;');
+    }
+
+    if (RepairObj.FaultTypeName) {
+      var fault = $api.byId('fault');
+      fault.innerHTML = RepairObj.FaultTypeName;
+    }
+
+    if (RepairObj.FaultContent) {
+      var description = $api.byId('description');
+      description.innerHTML = RepairObj.FaultContent;
+    }
+
+    if (RepairObj.RepairTime) {
+      var RepairTime = $api.byId('RepairTime');
+      RepairTime.innerHTML = RepairObj.RepairTime;
+    }
+
+    var images_show = $api.byId('images_show');
+
+    if (RepairObj.ImageList && RepairObj.ImageList.length > 0) {
+
+      pictures_show = RepairObj.ImageList;
+      var body = $api.dom('body');
+      var imageNode_show = $api.byId('imagesView_show');
+      $photosGet.addShowPhotoHtml(body, imageNode_show);
+      $photosGet.refreshImageView_Show(pictures_show);
+    } else {
+      images_show.style.display = 'none';
+    }
+
+    var image_content = $api.byId('image_content');
+    if (RepairObj.Status == 'Reject' || RepairObj.Status == 'Finish' || !RepairObj.Status) {
+      image_content.style.display = 'none';
+      var descView = $api.byId('descView');
+      descView.style.display = 'none';
+    } else {
+      var appType = api.getGlobalData({
+        key: 'APPTYPE'
+      });
+      if (appType == 'PDA') {
+        image_content.style.display = 'block';
+      }
+    }
+
+    api.execScript({
+      name: 'maintenanceEqp_nav',
+      script: "setStatus('" + RepairObj.Status + "');"
+    });
+
+  }
+
+  function loadRepairInfo() {
+    var parDic = api.pageParam.RepairId;
+    GetEqpRepairInfo(parDic, function (ret) {
+      if (ret.code == 200) {
+        RepairObj = ret.data;
+        fillInfo();
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+
+  function ComfirmRepair(tapType) {
+    var description = $api.byId('descInput');
+
+    var parDic = {
+      RepairId: RepairObj.RepairId,
+      Status: tapType,
+      Content: description.value
+    }
+
+    ConfirmEqpRepair(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        api.execScript({
+          name: 'maintenanceList_nav',
+          frameName: 'maintenanceList',
+          script: 'loadItemList();'
+        });
+
+        if (tapType == 'Reject') {
+          setTimeout(function () {
+            api.closeWin();
+          }, 600);
+
+          api.toast({
+            msg: '驳回成功',
+            duration: 1500,
+            location: 'middle',
+            global: true
+          });
+        } else if (tapType == 'Agree') {
+          api.toast({
+            msg: '确认完成',
+            duration: 1500,
+            location: 'middle'
+          });
+
+          description.value = '';
+          pictures = [];
+          loadRepairInfo();
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+
+    });
+  }
+
+
+  function UploadData(tapType) {
+
+    api.showProgress({
+      title: '数据上传中...',
+      modal: true
+    });
+
+    var description = $api.byId('descInput');
+    var parDic = {
+      EqpId: RepairObj.EqpId,
+      RepairId: RepairObj.RepairId,
+      OperateType: tapType,
+      OperateContent: description.value,
+      imageList: pictures,
+    }
+
+    PostEqpRepairs(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      api.execScript({
+        name: 'maintenanceList_nav',
+        frameName: 'maintenanceList',
+        script: 'loadItemList();'
+      });
+
+      if (ret.code == 200) {
+        setTimeout(function () {
+          api.closeWin();
+        }, 600);
+
+        hasUpload = true;
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+      api.hideProgress();
+
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+
+    });
+  }
+  // ===================逻辑处理===========================
+  function refreshLeftBtn() {
+    api.execScript({
+      name: 'maintenanceEqp_nav',
+      script: 'refreshLeftBtn();'
+    });
+  }
+  // ===================点击事件===========================
+
+  function chooseItemType() {
+    var winName = 'faultTypeList_nav';
+    var url = 'faultTypeList_win.html';
+
+    var type = api.pageParam.type;
+    switch (type) {
+      case 'fualt':
+        {
+          winName = 'faultTypeList_nav';
+          url = 'faultTypeList_win.html';
+        }
+        break;
+      case 'loss':
+        {
+          winName = 'standbyTypeList_nav';
+          url = 'standbyTypeList_win.html';
+        }
+        break;
+      case 'unknow':
+        {
+          winName = 'unKnowTypeList_nav';
+          url = 'unKnowTypeList_win.html';
+        }
+        break;
+      default:
+        {
+        }
+        break;
+    }
+
+    api.openWin({
+      name: winName,
+      url: url,
+      bgColor: '#ffffff',
+      pageParam: {
+        winName: 'commontItemDetail_nav',
+        frameName: 'commontItemDetail',
+        type: 'select',
+        code: currenTypeCode
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right',
+        duration: 300
+      }
+    });
+  }
+
+  function changeType(typeStr) {
+    var typeObj = JSON.parse(typeStr);
+    if (typeObj) {
+
+      currenTypeCode = typeObj.code;
+      var typeValueDiv = $api.byId('typeValue');
+
+      $api.css(typeValueDiv, 'color:#10131b');
+
+      typeValueDiv.innerHTML = typeObj.name;
+      currenTypeName = typeObj.name;
+    }
+  }
+
+  function addPhoto() {
+    api.actionSheet({
+      cancelTitle: '取消',
+      buttons: ['拍照', '从相册选择']
+    }, function (ret, err) {
+      if (ret) {
+        if (ret.buttonIndex == 1) {
+          $photosGet.takePhoto(pictures);
+        } else if (ret.buttonIndex == 2) {
+          $photosGet.pickPhoto(pictures);
+        }
+      }
+    });
+  }
+
+  function deleteImage(index) {
+    event.stopPropagation();
+
+    $photosGet.deleteImage(pictures, index);
+  }
+
+  function previewImage(index) {
+    event.stopPropagation();
+    $photosGet.previewImage(pictures, index);
+  }
+
+  function previewImage_show(index) {
+    $photosGet.previewImage(pictures_show, index);
+  }
+
+  function selectItemClick(tapType) {
+    currentSelectType = tapType;
+    var repairDiv = $api.byId('repair');
+    var discardDiv = $api.byId('discard');
+
+    switch (tapType) {
+      case 'R':
+        {
+          if ($api.hasCls(discardDiv, 'selected')) {
+            $api.removeCls(discardDiv, 'selected');
+            $api.addCls(discardDiv, 'unSelected');
+          }
+
+          if ($api.hasCls(repairDiv, 'unSelected')) {
+            $api.removeCls(repairDiv, 'unSelected');
+          }
+          $api.addCls(repairDiv, 'selected');
+        }
+        break;
+      case 'S':
+        {
+          if ($api.hasCls(repairDiv, 'selected')) {
+            $api.removeCls(repairDiv, 'selected');
+            $api.addCls(repairDiv, 'unSelected');
+          }
+
+          if ($api.hasCls(discardDiv, 'unSelected')) {
+            $api.removeCls(discardDiv, 'unSelected');
+          }
+          $api.addCls(discardDiv, 'selected');
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function controlBtnClick(tapType) {
+
+    var description = $api.byId('descInput');
+
+    if (!description.value) {
+      api.toast({
+        msg: '请输入维修内容',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (hasUpload == true) {
+      return;
+    }
+
+    uploadFileToLocatServer(pictures, 'EQM', function (updataSuccee) {
+      if (updataSuccee) {
+        UploadData(tapType);
+      } else {
+        api.hideProgress();
+        api.toast({
+          msg: '上传图片失败,请重试',
+          duration: 1000,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function rightBtnClick() {
+    console.log(JSON.stringify(RepairObj));
+    if (!RepairObj.MaintenaceRecordList || RepairObj.MaintenaceRecordList.length <= 0) {
+      api.toast({
+        msg: '暂无维修记录',
+        duration: 1500,
+        location: 'middle'
+      });
+
+      return;
+    }
+    api.openWin({
+      name: 'maintenanceRecordList_nav',
+      url: 'maintenanceRecordList_win.html',
+      slidBackEnabled: false,
+      pageParam: RepairObj,
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function comfirmBtnClick() {
+    api.sendEvent({
+      name: 'formReset',
+      extra: formSetObj
+    });
+    api.closeWin();
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+</script>
+
+</html>

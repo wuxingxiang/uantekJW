@@ -1,0 +1,446 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    #emptyDiv {
+      height: 100%;
+    }
+
+    .wrapper {
+      height: auto;
+      min-height: 2rem;
+    }
+
+    .deleteBtn {
+      width: 60px;
+    }
+
+    .container {
+      height: auto;
+    }
+
+    .item_title {
+      padding: 0.3rem 0.8rem;
+    }
+
+    .list_item {
+      padding: 0.5rem 0.8rem;
+    }
+
+    .separate_line {
+      left: 0.8rem;
+      right: 0.8rem;
+    }
+
+    .Qty {
+      width: 4rem;
+    }
+
+    .packTime {
+      width: 7rem;
+      text-align: center;
+    }
+
+    .Operator {
+      width: 7rem;
+      text-align: center;
+      font-size: 0.7rem;
+    }
+
+    .Qty {
+      width: 5rem;
+      text-align: center;
+      font-size: 0.7rem;
+    }
+
+    .timeDiv {
+      width: 8rem;
+    }
+
+    .separate_line{
+      left: 0.8rem;
+      right: 0.8rem;
+    }
+
+    #emptyDiv{
+      height: 80%;
+    }
+
+  .titleView{
+	  padding: 0.3rem 0.3rem;
+	  background-color: #efefef;
+  }
+
+  .list_sub_item{
+    padding: 0.3rem 0.3rem;
+  }
+
+  .Unit{
+    width: 2.5rem;
+  }
+
+  .BoxUnit{
+    width: 3.2rem;
+  }
+  .packTimeBox{
+    width: 7.65rem;
+  }
+  
+  </style>
+</head>
+
+<body>
+
+  <div id="item_list">
+
+  </div>
+
+  <script id="template" type="text/x-dot-template">
+  
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+  var LotName = '';
+  var CurrentIndex = 1;
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无数据');
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function deleteSNItem(index, tag) {
+    var tempModel = itemList[index];
+    var parDic = {
+      WorkOrderNo: WorkOrderNo,
+      LabelNo: tempModel.SN
+    };
+    DeleteSN(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        itemList.splice(index, 1);
+        $upRefresh.analysisData(itemList, itemList);
+        api.execScript({
+          name: 'MaterialUnison_nav',
+          script: 'deleteSNItem(' + index + ')'
+        })
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+
+  function setPartsPADTemplate() {
+    var template = $api.byId('template');
+    var html =
+      '<div class="item_row item_title color_bg_blue color_whith">' +
+      '<div class="item_sub_left" style="flex: 0.8;">不良类型</div>' +
+      '<div class="item_sub_center"  style="flex: 0.6;">不良code</div>' +
+      '<div class="item_sub_center timeDiv">时间</div>' +
+      '<div class="item_sub_left">备注</div>' +
+      '</div>' +
+      '{{~it:value:index}}' +
+      '<div class="item_row list_item pl6 pr6">' +
+      '<div class="item_sub_left" style="flex: 0.8;">{{=value.DefectName}}</div>' +
+      '<div class="item_sub_center" style="flex: 0.6;">{{=value.DefectCode}}</div>' +
+      '<div class="item_sub_center timeDiv">{{=value.CreateDate}}</div>' +
+      '<div class="item_sub_left">{{=value.Description}}</div>' +
+      '<div class="separate_line"></div>' +
+      '</div>' +
+      '{{~}}';
+    template.innerHTML = html;
+  }
+
+
+  function setPartsPDATemplate() {
+    var template = $api.byId('template');
+    var html =
+      '{{~it:value:index}}' +
+        '<div class="container list_item">' +
+          '<div class="item_row" style="align-items: flex-start;">' +
+            '<div class="item_sub_left font_size_16">{{=value.DefectName}}</div>' +
+          '</div>' +
+          '<div class="item_row color_darkgray font_size_14 mt4">' +
+            '<div class="item_row color_darkgray font_size_14 item_sub_left mr4">' +
+              '<div class="font_size_14">不良code：</div>' +
+              '<div class="item_sub_nowrap item_sub_left">{{=value.DefectCode}}</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="item_row color_darkgray font_size_14 mt4">' +
+            '<div class="item_row color_darkgray font_size_14 item_sub_left ml4" style="align-items: flex-start;">' +
+               '<div class="font_size_14">备注：</div>' +
+               '<div class="item_sub_nowrap font_size_14 item_sub_left">{{=value.Description}}</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="item_row color_darkgray mt6 font_size_14 item_sub_left" style="align-items: flex-start;">' +
+            '<div class="item_sub_right font_size_14">时间：</div>' +
+            '<div class="">{{=value.CreateDate}}</div>' +
+          '</div>' +
+          '<div class="separate_line"></div>' +
+        '</div>' +
+      '{{~}}';
+    template.innerHTML = html;
+  }
+
+  function setBadnessPADTemplate() {
+    var template = $api.byId('template');
+    var html =
+      '<div class="item_row item_title color_bg_blue color_whith">' +
+      '<div class="item_sub_left" style="flex:0.8;">不良代码</div>' +
+      '<div class="item_sub_center" style="flex:0.8;">不良名称</div>' +
+      '<div class="item_sub_center timeDiv">登录时间</div>' +
+      '<div class="item_sub_center Qty">数量</div>' +
+      '<div class="item_sub_center">备注</div>' +
+      '</div>' +
+      '{{~it:value:index}}' +
+      '<div class="item_row list_item">' +
+      '<div class="item_sub_left" style="flex:0.8;">{{=value.DefectCode}}</div>' +
+      '<div class="item_sub_center" style="flex:0.8;">{{=value.DefectParts}}</div>' +
+      '<div class="item_sub_center timeDiv">{{=value.CreateDate}}</div>' +
+      '<div class="item_sub_center Qty">{{=value.DefectQTY}}</div>' +
+      '<div class="item_sub_center">{{=value.Description}}</div>' +
+      '<div class="separate_line"></div>' +
+      '</div>' +
+      '{{~}}';
+    template.innerHTML = html;
+  }
+
+
+  function setBadnessPDATemplate() {
+    var template = $api.byId('template');
+    var html =
+      '{{~it:value:index}}' +
+      '<div class="container list_item">' +
+      '<div class="item_row" style="align-items: flex-start;">' +
+      '<div class="font_size_16">不良名称：</div>' +
+      '<div class="item_sub_left font_size_16 mr6">{{=value.DefectName}}</div>' +
+      '</div>' +
+
+      '<div class="item_row color_darkgray font_size_14 mt4">' +
+      '<div class="item_row color_darkgray font_size_14 item_sub_left mr4">' +
+      '<div class="font_size_14">不良代码：</div>' +
+      '<div class="item_sub_nowrap item_sub_left">{{=value.DefectCode}}</div>' +
+      '</div>' +
+      '<div class="item_row color_darkgray font_size_14 item_sub_left ml4" style="flex:0.8;">' +
+      '<div class="font_size_14">数量：</div>' +
+      '<div class="item_sub_nowrap font_size_14 item_sub_left">{{=value.DefectQTY}}</div>' +
+      '</div>' +
+      '</div>' +
+
+      '<div class="item_row color_darkgray font_size_14 item_sub_left mt4" style="align-items: flex-start;">' +
+      '<div class="font_size_14">备注：</div>' +
+      '<div class="item_sub_nowrap font_size_14 item_sub_left">{{=value.Description}}</div>' +
+      '</div>' +
+
+      '<div class="item_row color_darkgray mt4 font_size_14 item_sub_left" style="align-items: flex-start;">' +
+      '<div class="item_sub_right font_size_14">时间：</div>' +
+      '<div class="">{{=value.CreateDate}}</div>' +
+      '</div>' +
+      '<div class="separate_line"></div>' +
+      '</div>' +
+      '{{~}}';
+    template.innerHTML = html;
+  }
+
+  function setPackPADTemplate() {
+    var template = $api.byId('template');
+    var html =
+      '<div class="item_row item_title color_bg_blue color_whith">' +
+        '<div class="item_sub_left pr4" style="flex:0.7;">包装类型</div>' +
+        '<div class="item_sub_left pr4 pl4">箱号</div>' +
+        '<div class="item_sub_left pr4 pl4">卡板号</div>' +
+        '<div class="Operator align_center pr4 pl4">作业者</div>' +
+        '<div class="Qty align_center pr4 pl4">数量</div>' +
+        '<div class="align_center packTime pl4">时间</div>' +
+      '</div>' +
+      '{{~it:value:index}}' +
+        '<div class="list_item item_normal">' +
+          '<div class="item_row">' +
+            '<div class="item_sub_left pr4" style="flex:0.7;">{{=value.BarcodeType}}</div>' +
+            '<div class="item_sub_left pr4 pl4">{{=value.BoxLotName}}</div>' +
+            '<div class="item_sub_left pr4 pl4">{{=value.PalletLotName}}</div>' +
+            '<div class="Operator align_center pr4 pl4">{{=value.Operator}}</div>' +
+            '<div class="Qty align_center pr4 pl4">{{=value.BoxQty}}</div>' +
+            '<div class="align_center packTime pl4">{{=value.PalletTime}}</div>' +
+          '</div>' +
+         '<div class="separate_line"></div>' +
+      '</div>' +
+      '{{~}}';
+    template.innerHTML = html;
+  }
+
+  function setPackPDATemplate() {
+    var template = $api.byId('template');
+    var html =
+      '{{~it:value:index}}' +
+        '<div class="list_item item_normal">' +
+          '<div class="item_row font_size_14">' +
+            '<div class="font_size_16">包装箱号：</div>' +
+            '<div class="item_sub_nowrap font_size_16 item_sub_left">{{=value.BoxLotName}}</div>' +
+          '</div>' + 
+          '<div class="item_row color_darkgray font_size_14 mt4">' +
+            '<div class="font_size_14">包装类型：</div>' +
+            '<div class="item_sub_nowrap font_size_14 item_sub_left">{{=value.BarcodeType}}</div>' +
+          '</div>' + 
+          '<div class="item_row color_darkgray font_size_14 mt4">' +
+            '<div class="font_size_14">卡板号：</div>' +
+            '<div class="item_sub_nowrap font_size_14 item_sub_left">{{=value.PalletLotName}}</div>' +
+          '</div>' +
+          '<div class="item_row color_darkgray mt4">' +
+            '<div class="item_row font_size_14 item_sub_left mr4">' +
+              '<div class="font_size_14">数量：</div>' +
+              '<div class="item_sub_nowrap font_size_14 item_sub_left">{{=value.BoxQty}}</div>' +
+            '</div>' +
+            '<div class="item_row font_size_14 item_sub_left ml4">' +
+              '<div class="font_size_14">作业者：</div>' +
+              '<div class="item_sub_nowrap font_size_14 item_sub_left">{{=value.Operator}}</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="item_row color_darkgray font_size_14 mt6">' +
+            // '<div class="font_size_14 item_sub_right">时间：</div>' +
+            '<div class="item_sub_nowrap item_sub_right font_size_14">{{=value.PalletTime}}</div>' +
+          '</div>' +
+          '<div class="separate_line"></div>' +
+        '</div>' +
+      '{{~}}';
+    template.innerHTML = html;
+  }
+
+  function refreshItemList(itemsStr) {
+    itemList = [];
+    var tempArr = JSON.parse(itemsStr);
+    console.log(JSON.stringify(tempArr));
+    if (tempArr && $util.isArray(tempArr)) {
+      itemList = tempArr;
+    }
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function setLotName(_LotName) {
+    LotName = _LotName;
+  }
+
+  function setCurrentIndex(index) {
+    CurrentIndex = index;
+    switch (index) {
+      case 3: {
+        var uiMode = api.uiMode;
+        if (uiMode == 'pad') {
+          setPartsPADTemplate();
+        }else{
+          setPartsPDATemplate();
+        }
+      }
+        break;
+      case 4: {
+        var uiMode = api.uiMode;
+        if (uiMode == 'pad') {
+          setBadnessPADTemplate();
+        }else{
+          setBadnessPDATemplate();
+        }
+      }
+        break;
+      case 5: {
+        var uiMode = api.uiMode;
+        if (uiMode == 'pad') {
+          setPackPADTemplate();
+        }else{
+          setPackPDATemplate();
+        }
+      }
+        break;
+      default: {
+
+      }
+        break;
+    }
+  }
+
+  // ================点击事件=========================
+  function touchstartF(event) {
+    $slideDelete.touchstartF(event);
+  };
+
+  function touchmoveF(event, e) {
+    $slideDelete.touchmoveFWithLeft(event, e, -60);
+  };
+
+  function toDelete(index, tag) {
+    event.stopPropagation();
+
+    if (itemList.length > index) {
+      itemList.splice(index, 1);
+      $upRefresh.analysisData(itemList, itemList);
+
+      // deleteSNItem(index, tag);
+    }
+  }
+
+  function itemClick(index) {
+    console.log(index);
+    if (itemList.length > index) {
+      itemList.forEach(function (val,subIndex) {
+        if (index == subIndex) {
+          val.IsOpen = !val.IsOpen;
+        }else{
+          val.IsOpen = false;
+        }
+        if (val.IsOpen == true) {
+          val.arrowCls = 'arrow_up';
+        } else {
+          val.arrowCls = 'arrow_down';
+        }
+      });
+    }
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+
+</html>

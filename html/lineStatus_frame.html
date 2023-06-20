@@ -1,0 +1,786 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    html,
+    body {
+      background-color: #fff;
+      height: 100%;
+      position: relative;
+    }
+
+    .processItemView {
+      padding: 0.2rem 0.3rem;
+      position: relative;
+    }
+
+    .processItemView .layoutViewMultiple {
+      height: 10.5rem;
+      width: 10rem;
+      position: relative;
+      padding: 0px 0.2rem;
+    }
+
+    .processItemView .layoutViewTow {
+      height: 22rem;
+      padding: 0px 0.2rem;
+      padding-bottom: 3rem;
+      position: relative;
+    }
+
+
+    .processItemView .layoutViewThree {
+      height: 10.5rem;
+      width: 6rem;
+      padding: 0px 0.2rem;
+    }
+
+    .itemDivContentCircle {
+      position: absolute;
+      padding: 0.2rem;
+    }
+
+    .itemDivContent {
+      padding: 0.2rem 0rem;
+      margin: auto;
+    }
+
+    .itemDivContentTow {
+      padding: 0.2rem 0rem;
+      margin: 0rem 0.4rem;
+    }
+
+    .itemDivMultiple {
+      height: 1.6rem;
+      width: 1.6rem;
+      border-radius: 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+    }
+
+    .itemDivMultiple img {
+      height: 1.6rem;
+      width: 1.6rem;
+    }
+
+    .itemDivOne {
+      height: 3rem;
+      width: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+      margin-top: 0.2rem;
+    }
+
+    .itemDivOne img {
+      height: 2.9rem;
+      width: 2.9rem;
+    }
+
+    .itemDivThree {
+      height: 2.6rem;
+      width: 2.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+    }
+
+    .itemDivThree img {
+      height: 2.5rem;
+      width: 2.5rem;
+    }
+
+    .itemDivRT {
+      height: 3.6rem;
+      width: 3.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+    }
+
+    .itemDivRT img {
+      height: 3.5rem;
+      width: 3.5rem;
+    }
+
+    .itemTitleMultiple {
+      margin: auto;
+      text-align: center;
+      height: 1rem;
+      line-height: 1rem;
+      font-size: 0.5rem;
+    }
+
+    .itemTitleOne {
+      text-align: center;
+      font-size: 0.7rem;
+      margin-top: 0.2rem;
+    }
+
+    .itemTitleThree {
+      margin: auto;
+      text-align: center;
+      font-size: 0.7rem;
+      margin-top: 0.1rem;
+    }
+
+
+    .arrowhead {
+      height: 10rem;
+      width: 1.2rem;
+      min-width: 1.2rem;
+      margin: 0.5rem 0.4rem;
+      background-image: url(../image/common/xiangyou.png);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 1.2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    #xiuzuItem1 {
+      top: 0px;
+      left: 0px;
+    }
+
+    #xiuzuItem2 {
+      top: 0px;
+      left: 3rem;
+    }
+
+    #xiuzuItem3 {
+      top: 0px;
+      left: 6rem;
+    }
+
+    #xiuzuItem4 {
+      top: 3.1rem;
+      left: 0px;
+    }
+
+    #xiuzuItem5 {
+      top: 6.2rem;
+      left: 0px;
+    }
+
+    #xiuzuItem6 {
+      top: 6.2rem;
+      left: 3rem;
+    }
+
+    #xiuzuItem7 {
+      top: 6.2rem;
+      left: 6rem;
+    }
+
+    .processItemTitle {
+      text-align: center;
+      padding: 0.2rem 0.2rem;
+      min-width: 4.2rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border: 2px solid #d9d9d9;
+      border-radius: 0.2rem;
+      margin: 0.2rem 0rem;
+    }
+
+    .processTitle {
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      font-size: 1rem;
+      font-weight: bold;
+      margin: auto;
+      text-align: center;
+      width: 100%;
+      color: #f94d7e;
+    }
+
+    .processContent {
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      font-size: 1rem;
+      font-weight: bold;
+      margin: auto;
+      text-align: center;
+      width: 100%;
+    }
+
+    .item_row {
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      position: relative;
+      word-break: break-all;
+    }
+
+    .item_center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .color_bg_green {
+      background-color: #53d3a1;
+    }
+
+
+    .refreshView {
+      position: fixed;
+      height: 3rem;
+      width: 3rem;
+      top: 0.3rem;
+      right: 0.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .refreshView img {
+      height: 1.6rem;
+      width: 1.6rem;
+    }
+  </style>
+</head>
+
+<body>
+  <section class="item_row" style="height: 100%;">
+    <div class="processItemView item_center" style="height: 22rem;padding-bottom: 3rem">
+      <div class="layoutViewMultiple item_center" id="xiuzuLayout">
+        <div class="itemDivContentCircle" id="xiuzuItem1" onclick="itemClick('LR01');">
+          <div class="itemDivMultiple">
+            <img src="../image/lineStatus/activation/LR_icon.png" id='LR01' alt="">
+          </div>
+          <div class="itemTitleMultiple">LR01</div>
+        </div>
+        <div class="itemDivContentCircle" id="xiuzuItem2" onclick="itemClick('LR02');">
+          <div class="itemDivMultiple">
+            <img src="../image/lineStatus/activation/LR_icon.png" id='LR02' alt="">
+          </div>
+          <div class="itemTitleMultiple">LR02</div>
+        </div>
+
+        <div class="itemDivContentCircle" id="xiuzuItem3" onclick="itemClick('LR03');">
+          <div class="itemDivMultiple">
+            <img src="../image/lineStatus/activation/LR_icon.png" id='LR03' alt="">
+          </div>
+          <div class="itemTitleMultiple">LR03</div>
+        </div>
+
+        <div class="itemDivContentCircle" id="xiuzuItem4" onclick="itemClick('LR04');">
+          <div class="itemDivMultiple">
+            <img src="../image/lineStatus/activation/LR_icon.png" id='LR04' alt="">
+          </div>
+          <div class="itemTitleMultiple">LR04</div>
+        </div>
+
+        <div class="itemDivContentCircle" id="xiuzuItem5" onclick="itemClick('LR05');">
+          <div class="itemDivMultiple">
+            <img src="../image/lineStatus/activation/LR_icon.png" id='LR05' alt="">
+          </div>
+          <div class="itemTitleMultiple">LR05</div>
+        </div>
+        <div class="itemDivContentCircle" id="xiuzuItem6" onclick="itemClick('LR06');">
+          <div class="itemDivMultiple">
+            <img src="../image/lineStatus/activation/LR_icon.png" id='LR06' alt="">
+          </div>
+          <div class="itemTitleMultiple">LR06</div>
+        </div>
+        <div class="itemDivContentCircle" id="xiuzuItem7" onclick="itemClick('LR07');">
+          <div class="itemDivMultiple">
+            <img src="../image/lineStatus/activation/LR_icon.png" id='LR07' alt="">
+          </div>
+          <div class="itemTitleMultiple">LR07</div>
+        </div>
+        <div class="processItemTitle">镭射修阻</div>
+      </div>
+      <div class="processContent" onclick="itemClick('RT01');">
+        <div class="itemDivRT">
+          <img src="../image/lineStatus/activation/RT_icon.png" id='RT01' alt="">
+        </div>
+        <div class="itemTitleThree">RT01</div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="" onclick="itemClick('CL01');">
+            <div class="itemTitleOne">清洗烘干</div>
+            <div class="itemDivOne">
+              <img src="../image/lineStatus/activation/CL_icon.png" id='CL01' alt="">
+            </div>
+            <div class="itemTitleOne">CL01</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="">
+            <div class="itemDivContent" onclick="itemClick('RM01');">
+              <div class="itemDivThree">
+                <img src="../image/lineStatus/activation/RM_icon.png" id='RM01' alt=""> </div>
+              <div class="itemTitleThree">阻值RM01</div>
+            </div>
+            <div class="processItemTitle">检测/印刷</div>
+            <div class="itemDivContent" onclick="itemClick('IP01');">
+              <div class="itemDivThree">
+                <img src="../image/lineStatus/activation/IP_icon.png" id='IP01' alt=""> </div>
+            </div>
+            <div class="itemTitleThree">防焊IP01</div>
+          </div>
+        </div>
+        <div class="processContent" onclick="itemClick('RT02');">
+          <div class="itemDivRT">
+            <img src="../image/lineStatus/activation/RT_icon.png" id='RT02' alt="">
+          </div>
+          <div class="itemTitleThree">RT02</div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="item_mormal" onclick="itemClick('OV01');">
+            <div class="itemTitleOne">隧道炉</div>
+            <div class="itemDivOne">
+              <img src="../image/lineStatus/activation/OV_icon.png" id='OV01' alt="">
+            </div>
+            <div class="itemTitleOne">OV01</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="">
+            <div class="itemDivContent" onclick="itemClick('LC02L');">
+              <div class="itemDivThree">
+                <img src="../image/lineStatus/activation/LC_icon.png" id='LC02L' alt="">
+              </div>
+              <div class="itemTitleThree">LC02</div>
+            </div>
+            <div class="processItemTitle">激光切割</div>
+            <div class="itemDivContent" onclick="itemClick('LC01L');">
+              <div class="itemDivThree">
+                <img src="../image/lineStatus/activation/LC_icon.png" id='LC01L' alt="">
+              </div>
+              <div class="itemTitleThree">LC01</div>
+            </div>
+            <div class="processContent" onclick="itemClick('RT03');">
+              <div class="itemDivRT">
+                <img src="../image/lineStatus/activation/RT_icon.png" id='RT03' alt="">
+              </div>
+              <div class="itemTitleThree">RT03</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="">
+            <div class="itemDivContentTow" onclick="itemClick('LS03');">
+              <div class="itemDivThree">
+                <img src="../image/lineStatus/activation/LS_icon.png" id='LS03' alt="">
+              </div>
+              <div class="itemTitleThree">LS03</div>
+            </div>
+            <div class="processItemTitle">激光扫电极</div>
+            <div class="item_row">
+              <div class="itemDivContentTow mr4" onclick="itemClick('LS02');">
+                <div class="itemDivThree">
+                  <img src="../image/lineStatus/activation/LS_icon.png" id='LS02' alt="">
+                </div>
+                <div class="itemTitleThree">LS01</div>
+              </div>
+
+              <div class="itemDivContentTow ml4" onclick="itemClick('LS01');">
+                <div class="itemDivThree">
+                  <img src="../image/lineStatus/activation/LS_icon.png" id='LS02' alt="">
+                </div>
+                <div class="itemTitleThree">LS02</div>
+              </div>
+            </div>
+          </div>
+          <div class="processContent" onclick="itemClick('RT04');">
+            <div class="itemDivRT">
+              <img src="../image/lineStatus/activation/RT_icon.png" id='RT04' alt="">
+            </div>
+            <div class="itemTitleThree">RT04</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="" onclick="itemClick('CL02');">
+            <div class="itemTitleOne">清洗烘干</div>
+            <div class="itemDivOne">
+              <img src="../image/lineStatus/activation/CL_icon.png" id='CL02' alt="">
+            </div>
+            <div class="itemTitleOne">CL02</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="" onclick="itemClick('AOI01');">
+            <div class="itemTitleOne item_sub_nowrap">外观检测机</div>
+            <div class="itemDivOne">
+              <img src="../image/lineStatus/activation/AOI_icon.png" id='AOI01' alt="">
+            </div>
+            <div class="itemTitleOne">AOI01</div>
+          </div>
+          <div class="processContent" onclick="itemClick('RT05');">
+            <div class="itemDivRT">
+              <img src="../image/lineStatus/activation/RT_icon.png" id='RT05' alt="">
+            </div>
+            <div class="itemTitleThree">RT05</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="" onclick="itemClick('TP01');">
+            <div class="itemTitleOne item_sub_nowrap">文字印刷机</div>
+            <div class="itemDivOne">
+              <img src="../image/lineStatus/activation/TP_icon.png" id='TP01' alt="">
+            </div>
+            <div class="itemTitleOne">TP01</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="">
+            <div class="item_row">
+              <div class="itemDivContentTow mr6" onclick="itemClick('LD01');">
+                <div class="itemDivThree">
+                  <img src="../image/lineStatus/activation/LD_icon.png" id='LD01' alt="">
+                </div>
+                <div class="itemTitleThree">LD01</div>
+              </div>
+
+              <div class="itemDivContentTow ml6" onclick="itemClick('LD02');">
+                <div class="itemDivThree">
+                  <img src="../image/lineStatus/activation/LD_icon.png" id='LD02' alt="">
+                </div>
+                <div class="itemTitleThree">LD02</div>
+              </div>
+            </div>
+            <div class="processItemTitle">激光划线机</div>
+            <div class="itemDivContentTow" onclick="itemClick('LD03');">
+              <div class="itemDivThree">
+                <img src="../image/lineStatus/activation/LD_icon.png" id='LD03' alt="">
+              </div>
+              <div class="itemTitleThree">LD03</div>
+            </div>
+          </div>
+          <div class="processContent" onclick="itemClick('RT06');">
+            <div class="itemDivRT">
+              <img src="../image/lineStatus/activation/RT_icon.png" id='RT06' alt="">
+            </div>
+            <div class="itemTitleThree">RT06</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrowhead"></div>
+    <div class="item_normal pr20" style="padding-right: 1.0rem;">
+      <div class="processItemView">
+        <div class="layoutViewTow item_center">
+          <div class="">
+            <div class="itemDivContent" onclick="itemClick('SA02');">
+              <div class="itemDivThree">
+                <img src="../image/lineStatus/activation/SA_icon.png" id='SA02' alt="">
+              </div>
+              <div class="itemTitleThree">SA02</div>
+            </div>
+            <div class="processItemTitle">剥条堆叠</div>
+            <div class="itemDivContent" onclick="itemClick('SA01');">
+              <div class="itemDivThree">
+                <img src="../image/lineStatus/activation/SA_icon.png" id='SA01' alt="">
+              </div>
+              <div class="itemTitleThree">SA01</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="refreshView" onclick="refreshViewBtnClick();">
+    <img src="../image/common/refresh_icon.png" alt="">
+  </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+  apiready = function () {
+    var body = $api.dom('body');
+    setLayout();
+    loadItemList();
+  }
+
+  function setLayout() {
+    var xiuzuLayoutNode = $api.byId('xiuzuLayout');
+    var offset = $api.offset(xiuzuLayoutNode);
+    var LayoutWidth = offset.w;
+    var itemDivContentNode = $api.dom('.itemDivContentCircle');
+    if (itemDivContentNode) {
+      var offsetItem = $api.offset(itemDivContentNode);
+      // 圆弧上点的个数
+      var len = 7;
+      for (var i = 1; i <= len; i++) {
+        var position = getCirclePosition({
+          x: LayoutWidth / 2,
+          y: LayoutWidth / 2,
+          r: LayoutWidth * 0.8 / 2,
+          nodeNum: len,
+          nodeIndex: i,
+          changeAngle: 0
+        })
+
+        console.log(JSON.stringify(position));
+        var itemNode = $api.byId('xiuzuItem' + i);
+        itemNode.style.left = (position.x_ - offsetItem.w / 2) + 'px';
+        itemNode.style.top = (position.y_ - offsetItem.w / 2) + 'px';
+      }
+    }
+
+
+    var itemTitles = $api.domAll('.itemTitleMultiple');
+    if (itemTitles && itemTitles.length > 0) {
+      for (var index = 0; index < itemTitles.length; index++) {
+        var node = itemTitles[index];
+        if (node && node.innerHTML == 'LR04') {
+          // $api.css(node,'background-color: #f94d7e;');
+        }
+      }
+    }
+    // var itemNode = $api.byId('LR04');
+    // $api.css(itemNode, 'background-color: #f94d7e;');
+
+    // var itemNode2 = $api.byId('OV01');
+    // $api.css(itemNode2, 'background-color: #d9d9d9;');
+  }
+
+  /**
+	 * 获取环形坐标 
+	 * 根据圆心计算圆形布局坐标点
+	 * 已知圆的标准方程 (x - a) ² + (y - b) ² = r ²
+	 * 通过相关公式可知当前圆的坐标 x , y为当前圆圆心，α为当前点角度，r为半径
+	 * 圆弧坐标公式： x1 = x + r * Math.cos( α * Math.PI / 180 )， y1 = y + r * Math.sin( α * Math.PI / 180)
+	 * @param {Number} x 圆心x坐标
+	 * @param {Number} y 圆心y坐标
+	 * @param {Number} r 圆半径
+	 * @param {Number} nodeNum 节点总的数量
+	 * @param {Number} nodeIndex 当前节点下标
+	 * @param {Number} changeAngle 改变初始角度，初始角度：x轴正方向为圆的起始角度0°，以顺时针旋转计算
+	 * @return {Object} {x_,y_} 目标点的坐标x_,y_
+	*/
+  function getCirclePosition(position) {
+    // 获取平分的角度
+    var angle = 360 / position.nodeNum;
+    // 获取当前角度值
+    var currentAngle = angle * position.nodeIndex;
+    // 调整这个角度，即可变换初始角度
+    if (position.changeAngle) {
+      currentAngle = currentAngle + position.changeAngle;
+    }
+    // 圆上点的x_
+    var x_ = position.x + position.r * Math.cos((currentAngle * Math.PI) / 180);
+    // 圆上点的y_
+    var y_ = position.y + position.r * Math.sin((currentAngle * Math.PI) / 180);
+
+    return { x_, y_ }
+  }
+
+  function loadItemList() {
+
+    var parUrl = '';
+    GetEqpStateList(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        itemList = ret.data;
+        setDeviceStatus();
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.refreshHeaderLoadDone();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function setDeviceStatus() {
+    itemList.forEach(function (val, index) {
+      var node = $api.byId(val.Code);
+      if (node) {
+        var imgUrl = node.src;
+
+        var path = 'activation';
+        console.log(val.State);
+        var bg_color = '#53d3a1';
+        switch (val.State) {
+          case 'RUNNING':
+            {
+              path = 'activation';
+            }
+            break;
+          case 'FAULT':
+            {
+              path = 'fault';
+            }
+            break;
+          case 'IDLE':
+            {
+              path = 'stop';
+            }
+            break;
+          default:
+            {
+              path = 'other';
+            }
+            break;
+        }
+
+        if (imgUrl) {
+          imgUrl = imgUrl.replace('activation',path);
+          imgUrl = imgUrl.replace('fault',path);
+          imgUrl = imgUrl.replace('stop',path);
+          imgUrl = imgUrl.replace('other',path);
+          console.log(imgUrl);
+          node.src = imgUrl;
+        }
+      }
+    });
+  }
+
+  // ================点击事件=========================
+  function itemClick(itemValue) {
+    var itemInfo;
+    itemList.forEach(function (val, index) {
+      if (itemValue == val.Code) {
+        itemInfo = val;
+      }
+    });
+
+    if (!itemInfo) {
+      api.toast({
+        msg: '请确认该设备是否存在',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    
+    var IsMechanical = itemValue.indexOf("RT") > -1;
+    api.openFrame({
+      name: 'lineStatusDetail',
+      url: 'lineStatusDetail_mark.html',
+      rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+        marginTop: 0, // main页面距离win顶部的高度
+        marginBottom: 0, // main页面距离win底部的高度
+        w: 'auto' // main页面的宽度 自适应屏幕宽度
+      },
+      pageParam: {
+        winName: api.winName,
+        frameName: api.frameName,
+        itemInfo: itemInfo,
+        IsMechanical:IsMechanical
+      },
+      bounces: false,
+      reload: true,
+      bgColor: 'rgba(0,0,0,0.3)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+
+    // testPush(itemInfo.Id);
+  };
+
+  function testPush(itemId) {
+    var parDic = {
+      EqpId: itemId
+    };
+    PostEqpControlNotice(parDic, function (ret) {
+      api.toast({
+        msg: ret.info,
+        duration: 1000,
+        location: 'middle'
+      });
+    }, function (err) {
+      api.toast({
+        msg: '请求失败',
+        duration: 1000,
+        location: 'middle'
+      });
+    });
+  }
+  
+  function refreshViewBtnClick() {
+    loadItemList();
+  }
+
+</script>
+
+</html>

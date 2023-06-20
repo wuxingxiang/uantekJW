@@ -1,0 +1,490 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body,
+    html {
+      background-color: transparent;
+      height: 100vh;
+      width: 100%;
+    }
+
+    .main {
+      height: 100%;
+      width: 100%;
+      position: relative;
+    }
+
+    .contentView {
+      width: 50%;
+      border-radius: 0.5rem;
+      background-color: #fff;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    input[type="text"] {
+      border: 1px solid #d9d9d9;
+      height: 1.6rem;
+      font-size: 0.7rem;
+      text-align: left;
+      border-radius: 0.15rem;
+      padding: 0px 3px;
+      text-align: center;
+    }
+
+    input[type="tel"] {
+      border: 1px solid #d9d9d9;
+      height: 1.6rem;
+      line-height: 1.6rem;
+      width: 4rem;
+      border-radius: 0.15rem;
+    }
+
+    .cancellBtn {
+      background-color: #efefef;
+      color: #9d9d9d;
+    }
+
+    textarea {
+      height: 5rem;
+      width: 100%;
+      padding: 3px;
+      font-size: 0.8rem;
+      border: 1px solid #d9d9d9;
+      border-radius: 0.2rem;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.7rem;
+    }
+
+    .btnItem {
+      width: 60%;
+      margin: 0.6rem 0.5rem;
+      color: #fff;
+      background-color: #1eb1ed;
+      border-radius: 1rem;
+      height: 2rem;
+      line-height: 2rem;
+      text-align: center;
+      font-size: 0.7rem;
+    }
+
+    .cancellBtn {
+      background-color: #efefef;
+      color: #9d9d9d;
+    }
+
+    #addBtn_product {
+      width: 0.9rem;
+      height: 1rem;
+      background-image: url(../image/common/common_right_add_btn.png);
+      background-position: center;
+      background-repeat: no-repeat;
+      -webkit-background-size: 0.8rem;
+      background-size: 0.8rem;
+      z-index: 10000;
+    }
+
+    .addBtn_product_view {
+      width: 0.9rem;
+      height: 1rem;
+    }
+
+    #productName {
+      -webkit-line-clamp: 3;
+    }
+
+    .searchBtn {
+      padding: 0.2rem 0.7rem;
+      background-color: #1eb1ed;
+      border-radius: 0.15rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: white;
+      margin-left: 0.8rem;
+    }
+
+    .tapDownBtn {
+      height: 100%;
+      width: 1rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center;
+      background-size: 0.6rem;
+      z-index: 10000;
+    }
+
+    .scanBtnBig {
+      height: 1.8rem;
+      width: 2rem;
+      background-size: 1.4rem;
+      background-position: center right;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    .closeBtn {
+      position: absolute;
+      width: 2.2rem;
+      height: 2.2rem;
+      right: 0rem;
+      top: 0rem;
+      -webkit-background-size: 1.5rem;
+      background: url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-size: 1.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main item_center">
+    <div class="contentView" id="contentDiv">
+      <div class="align_center mb24">绑卡</div>
+      <div class="item_row item_sub_left">
+        <input id="userInput" autofocus="autofocus" class='inputView item_sub_left font_size_16' maxlength='300'
+          value="" type="text" placeholder="请输入账户/工号">
+        <div class="searchBtn" onclick="queryUserInfo();">查询</div>
+      </div>
+      <div class="item_row font_size_16 mt16 color_darkgray" style="align-items: flex-start;">
+        <div class="font_size_14">用户：</div>
+        <div id='userName' class="item_sub_left font_size_14 item_sub_wrap"></div>
+      </div>
+
+      <div class="item_row mt8">
+        <div class="font_size_14">工号：</div>
+        <div id='workNo' class="item_sub_left font_size_14 item_sub_wrap"></div>
+      </div>
+      
+      <div id='' class="mt16 item_row" style="align-content: flex-start;">
+        <div id='workNo' class="color_darkgray font_size_12">提示：</div>
+        <div id='workNo' class="item_sub_left mr20 font_size_12 color_darkgray">请将IC卡放置到读卡器上，查询用户信息后点击绑卡按钮即可完成绑卡操作</div>
+
+      </div>
+
+      <div class="item_row item_center mt12">
+        <div class="btnItem" onclick="binBtnClick();">绑卡</div>
+      </div>
+      <div class="closeBtn" tapmode onclick="api.closeFrame();"></div>
+    </div>
+  </div>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/canvas2image.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+
+<script type="text/javascript">
+  var userModel = null;
+
+  apiready = function () {
+    // loadAllItemArr();
+
+    keybordTap();
+  }
+
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#orderInput').bind('keyup', function (event) {
+      if (event.keyCode == "13") {
+        console.log(event.target.value);
+        if (event.target.value && event.target.value.length > 0) {
+          var scanResualt = $api.byId('scanOrderResualt');
+          // SNResualt.innerHTML = event.target.value;
+          $api.css(scanResualt, 'color:#323232;');
+          var scanValue = event.target.value;
+          var slpits = scanValue.split("\n");
+          if (slpits.length > 0) {
+            scanValue = slpits[slpits.length - 1];
+            event.target.value = '';
+            var parameter = null;
+            if ($util.getQrResult(scanValue, ['O']) == null) {
+              api.toast({
+                msg: '请扫描正确的工单二维码',
+                duration: 1500,
+                location: 'middle'
+              });
+              return;
+            }
+            parameter = $util.getQrResult(scanValue, ['O']);
+            loadOrderInfo(parameter);
+          }
+        }
+      }
+    });
+  }
+
+  function fillInputText() {
+    if (api.pageParam.MaintainName) {
+      var nameInput = $api.byId('nameInput');
+      nameInput.value = api.pageParam.MaintainName;
+    }
+
+    if (api.pageParam.MaintainContent) {
+      var contentInput = $api.byId('contentInput');
+      contentInput.value = api.pageParam.MaintainContent;
+    }
+  }
+
+  function loadAllItemArr() {
+    loadItemArr('DefectType', '', false, function (itemArr) {
+      defecttypeList = itemArr;
+    });
+
+    loadItemArr('DefectCode', '', false, function (itemArr) {
+      DefectCodeList = itemArr;
+    });
+  }
+
+
+  function loadOrderInfo(parameter) {
+    loadItemInfo(parameter, function (result) {
+      if (result) {
+        orderModel = result;
+        fillOrderInfo(orderModel);
+        // fillProductInfo(orderModel.name);
+      }
+    });
+  }
+
+  function loadUserInfo(callBack) {
+    var userInput = $api.byId('userInput');
+    if ($util.isEmpty(userInput.value)) {
+      api.toast({
+        msg: '请先输入账户/工号',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+    var parDic = {
+      acount: userInput.value,
+    }
+
+    GetEqpCheckList(parDic, function (ret) {
+      if (ret.code == 200) {
+        userModel = ret.data;
+        fillUserInfo();
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle'
+      });
+    }, function (err) {
+      api.toast({
+        msg: '绑定失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UploadData(cartNo) {
+    var parDic = {
+      userId: userModel.Id,
+      cartId: cartNo
+    }
+
+    BindICNo(parDic, function (ret) {
+      if (ret.code == 200) {
+        cleanUserInfo();
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle'
+      });
+    }, function (err) {
+      api.toast({
+        msg: '绑定失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+
+  function selectedItem(itemStr) {
+    var item = JSON.parse(itemStr);
+    if (item) {
+      productModel = item;
+      fillProductInfo(item.name);
+      var volume = $api.byId('volumeInput');
+      volume.value = item.boxQty;
+    }
+  }
+
+  function selectedOrderItem(itemStr) {
+    var item = JSON.parse(itemStr);
+    console.log(itemStr);
+    if (item) {
+      orderModel = item;
+      fillOrderInfo(item);
+    }
+  }
+
+  function fillUserInfo() {
+    if (userModel) {
+      var userNameDiv = $api.byId('userName');
+      userNameDiv.innerHTML = userModel.Name;
+
+      var workNoDiv = $api.byId('workNo');
+      workNoDiv.innerHTML = userModel.Code;
+    }
+  }
+
+  function cleanUserInfo() {
+    userModel = null;
+    var userNameDiv = $api.byId('userName');
+    userNameDiv.innerHTML = '';
+
+    var workNoDiv = $api.byId('workNo');
+    workNoDiv.innerHTML = '';
+
+    var userInputDiv = $api.byId('userInput');
+    userInputDiv.value = '';
+  }
+
+
+  function showProductAddBtn(flag) {
+    var addBtn_product = $api.byId('addBtn_product');
+    var display = 'none';
+    if (flag) {
+      display = 'block';
+    }
+    addBtn_product.style.display = display;
+  }
+
+  function fillItemInfo(nodeName, value) {
+    var itemDiv = $api.byId(nodeName);
+    itemDiv.innerHTML = value;
+    $api.css(itemDiv, 'color:#323232;');
+  }
+
+  // ======================点击事件==============================
+  function SNClick(inputName) {
+    var input = $api.byId(inputName);
+    input.focus();
+    $api.attr(input, 'readOnly', true);
+    setTimeout(function () {
+      input.removeAttribute("readOnly")//延迟移除readonly属性
+    }, 80);
+  }
+
+  function tapDownBtnClick() {
+    api.openWin({
+      name: 'QueryOrder_nav',
+      url: 'QueryOrder_win.html',
+      pageParam: {
+        winName: api.winName,
+        frameName: api.frameName,
+        selected: true
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right',
+        duration: 300
+      }
+    });
+    event.stopPropagation();
+  }
+
+  function hideMask() {
+    api.closeFrame({
+      name: 'CreatePallet'
+    });
+  }
+
+  function queryUserInfo() {
+
+    var userInput = $api.byId('userInput');
+    if ($util.isEmpty(userInput.value)) {
+      api.toast({
+        msg: '请先输入账户/工号并查询',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+    
+    var parUrl = userInput.value;
+    Userinfoget(parUrl, function (ret) {
+      if (ret.code == 200) {
+        userModel = ret.data;
+        fillUserInfo();
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle'
+      });
+    }, function (err) {
+      api.toast({
+        msg: '获取用户信息失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+    
+  }
+
+  function binBtnClick() {
+    if (!userModel) {
+      api.toast({
+        msg: '请先输入账户/工号并查询',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var UsbIC = api.require('ICModule');
+    var param = {
+
+    };
+    var resultCallback = function (ret, err) {
+      console.log(JSON.stringify(ret));
+      if (ret && ret.code == 200) {
+        UploadData(ret.result);
+      } else {
+        alert(ret.msg);
+      }
+    }
+    UsbIC.readIcContent(param, resultCallback);
+  }
+
+  function inputEnd(el) {
+    if (!el.value || el.value.length <= 1) {
+      el.value = 1;
+    }
+  }
+
+
+</script>
+
+</html>

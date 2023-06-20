@@ -1,0 +1,37 @@
+/*
+ * =========================================================================
+ * APIClud - AUI UI 框架    流浪男  QQ：343757327  http://www.auicss.com
+ * Verson 2.1
+ * =========================================================================
+ */
+ /*初始化类*/
+@charset "UTF-8";
+.wrapper {
+	position: relative;
+	overflow: hidden;
+	height: 2.5rem;
+	height: auto;	
+}
+.container {
+	position: relative;
+	left: 0;
+	width: 100%;
+	background-color: #fff;
+	padding: 0px 0.8rem;
+	z-index: 20000;
+	height: auto;
+}
+.deleteBtn {
+	/* float: right; */
+	position: absolute;
+	width: 3rem;
+	top: 0;
+	right: 0;
+	height: 98%;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 20px 20px;
+	background-image:  url(../image/common/delete_icon.png) ;
+	background-color: #ff0000;
+	z-index: 10;
+}

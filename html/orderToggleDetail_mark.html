@@ -1,0 +1,342 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    html,
+    body {
+      background-color: transparent;
+    }
+
+    #contentView {
+      height: 85%;
+      width: 85%;
+      background-color: white;
+      border-radius: 0.4rem;
+      padding: 0.3rem 0.8rem;
+      position: relative;
+    }
+
+    .closeBtn {
+      position: absolute;
+      top: -0.7rem;
+      right: -0.7rem;
+      height: 1.8rem;
+      width: 1.8rem;
+      background: url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 1.4rem;
+      z-index: 1000;
+    }
+
+    .title_item {
+      padding: 0.4rem 0px;
+      position: relative;
+    }
+
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .detailData {
+      padding: 0.5rem 0.3rem;
+      position: relative;
+    }
+
+    .status {
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #f94d7e;
+      font-size: 0.7rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+
+    #item_list {
+      height: 100%;
+      overflow-y: scroll;
+    }
+  </style>
+</head>
+
+<body class="item_center">
+  <section id="contentView">
+    <div class="item_row title_item item_center font_size_16" id="topView">
+      <div class="font_size_16">设备列表</div>
+      <!-- <div class="font_size_16 item_sub_left" id="nameDiv"></div> -->
+      <div class="separate_line"></div>
+    </div>
+    <div id="itemListView">
+      <div id="item_list">
+
+      </div>
+    </div>
+    <div class="closeBtn" onclick="closeFrame();"></div>
+  </section>
+
+  <!-- <div class="status">{{=value.StatusName}}</div> -->
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+        <div class="font_size_14 list_item">
+          <div class="item_row" style='align-items: flex-start;'>
+            <div class="item_sub_left font_size_16 mr6">{{=value.EquipmenName}}</div>
+          </div>
+          <div class="separate_line"></div>
+        </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var PageNum = 1;
+  var PageSize = 20;
+  var itemList = [];
+
+  var startDate = '';
+  var endDate = '';
+
+  var OrderNum = '';
+
+  apiready = function () {
+    var body = $api.byId('itemListView');
+    var contentView = $api.byId('contentView');
+    var offsetC = $api.offset(contentView);
+
+    var topView = $api.byId('topView');
+    var offset = $api.offset(topView);
+    var height = offsetC.h - offset.h -16;
+    $api.css(body, 'height:' + height + 'px;');
+
+    $upRefresh.addHtml(body, '暂无数据');
+    $showErrorDiv.addErrorHtml(body);
+
+    itemList = api.pageParam.ItemList;
+    $upRefresh.analysisData(itemList, itemList);
+
+    var contentView = $api.byId('contentView');
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType != 'PDA') {
+      $api.css(contentView, 'width:50%');
+    } 
+  }
+
+  function loadItemList() {
+
+    var parUrl = api.pageParam.WorkOrderNo;
+    GetMtrlListForWorkOrder(parUrl, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      itemList = [];
+      if (ret.code == 200) {
+        if (ret.data && ret.data.MtrlList) {
+          itemList = ret.data.MtrlList;
+        }
+        $upRefresh.analysisData(itemList, itemList);
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  // ================数据处理=========================
+  function setStartDate(_startDate) {
+    startDate = _startDate
+  }
+
+  function setEndDate(_endDate) {
+    endDate = _endDate;
+  }
+
+  function setProductId(_ProductId) {
+    ProductId = _ProductId;
+
+  }
+
+  function setProcessId(_ProcessId) {
+    ProcessId = _ProcessId;
+  }
+
+  function setOrderNum(_OrderNum) {
+    OrderNum = _OrderNum;
+  }
+  // ================点击事件=========================
+
+  function saveBtnClick() {
+    loadItemList();
+  }
+
+  function itemClick(index) {
+    console.log(index);
+    api.actionSheet({
+      cancelTitle: '取消',
+      buttons: ['工单投入', '工单完成']
+    }, function (ret, err) {
+      if (ret) {
+        var tempModel = itemList[index];
+
+        if (ret.buttonIndex == 1 || ret.buttonIndex == 2) {
+          var DevotStr = '';
+          var FinishStr = '';
+          var showHint = true;
+
+          switch (tempModel.Status) {
+            case 'Recived':
+              {
+                DevotStr = '该工单未确认，无法投入';
+                FinishStr = '该工单未确认，无法完成';
+              }
+              break;
+            case 'Release':
+              {
+                FinishStr = '该工单未投入，无法完成';
+                if (ret.buttonIndex == 1) {
+                  showHint = false;
+                  api.openWin({
+                    name: 'OrderDevot_nav',
+                    url: 'OrderDevot_win.html',
+                    slidBackEnabled: false,
+                    pageParam: tempModel,
+                    animation: {
+                      type: 'movein',
+                      subType: 'from_right'
+                    }
+                  });
+                }
+              }
+              break;
+            case 'Pause':
+              {
+                DevotStr = '该工单挂起，无法投入';
+                FinishStr = '该工单挂起，无法完成';
+              }
+              break;
+            case 'WIP':
+              {
+                showHint = false;
+                if (ret.buttonIndex == 2) {
+                  api.openWin({
+                    name: 'OrderComplete_nav',
+                    url: 'OrderComplete_win.html',
+                    slidBackEnabled: false,
+                    pageParam: itemList[index],
+                    animation: {
+                      type: 'movein',
+                      subType: 'from_right'
+                    }
+                  });
+                }
+
+                if (ret.buttonIndex == 1) {
+                  api.openWin({
+                    name: 'OrderDevot_nav',
+                    url: 'OrderDevot_win.html',
+                    slidBackEnabled: false,
+                    pageParam: tempModel,
+                    animation: {
+                      type: 'movein',
+                      subType: 'from_right'
+                    }
+                  });
+                }
+              }
+              break;
+            case 'Finish':
+              {
+                DevotStr = '该工单已完成，无法投入';
+                FinishStr = '该工单已完成，无法完成';
+              }
+              break;
+            case 'Close':
+              {
+                DevotStr = '该工单已结束，无法投入';
+                FinishStr = '该工单已结束，无法完成';
+              }
+              break;
+            default:
+              break;
+          };
+
+          if (showHint) {
+            if (ret.buttonIndex == 1) {
+              api.toast({
+                msg: DevotStr,
+                duration: 1500,
+                location: 'middle'
+              });
+            } else {
+              api.toast({
+                msg: FinishStr,
+                duration: 1500,
+                location: 'middle'
+              });
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function closeFrame(){
+    api.closeFrame();
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+
+</html>

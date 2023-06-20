@@ -1,0 +1,410 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>AUI快速完成布局</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style type="text/css">
+        body,html{
+          background-color: transparent;
+          height: 100vh;
+          width: 100%;
+        }
+
+        .main
+        {
+          height: 100%;
+          width: 100%;
+          position: relative;
+        }
+
+        .contentView
+        {
+          margin: 0px 2rem;
+          border-radius: 0.3rem;
+          background-color: #fff;
+          padding: 0.8rem 0.8rem;
+          margin-bottom: 1.5rem;
+        }
+
+        input[type="text"]{
+          border: 1px solid #d9d9d9;
+          height: 1.5rem;
+          line-height: 1.5rem;
+          font-size: 0.7rem;
+          text-align: left;
+          border-radius: 0.15rem;
+          padding: 0px 3px;
+        }
+
+        input{
+          /*width: 150px;*/
+        }
+
+        .cancellBtn{
+          background-color: #efefef;
+          color: #9d9d9d;
+        }
+
+        textarea
+        {
+          height: 5rem;
+          width: 100%;
+          padding: 3px;
+          font-size: 0.8rem;
+          border: 1px solid #d9d9d9;
+          border-radius: 0.2rem;
+        }
+
+        textarea::-webkit-input-placeholder {
+            color: #b9babe;
+            font-size: 0.7rem;
+        }
+
+        .btnItem{
+          flex: 1;
+          margin: 0.8rem 0.5rem;
+          color: #fff;
+          background-color: #1eb1ed;
+          border-radius: 0.2rem;
+          height: 1.5rem;
+          line-height: 1.6rem;
+          text-align: center;
+          font-size: 0.7rem;
+        }
+
+        .cancellBtn{
+          background-color: #efefef;
+          color: #9d9d9d;
+        }
+    </style>
+</head>
+<body >
+  <div class="main item_center">
+    <div class="contentView" id="contentDiv">
+
+      <div class="item_row ">
+        <div class="mr12">保养项目</div>
+        <input id="nameInput" class='item_sub_left font_size_14' maxlength = '20' value="" type="text" placeholder="请输入保养项目名称">
+      </div>
+
+      <div class="item_row mt12" style="align-items: flex-start;">
+        <div class="mr12">保养内容</div>
+        <textarea class='item_sub_left' id="contentInput" name="txt" clos=",50" rows="5" maxlength="100" warp="virtual" placeholder="请入保养内容"></textarea>
+      </div>
+
+      <div class="item_row mt4">
+        <div class="btnItem cancellBtn" onclick="cancellBtnClick();">取消</div>
+        <div class="btnItem" onclick="comfirmBtnClick();">确定</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+<script type="text/javascript" src="../script/api.js" ></script>
+<script type="text/javascript" src="../script/jquery.min.js" ></script>
+<script type="text/javascript" src="../script/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/canvas2image.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+
+<script type="text/javascript">
+
+    var loadUserPath = false;
+    var loadCategory = false;
+
+    var DefectTypeObj = null;
+    var DefectCodeObj = null;
+
+    var DefectTypeList = [];
+    var DefectCodeList = [];
+
+    apiready = function () {
+      if (api.pageParam) {
+        fillInputText();
+      }
+
+      console.log(JSON.stringify(api.pageParam));
+    }
+
+    function fillInputText() {
+      if (api.pageParam.MaintainItemName) {
+        var nameInput = $api.byId('nameInput');
+        nameInput.value = api.pageParam.MaintainItemName;
+      }
+
+      if (api.pageParam.MaintainItemContent) {
+        var contentInput = $api.byId('contentInput');
+        contentInput.value = api.pageParam.MaintainItemContent;
+      }
+    }
+
+    function loadAllItemArr() {
+      loadItemArr('DefectType','',false,function(itemArr) {
+        defecttypeList = itemArr;
+      });
+
+      loadItemArr('DefectCode','',false,function(itemArr) {
+        DefectCodeList = itemArr;
+      });
+    }
+
+    function loadItemArr(itemType,para,loadShow,callBack) {
+      var parDic = {
+        optionType:itemType,
+        para:para
+      }
+      var parUrl = '&data='+JSON.stringify(parDic);
+      CommomOptionList(parDic,loadShow,function(ret){
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data && ret.data.length > 0) {
+            var tempArr = ret.data;
+            if (tempArr && tempArr.length) {
+              tempArr.forEach(function (val,index,arr) {
+                val.name = val.ItemName;
+              });
+            }
+            callBack(tempArr);
+          }else {
+            api.toast({
+                msg: ret.info,
+                duration: 1500,
+                location: 'middle'
+            });
+          }
+        }else {
+          api.toast({
+              msg: '获取失败',
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+
+      },function(err){
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+
+// ======================点击事件==============================
+
+    function hideMask() {
+      api.closeFrame();
+
+    }
+
+
+    function comfirmBtnClick() {
+      var nameInput = $api.byId('nameInput');
+      if ($util.isEmpty(nameInput.value)) {
+        api.toast({
+            msg: '请先输入保养名称',
+            duration: 1500,
+            location: 'middle'
+        });
+
+        return;
+      }
+
+      // var contentInput = $api.byId('contentInput');
+      // if ($util.isEmpty(contentInput.value)) {
+      //   api.toast({
+      //       msg: '请先输入保养内容',
+      //       duration: 1500,
+      //       location: 'middle'
+      //   });
+      //   return;
+      // }
+
+      var tempModel = api.pageParam;
+      if (tempModel) {
+        tempModel.MaintainItemName = nameInput.value;
+        tempModel.MaintainItemContent = contentInput.value;
+      }else {
+        tempModel = {
+          MaintainItemName:nameInput.value,
+          MaintainItemContent:contentInput.value,
+          MaintainItemId:$util.guid(),
+        }
+      }
+
+      api.execScript({
+          frameName: 'maintainEqp',
+          script: "addmaintain('"+JSON.stringify(tempModel)+"');"
+      });
+      api.closeFrame();
+    }
+
+    function cancellBtnClick() {
+      api.closeFrame();
+    }
+
+    function ItemSelect(itemType) {
+
+      switch (itemType) {
+        case 'DefectType':
+         {
+           if (DefectTypeList.length <= 0) {
+             loadItemArr(itemType,'',true,function(itemArr) {
+               DefectTypeList = itemArr;
+               if (DefectTypeList.length > 0) {
+                 ItemSelect(itemType);
+               }
+             });
+             return;
+           }
+           showSelector(DefectTypeList,function(flag,itemModel) {
+             if (flag == true) {
+              var DefectTypeDiv =$api.byId('DefectType');
+              DefectTypeDiv.innerHTML = itemModel.ItemName;
+              $api.css(DefectTypeDiv, 'color:#323232;');
+              DefectTypeObj = itemModel;
+
+              DefectCodeObj = null;
+              var defectDiv =$api.byId('defect');
+              defectDiv.innerHTML = '请选择Code';
+              $api.css(defectDiv, 'color:#666666;');
+              DefectCodeList = [];
+            }else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'DefectCode':
+        {
+          var para = '';
+          if (DefectTypeObj) {
+            para = DefectTypeObj.ItemCode;
+          }
+          if (DefectCodeList.length <= 0) {
+            loadItemArr(itemType,para,true,function(itemArr) {
+              DefectCodeList = itemArr;
+              if (DefectCodeList.length > 0) {
+                ItemSelect(itemType);
+              }
+            });
+            return;
+          }
+          showSelector(DefectCodeList,function(flag,itemModel) {
+            if (flag == true) {
+              var defectDiv =$api.byId('defect');
+              defectDiv.innerHTML = itemModel.ItemName;
+              $api.css(defectDiv, 'color:#323232;');
+              DefectCodeObj = itemModel;
+            }else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      default:
+        break;
+     }
+   }
+
+  function showSelector(itemArr,callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+               datas: itemArr,
+               layout: {
+                   row: 6,
+                   col: 1,
+                   height: 44,
+                   size: 16,
+                   sizeActive: 16,
+                   rowSpacing: 0,
+                   colSpacing: 0,
+                   maskBg: 'rgba(0,0,0,0.2)',
+                   bg: '#fff',
+                   color: '#8c9098',
+                   colorActive: '#10131b',
+                   colorSelected: '#10131b'
+               },
+               animation: true,
+               cancel: {
+                   text: '取消',
+                   size: 18,
+                   w: 80,
+                   h: 35,
+                   bgActive: '#8c9098',
+                   colorActive: '#fff',
+                   color: '#555555',
+                   bg: '#d9d9d9'
+               },
+               ok: {
+                   text: '确定',
+                   size: 18,
+                   w: 80,
+                   h: 35,
+                   color: '#fff',
+                   bg: '#1eb1ed',
+                   colorActive: '#fff',
+                   bgActive: '#8c9098',
+               },
+               title: {
+                   text: '请选择',
+                   size: 18,
+                   h: 60,
+                   bg: '#fff',
+                   color: '#10131b'
+               },
+               fixedOn: api.frameName
+           }, function(ret, err) {
+              console.log(JSON.stringify(ret));
+              var tempModel = null;
+
+              if (ret&&ret.eventType =='ok') {
+                if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+                  tempModel = ret.selectedInfo[0];
+                  callBack(true,tempModel);
+                }else{
+                   callBack(false,tempName);
+                }
+              }
+           });
+     }
+
+     function inputEnd(el) {
+       if (!el.value ||el.value.length <= 1) {
+         el.value = 1;
+       }
+     }
+
+     function subtractBtnClick(type) {
+       var countInput = $api.byId('countInput');
+       if (type == 'add') {
+         countInput.value = parseInt(countInput.value)+ 1;
+        }else{
+          countInput.value -= 1;
+          if (countInput.value <= 1) {
+            countInput.value = 1;
+          }
+       }
+     }
+
+
+</script>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style>
+        body{
+          margin: 0px;
+          padding: 0px;
+          background-color: #fff;
+        }
+
+
+        .content
+        {
+          padding: 50px 0px 60px;
+          margin: 0px;
+          width: 100%;
+          font-size: 0.8rem;
+        }
+        .logImage
+        {
+          margin: 0px auto;
+          height: 3.8rem;
+          width: 3.8rem;
+          background-image:  url(../image/logo.png) ;
+        	background-position: center;
+        	background-repeat: no-repeat;
+        	background-size: 3.8rem 3.8rem;
+        }
+
+        .content .appName
+        {
+          text-align: center;
+          color: #10131b;
+          padding: 10px 0px 3px;
+        }
+
+         #version
+        {
+          text-align: center;
+          font-size: 0.7rem;
+          color: #b0b0b0;
+          padding: 0px;
+        }
+
+        .updata
+        {
+          height: 44px;
+          margin-left: 15px;
+          font-size: 0.7rem;
+          color: #10131b;
+          line-height: 44px;
+          background-image:  url(../image/mine/common_right_icon.png) ;
+          background-position: center right 15px;
+          background-repeat: no-repeat;
+          -webkit-background-size: 8px;
+          background-size: 8px;
+          border-bottom: 1px solid #efefef;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="content">
+      <div class="logImage"></div>
+      <div class="appName">爱美E站</div>
+      <div id="version">版本 1.0.0</div>
+    </div>
+    <div class="updata" onclick="showTheAgreement()">用户协议</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+
+    apiready = function(){
+      var appVersion = api.appVersion;
+
+      var versionDiv = $api.byId('version');
+      versionDiv.innerHTML = '版本 '+appVersion;
+    };
+
+    function closeWin(){
+        api.closeWin({
+        });
+    }
+
+    function showTheAgreement() {
+      api.openWin({
+          name: 'web_fram_nav',
+          url: 'web_fram_win.html',
+          slidBackEnabled:false,
+          pageParam: {
+            linkTitle:'用户协议',
+            link: 'https://gsc.ywapi.com:8088/Pricacy'
+          },
+          animation: {
+              type: 'movein',
+              subType: 'from_right'
+          }
+      });
+    }
+
+    function updataVersions() {
+      checkUpdate();
+    }
+
+    function checkUpdate() {
+            var mam = api.require('mam');
+            mam.checkUpdate(function(ret, err) {
+                if (ret) {
+                    var result = ret.result;
+                    console.log(JSON.stringify(ret));
+                    if (result.update == true && result.closed == false) {
+                      if (api.systemType == "android") {
+                          api.download({
+                              url : result.source,
+                              report : true
+                          }, function(ret, err) {
+                              if (ret && 0 == ret.state) {/* 下载进度 */
+                                  api.toast({
+                                      msg : "正在下载应用" + ret.percent + "%",
+                                      duration : 1000
+                                  });
+                              }
+                              if (ret && 1 == ret.state) {/* 下载完成 */
+                                  var savePath = ret.savePath;
+                                  api.installApp({
+                                      appUri : savePath
+                                  });
+                              }
+                          });
+                      }
+                      if (api.systemType == "ios") {
+                          api.installApp({
+                              appUri : result.source
+                          });
+                      }
+                    } else {
+                        api.alert({
+                            msg : "此版本为最新版本"
+                        });
+                    }
+                } else {
+                    api.alert({
+                      msg : "此版本为最新版本"
+                    });
+                }
+            });
+        }
+
+
+</script>
+</html>

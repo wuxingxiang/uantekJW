@@ -1,0 +1,258 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    .order_item {
+      padding: 0.5rem 0px;
+      position: relative;
+    }
+
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .detailData {
+      padding: 0.5rem 0.3rem;
+      position: relative;
+    }
+
+    .status {
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #f94d7e;
+      font-size: 0.6rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section id="item_list">
+
+  </section>
+  <!-- <div class="status">{{=value.StatuLotame}}</div> -->
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+      <div class="font_size_14 order_item">
+        <div class="font_size_14"  onclick="itemClick({{=index}});">
+          <div class="item_row">
+            <div class="item_sub_left item_sub_nowrap font_size_16 mr6">{{=value.name}}</div>
+          </div>
+          <div class="item_row color_darkgray mt4">
+            <div class="item_row color_darkgray item_sub_left">
+              <div class="">编号：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.code}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="separate_line"></div>
+      </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefreshMore.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var pageNum = 1;
+  var pageSize = 20;
+  var itemList = [];
+
+  var LocationId = '';
+  var WarehouseId = '';
+  var startDate = '';
+  var endDate = '';
+
+  var name = '';
+  var code = '';
+
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无数据');
+    $showErrorDiv.addErrorHtml(body);
+    $upRefresh.analysisData(itemList, itemList);
+
+    initEventListenner();
+    // setdate();
+    loadItemList(false);
+    // addTemplate();
+  }
+
+  function addTemplate() {
+    var template = $api.byId('template');
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+    if (appType != 'PDA') {
+      var html =
+        '{{~it:value:index}}' +
+        '<div class="item_row font_size_14 order_item detailData" onclick="itemClick({{=index}});">' +
+        '<div class="item_sub_left pl6">{{=value.OrderNo}}</div>' +
+        '<div class="item_sub_left pl4 pr4">{{=value.Product}}</div>' +
+        '<div class="item_center pl4 pr4">{{=value.Process}}</div>' +
+        '<div class="align_center pl4 pr4" id="count">{{=value.Qty}}</div>' +
+        '<div class="align_center pl4 pr4" id="completeCount">{{=value.CompleteQty}}</div>' +
+        '<div class="timeDiv pl4">{{=value.PlanDate}}</div>' +
+        '<div class="statusView color_main pl4">{{=value.StatuLotame}}</div>' +
+        '<div class="separate_line"></div>' +
+
+        '</div>' +
+        '{{~}}';
+
+      template.innerHTML = html;
+    }
+
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+        loadItemList(false);
+        api.refreshHeaderLoadDone();
+      }, 400);
+    });
+  }
+
+
+  function loadItemList(flag) {
+    var parameters = {
+      name:name,
+      code:code
+    };
+    return;
+    loadItems($requst.Api.productList, parameters, itemList, flag, function (isOk, result, message) {
+      api.refreshHeaderLoadDone();
+      if (isOk) {
+        // if (!$util.isNotEmptyArray(data)) {
+        //   itemList = result;
+        //   var tempList = analyseData(data);
+        //   itemList = tempList;
+        // }
+
+        itemList = result;
+        $upRefresh.analysisData(itemList, itemList);
+        $showErrorDiv.loadSucceed();
+      } else {
+        if (flag == false) {
+          $showErrorDiv.loadError();
+        }
+        api.toast({
+          msg: message,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function loadMoreItemList() {
+    $upRefresh.loadMoreHeader();
+    api.refreshHeaderLoadDone();
+    loadItemList(true);
+  }
+  // ================数据处理=========================
+  function setCode(_code) {
+    code = _code
+  }
+
+  function setName(_name) {
+    name = _name;
+  }
+
+  function setLocationId(_LocationId) {
+    LocationId = _LocationId;
+  }
+
+  function setWarehouseId(_WarehouseId) {
+    WarehouseId = _WarehouseId;
+  }
+
+  function setOrderNum(_OrderNum) {
+    OrderNum = _OrderNum;
+  }
+
+  // ================点击事件=========================
+
+  function saveBtnClick() {
+    loadItemList(false);
+  }
+
+  function itemClick(index) {
+    if (index < itemList.length) {
+      var tempModel = itemList[index];
+      tempModel.itemType = api.pageParam.itemType;
+      if (api.pageParam.frameName) {
+        api.execScript({
+          name: api.pageParam.winName,
+          frameName: api.pageParam.frameName,
+          script: "selectedItem('" + JSON.stringify(tempModel) + "')"
+        })
+      } else {
+        api.execScript({
+          name: api.pageParam.winName,
+          script: "selectedItem('" + JSON.stringify(tempModel) + "')"
+        })
+      }
+      api.closeWin();
+    }
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList(false);
+  }
+
+</script>
+
+</html>

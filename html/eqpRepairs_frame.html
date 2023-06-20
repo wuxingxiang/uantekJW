@@ -1,0 +1,769 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/addPhotos.css" />
+
+
+  <style type="text/css">
+    html,
+    body {
+      min-height: 100%;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    body {
+      background-color: #fff;
+    }
+
+    #inputView {
+      border: 1px solid #d9d9d9;
+      height: 1.7rem;
+      border-radius: 0.15rem;
+      padding-left: 0.2rem;
+    }
+
+    #scanResualt {
+      height: 1.7rem;
+      line-height: 1.7rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      font-size: 0.8rem;
+    }
+
+    #EqpNumInput {
+      position: absolute;
+      top: 0px;
+      left: 0.2rem;
+      right: 1rem;
+      bottom: 0rem;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    input[type="text"] {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      text-align: center;
+      padding-right: 1.2rem;
+    }
+
+    input::-webkit-input-placeholder {
+      line-height: 1.6rem;
+    }
+
+
+    .selectItem {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.8rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    .leftTitle {
+      width: 3.6rem;
+    }
+
+    textarea {
+      height: 5rem;
+      width: 100%;
+      padding: 3px;
+      font-size: 0.8rem;
+      border: 1px solid #d9d9d9;
+      border-radius: 0.2rem;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.8rem;
+    }
+
+    #UNPDAView {
+      display: none;
+    }
+
+    #PADView {
+      display: none;
+    }
+
+    .tapDownBtn {
+      height: 100%;
+      width: 1rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center;
+      background-size: 0.6rem;
+      z-index: 10000;
+    }
+
+
+    .selectIcon {
+      width: 1.4rem;
+      height: 1.4rem;
+      background: url(../image/common/common_unSelected_icon.png) no-repeat;
+      background-position: center;
+      background-size: 0.8rem;
+      margin-right: 0.2rem;
+    }
+
+    .selected {
+      background-image: url(../image/common/common_select.png);
+    }
+
+    .unSelected {
+      background-image: url(../image/common/common_unSelected_icon.png);
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <section class="pt12" id="topView">
+    <div class="item_row item_sub_left mb12">
+      <div class="font_size_16 leftTitle">扫描设备</div>
+      <div class="item_sub_right item_normal item_row" id="inputView">
+        <div id="scanResualt" class="color_gray font_size_14 item_sub_nowrap font_size_16 item_sub_left">请扫描设备二维码</div>
+        <div class="tapDownBtn"></div>
+
+        <input id="EqpNumInput" name='SNScan' autofocus="autofocus" class='item_sub_right font_size_16' maxlength='300'
+          value="" type="text" oninput="OnInput(event,this)" onclick='SNClick();' placeholder="">
+        <div tapmode class="tapView" onclick="tapDownBtnClick();"></div>
+        <!-- 请输入SN -->
+      </div>
+    </div>
+
+    <div class="item_row item_sub_left mb12" id="defualtType">
+      <div class="font_size_16 mr8 " id="title">故障类型</div>
+      <div class="selectItem item_sub_center color_darkgray" id="RepirType" onclick="itemSelect('RepirType')">请选择故障类型
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="item_row item_sub_left mb16" id="UrgencyView">
+
+    </div>
+  </section>
+
+  <section style="background-color:#fff;margin-top:0.8rem;">
+    <div class="font_size_16 leftTitle mb4" id="title">故障描述</div>
+    <div class="item_row">
+      <textarea id="description" class="item_sub_left" name="txt" clos=",50" rows="5" maxlength="100" warp="virtual"
+        placeholder="设备故障请尽快维修！"></textarea>
+      <div class="separate Hide" style="flex: 0.6;"></div>
+    </div>
+  </section>
+
+  <section class="image_list_content" id="imagesView">
+    <div class="image_list_title">上传图片（最多9张）</div>
+    <div id="imagesView_take" class="image_lists">
+    </div>
+  </section>
+
+  <section class="item_row item_center" id="bottomViewParent">
+    <div class="bottomView item_row" id="submitBtnView" style="width: 60%;">
+      <div class="bottomBtn color_bg_blue item_sub_center" onclick="submitBtnClick();">提交</div>
+    </div>
+    <div class="separate_line_top"></div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<!-- <script type="text/javascript" src="../script/aliyun-oss-sdk.min.js"></script> -->
+<!-- <script type="text/javascript" src="../script/ossRequst.js"></script> -->
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/photosGet.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var currenTypeCode = '';
+  var currenTypeName = '';
+
+  var navName = 'faultList_nav';
+  var frameName = 'faultList';
+
+  var filePath = 'fault';
+
+  var EqpObj = null;
+  var EqpArr = new Array;
+
+  var pictures = new Array;
+
+  var DefaultObj = null;
+  var DefaultArr = new Array;
+
+  var Urgency = 1;
+  var hasUpload = false;
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $showErrorDiv.addErrorHtml(body);
+    betrothScreen();
+    keybordTap();
+
+    var tempArr = [{ "Key": "1", "Value": "普通", "Code": null }, { "Key": "2", "Value": "正常", "Code": null }, { "Key": "3", "Value": "紧急", "Code": null }];
+    showUrgencyView(tempArr);
+
+    loadUrgencyArr();
+  };
+
+  function betrothScreen() {
+    var topView = $api.byId('topView');
+    var defualtType = $api.byId('defualtType');
+    var separateView = $api.dom('.separate');
+
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType == 'PDA') {
+      if ($api.hasCls(topView, 'item_row')) {
+        $api.removeCls(topView, 'item_row');
+      }
+
+      var body = $api.dom('body');
+      var imagesNode = $api.byId('imagesView_take');
+      $photosGet.addPhotoHtml(body, imagesNode);
+    } else {
+
+      var imagesView = $api.byId('imagesView');
+      imagesView.style.display = 'none';
+
+      $api.addCls(topView, 'item_row');
+      $api.addCls(defualtType, 'ml16');
+      separateView.style.display = 'block';
+
+      var submitBtnView = $api.byId('submitBtnView');
+      if (submitBtnView) {
+        $api.css(submitBtnView, 'width:35%');
+      }
+    }
+  }
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#EqpNumInput').bind('keyup', function (event) {
+      var currentScanStr = '';
+      var scanResualt = $api.byId('scanResualt');
+      if (event.keyCode == "13") {
+        if (event.target.value && event.target.value.length > 0) {
+
+          var scanStr = event.target.value;
+          console.log(JSON.stringify(scanStr));
+          event.target.value = '';
+
+          currentInput = currentScanStr;
+          loadEqpInfo(scanStr);
+        }
+      } else {
+        var appType = api.getGlobalData({
+          key: 'APPTYPE'
+        });
+        if (appType == 'PDA') {
+          if (this.value.length == 1) {
+            this.value = '';
+          }
+        }
+      }
+    });
+
+    $("#EqpNumInput").bind("input propertychange", function () {
+      // var scanResualt = $api.byId('scanResualt');
+      // $api.css(scanResualt, 'color:#323232;');
+
+      // var scanResualt = $api.byId('EqpNumInput');
+      // scanResualt.innerHTML = scanResualt.value;
+      //
+      console.log(scanResualt.value);
+    });
+
+    $("#EqpNumInput").bind("keyup blur", function () {
+      console.log(22222);
+      // 。。。
+    });
+  }
+
+  // ===========数据请求==========
+  function loadEqpInfo(scanStr) {
+    var parDic = scanStr;
+    isLoading = true;
+    // var parUrl = '&EqpId='+scanStr;
+    GetEqpInfo(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data) {
+          EqpObj = ret.data;
+          var scanResualt = $api.byId('scanResualt');
+          $api.css(scanResualt, 'color:#323232;');
+          scanResualt.innerHTML = EqpObj.EqpName;
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadUrgencyArr() {
+    loadItemArr('Urgency', function (itemArr) {
+      if (itemArr.length > 0) {
+        showUrgencyView(itemArr);
+      }
+    });
+  }
+
+  function showUrgencyView(itemArr) {
+    var html = '<div class="font_size_16 mr24 " id="title">紧急程度</div>';
+    var selectedClass = 'selected';
+
+    for (var i = 0; i < itemArr.length; i++) {
+      if (i != 0) {
+        selectedClass = 'unSelected';
+      }
+      html +=
+        '<div class="item_sub_center mr20"  onclick="selectItemClick(' + itemArr[i].Key + ',this);">' +
+        '<div class="item_row">' +
+        '<div class="selectIcon ' + selectedClass + ' operationType"></div>' +
+        '<div class="font_size_16">' + itemArr[i].Value + '</div>' +
+        '</div>' +
+        '</div>'
+    }
+
+    var UrgencyView = $api.byId('UrgencyView');
+    UrgencyView.innerHTML = html;
+  }
+
+  function loadItemArr(itemType, callBack) {
+    var parUrl = itemType;
+    GetSeletItemList(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.Value;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+
+  function loadEqpArr(callBack) {
+    var parDic = {
+      EqpType: '',
+      LineId: '',
+      ProcessId: '',
+      PageSize: 30,
+      PageNum: 1
+    }
+
+    GetEqplist(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = va;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UploadData() {
+    var description = $api.byId('description');
+    var descriptionStr = '故障设备请尽快维修';
+    if (description && !$util.isEmpty(description.value)) {
+      descriptionStr = description.value;
+    }
+
+    var parDic = {
+      EqpId: EqpObj.Id,
+      FaultTypeId: DefaultObj.Key,
+      FaultContent: descriptionStr,
+      UrgentLevel: Urgency,
+      ImageList: pictures
+    }
+
+    PostEqpRepairsSubmit(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        setTimeout(function () {
+          api.closeWin();
+        }, 600);
+
+        hasUpload = true;
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+      api.hideProgress();
+    }, function (err) {
+      api.toast({
+        msg: '报修失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+
+  // ==============================================
+  function OnInput(event, tag) {
+    console.log(tag.value);
+    //  console.log(event.target.value);
+
+
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+    if (appType == 'PDA') {
+      if (event.target.value.length == 1) {
+        event.target.value = '';
+      }
+    }
+
+  }
+  function SNClick() {
+
+    var input = $api.byId('EqpNumInput');
+    input.focus();
+    $api.attr(input, 'readOnly', true);
+    setTimeout(function () {
+      input.removeAttribute("readOnly")//延迟移除readonly属性
+    }, 30);
+  }
+
+  function tapDownBtnClick() {
+    event.stopPropagation();
+
+    api.openWin({
+      name: 'eqpSelectedList_nav',
+      url: 'eqpSelectedList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName: 'eqpRepairs_nav',
+        frameName: 'eqpRepairs'
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+    // itemSelect('Eqp');
+  }
+
+  function itemSelect(itemType) {
+
+    switch (itemType) {
+      case 'RepirType':
+        {
+          if (DefaultArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              DefaultArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(DefaultArr, function (flag, tempModel) {
+            if (flag == true) {
+              var itemTypeDiv = $api.byId(itemType);
+              itemTypeDiv.innerHTML = tempModel.Value;
+              $api.css(itemTypeDiv, 'color:#323232;');
+              DefaultObj = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'Eqp':
+        {
+          if (EqpArr.length <= 0) {
+            loadEqpArr(function (itemArr) {
+              EqpArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+          showSelector(EqpArr, function (flag, tempModel) {
+            if (flag == true) {
+              var itemTypeDiv = $api.byId('scanResualt');
+              itemTypeDiv.innerHTML = tempModel.EqpName;
+              $api.css(itemTypeDiv, 'color:#323232;');
+              EqpObj = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function selectedItem(itemStr) {
+    var tempItem = JSON.parse(itemStr);
+    var itemTypeDiv = $api.byId('scanResualt');
+    itemTypeDiv.innerHTML = tempItem.EqpName;
+    $api.css(itemTypeDiv, 'color:#323232;');
+    EqpObj = tempItem;
+  }
+
+  function addPhoto() {
+
+    api.actionSheet({
+      cancelTitle: '取消',
+      buttons: ['拍照', '从相册选择']
+    }, function (ret, err) {
+      if (ret) {
+        if (ret.buttonIndex == 1) {
+          $photosGet.takePhoto(pictures);
+        } else if (ret.buttonIndex == 2) {
+          $photosGet.pickPhoto(pictures);
+        }
+      }
+    });
+  }
+
+  function deleteImage(index) {
+    event.stopPropagation();
+    $photosGet.deleteImage(pictures, index);
+  }
+
+  function previewImage(index) {
+    event.stopPropagation();
+    $photosGet.previewImage(pictures, index);
+  }
+
+  function showSelector(itemArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 8,
+        col: 1,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempModel = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          var index = ret.selectedInfo.length;
+          tempModel = ret.selectedInfo[index - 1];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+
+      // if (ret.eventType != 'onChange') {
+      //   setTimeout(function () {
+      //     SNClick();
+      //   }, 200);
+      // }
+    });
+  }
+
+  function submitBtnClick() {
+    if (!EqpObj) {
+      api.toast({
+        msg: '请选择设备',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (!DefaultObj) {
+      api.toast({
+        msg: '请选择故障类型',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (hasUpload == true) {
+      return;
+    }
+
+    uploadFileToLocatServer(pictures, 'EQM', function (updataSuccee) {
+      if (updataSuccee) {
+        UploadData();
+      } else {
+        api.hideProgress();
+        api.toast({
+          msg: '上传图片失败,请重试',
+          duration: 1000,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function selectItemClick(controlType, el) {
+
+    Urgency = controlType;
+    var items = $api.domAll('.operationType');
+    if (items) {
+      for (var i = 0; i < items.length; i++) {
+        if ($api.hasCls(items[i], 'selected')) {
+          $api.removeCls(items[i], 'selected');
+        }
+        $api.addCls(items[i], 'unSelected')
+      }
+    }
+
+    var node = $api.dom(el, '.operationType');
+    if (node) {
+      if ($api.hasCls(node, 'unSelected')) {
+        $api.removeCls(node, 'unSelected');
+      }
+      $api.addCls(node, 'selected')
+    }
+  }
+
+</script>
+
+</html>

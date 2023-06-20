@@ -1,0 +1,545 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    .order_item {
+      padding: 0.5rem 0px;
+      position: relative;
+    }
+
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .detailData {
+      padding: 0.5rem 0.3rem;
+      position: relative;
+    }
+
+    .status {
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #f94d7e;
+      font-size: 0.6rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+
+
+    #item_list {}
+
+    .selectedIcon img {
+      height: 1rem;
+      width: 1rem;
+    }
+
+    .tapView {
+      position: absolute;
+      left: -1rem;
+      top: -0.5rem;
+      right: 0px;
+      bottom: -0.5rem;
+    }
+
+    .leftSeperate {
+      width: 0.6rem;
+      height: 10px;
+    }
+
+    .Unit {
+      text-align: center;
+      width: 4rem;
+    }
+
+    .list_item_sub {
+      padding: 0.25rem 0px;
+    }
+
+    .AddBtn {
+      position: fixed;
+      bottom: 1rem;
+      right: 0rem;
+      height: 5rem;
+      width: 5rem;
+      background: url(../image/common/add_big_icon.png) no-repeat;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 5rem;
+      z-index: 1000;
+    }
+
+    .itemView{
+      padding: 0.3rem 0.4rem;
+      border-radius: 0.2rem;
+      background-color: #efefef;
+      margin-top: 0.5rem;
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section id="item_list">
+
+  </section>
+  <!-- <div class="AddBtn" onclick="addUnisonBtnClick()"></div> -->
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+      <div class="font_size_14 order_item">
+        <div class="item_normal color_darkgray mt6"  onclick="itemClick({{=index}});">
+          <div class="item_row font_size_16 " style='align-items: flex-start;'>
+            <div class="item_sub_left font_size_16">{{=value.SpareName}}</div>
+          </div>
+
+          <div class="item_row mt4">
+            <div class="">SN：</div>
+            <div class="item_sub_nowrap item_sub_left">{{=value.BarcodeNo}}</div>
+          </div>
+
+          <div class="item_row mt6">
+            <div class="item_row item_sub_left mr4" style='align-items: flex-start;'>
+              <div class="">出库人员：</div>
+              <div class="item_sub_left item_sub_nowrap pr12">{{=value.CreatorName}}</div>
+            </div>
+  
+            <div class="item_row item_sub_left ml4" style='flex:1.2;'>
+              <div class="">出库类型：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.ActionTypeName}}</div>
+            </div>
+          </div>
+
+          <div class="item_row mt4">
+            <div class="">备注：</div>
+            <div class="item_sub_nowrap item_sub_left">{{=value.Description}}</div>
+          </div>
+
+          <div class="item_row mt8">
+            <div class="item_sub_right">出库时间：</div>
+            <div class="">{{=value.CreationTime}}</div>
+          </div>
+        </div>
+        <div class="separate_line"></div>
+      </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefreshMore.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var PageNum = 1;
+  var PageSize = 20;
+  var itemList = [];
+
+  var LocationId = '';
+  var WarehouseId = '';
+  var OutStockTypeId = '';
+
+  var startDate = '';
+  var endDate = '';
+
+  var OrderNum = '';
+  var SarePart = '';
+  var Supplier = '';
+  var selectedItem = null;
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无数据');
+    $showErrorDiv.addErrorHtml(body);
+    $upRefresh.analysisData(itemList, itemList);
+    initEventListenner();
+    setdate();
+    loadItemList();
+  }
+
+  function setdate() {
+    var myDate = new Date();
+    var year = myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+    var month = myDate.getMonth() + 1;       //获取当前月份(0-11,0代表1月)
+    if (month < 10) {
+      month = '0' + month;
+    }
+    var day = myDate.getDate();        //获取当前日(1-31)
+
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    endDate = year + '-' + month + '-' + day;
+    startDate = $util.GetDateStr(endDate, -7);
+  }
+
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+        loadItemList();
+        api.refreshHeaderLoadDone();
+      }, 400);
+    });
+  }
+
+  function loadStorageCode() {
+    var parDic = '';
+    GetOtherOutgoinSearch(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      itemList = [];
+      if (ret.code == 200 && ret.data && ret.data.Code) {
+        openStockDetail(ret.data.Code);
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '获取入库code失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadItemList() {
+    PageNum = 1;
+    var parDic = {
+      SpareName: SarePart,
+      ActionType:OutStockTypeId,
+      StartTime: startDate ? startDate + ' 00:00:00' : '1970-01-01 00:00:00',
+      EndTime: endDate ? endDate + ' 23:59:59' : '2200-01-01 23:59:59',
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+
+    SpareStockOutHist(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      itemList = [];
+      if (ret.code == 200) {
+        if (ret.data) {
+          itemList = ret.data;
+        }
+        $upRefresh.analysisData(itemList, itemList);
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadMoreItemList() {
+    $upRefresh.loadMoreHeader();
+    api.refreshHeaderLoadDone();
+
+    PageNum++;
+    var parDic = {
+      SpareName: SarePart,
+      ActionType:OutStockTypeId,
+      StartTime: startDate ? startDate + ' 00:00:00' : '1970-01-01 00:00:00',
+      EndTime: endDate ? endDate + ' 23:59:59' : '2200-01-01 23:59:59',
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+
+    SpareStockOutHist(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          itemList = itemList.concat(ret.data);
+        }
+        $showErrorDiv.loadSucceed();
+        $upRefresh.analysisData(ret.data, itemList);
+      } else {
+        PageNum--;
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      PageNum--;
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UploadData() {
+    if (!selectedItem) {
+      api.toast({
+        msg: '请选择需要提交的物料',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (!WarehouseToId) {
+      api.toast({
+        msg: '请选择入库仓库',
+        duration: 1500,
+        location: 'middle'
+      });
+
+      return;
+    }
+    if (!LocationId) {
+      api.toast({
+        msg: '请选择库位',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var parDic = {
+      PreinspectionId: selectedItem.Id,
+      WarehouseId: WarehouseToId,
+      BinCode: LocationId,
+      LabelList: selectedItem.LabelList
+    };
+
+    GodownEntrySubmit(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        api.execScript({
+          name: api.pageParam.winName,
+          frameName: api.pageParam.frameName,
+          script: "loadItemList()"
+        });
+
+        var itemListDiv = $api.byId('item_list');
+        var items = $api.domAll(itemListDiv, '.order_item');
+        var index = 0;
+        var contain = false;
+        itemList.forEach(function (val, subIndex) {
+          if (selectedItem.Id == val.Id) {
+            contain = true;
+            index = subIndex;
+            return;
+          }
+        });
+        if (items && items.length > 0 && contain && items.length >= index) {
+          var Node = items[index]
+          $api.remove(Node);
+          itemList.splice(index,1);
+        }
+
+        if (itemList.length <= 0) {
+          $upRefresh.analysisData(itemList, itemList);
+        }
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  // ================数据处理=========================
+  function setStartDate(_startDate) {
+    startDate = _startDate
+  }
+
+  function setEndDate(_endDate) {
+    endDate = _endDate;
+  }
+
+  function setSupplier(_Supplier) {
+    Supplier = _Supplier;
+  }
+
+  function setOrderNum(_OrderNum) {
+    OrderNum = _OrderNum;
+  }
+
+  function setSarePart(_SarePart) {
+    SarePart = _SarePart;
+  }
+
+  function setLocationId(_LocationId) {
+    LocationId = _LocationId;
+  }
+
+  function setWarehouseId(_WarehouseId) {
+    WarehouseId = _WarehouseId;
+  }
+
+  function setOutStockTypeId(_OutStockTypeId) {
+    OutStockTypeId = _OutStockTypeId;
+  }
+
+  function refreshSelectIcon() {
+    var selected = true;
+    if (itemList.length > 0) {
+      itemList.forEach(function (val, index) {
+        if (val.selected == false) {
+          selected = false;
+          return;
+        }
+      });
+    } else {
+      selected = false;
+    }
+
+    api.execScript({
+      name: 'SarePartWaitForStock_nav',
+      script: "refreshSelectIcon(" + selected + ")"
+    })
+  }
+
+
+  function refreshItemSelectIcon(flag) {
+    itemList.forEach(function (val, index) {
+      val.selected = flag
+    });
+
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  // ================点击事件=========================
+
+  function saveBtnClick() {
+    UploadData();
+  }
+
+  function itemClick(tapIndex) {
+    itemList.forEach(function (val, index) {
+      if (tapIndex == index) {
+        val.IsOpen = !val.IsOpen;
+        if (val.IsOpen == true) {
+          val.arrowCls = 'arrow_up';
+        } else {
+          val.arrowCls = 'arrow_down';
+        }
+      } else {
+        val.IsOpen = false;
+        val.arrowCls = 'arrow_down';
+      }
+    });
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function selectedIconTap(index) {
+    event.stopPropagation();
+    if (itemList.length > index) {
+      var tempModel = itemList[index];
+      var selected = tempModel.selected;
+      itemList.forEach(function (val, index) {
+        val.selected = false;
+      });
+
+      selectedItem = tempModel;
+      tempModel.selected = !selected;
+      $upRefresh.analysisData(itemList, itemList);
+    }
+
+    // refreshSelectIcon();
+  }
+
+  function addUnisonBtnClick() {
+    // loadStorageCode();
+
+    openStockDetail('');
+  }
+
+  function openStockDetail(code) {
+    api.openWin({
+      name: 'sarePartStockOutDetail_nav',
+      url: 'sarePartStockOutDetail_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName:'sarePartStockOutList_nav',
+        frameName:api.framName,
+        StorageCode:code
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+
+</html>

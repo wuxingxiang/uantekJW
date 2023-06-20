@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .detailData {
+      padding: 0.5rem 0.3rem;
+      position: relative;
+    }
+
+    .status {
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #f94d7e;
+      font-size: 0.6rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+
+    .wrapper {
+      height: auto;
+      min-width: 2rem;
+    }
+
+
+    .deleteBtn {
+      width: 100px;
+    }
+
+    .Unit {
+      text-align: center;
+      width: 4rem;
+    }
+
+    .selectedIcon img {
+      height: 1rem;
+      width: 1rem;
+    }
+    .scanView {
+      text-align: center;
+      width: 2rem;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <section id="item_list">
+
+  </section>
+  <!-- <div class="status">{{=value.StatusName}}</div> -->
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+      <div class="item_row list_item">
+        <div class="item_sub_left item_sub_nowrap">{{=value.LabelNo}}</div>
+        <div class="item_sub_nowrap Unit">{{=value.Qty}}</div>
+        <div class="item_sub_nowrap Unit">{{=value.Unit}}</div>
+        <div class="item_sub_center selectedIcon scanView">
+          {{? value.checked}}
+            <img src="../image/common/common_select.png" alt="">
+          {{?}}
+        </div>
+        <div class="separate_line"></div>
+      </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无数据');
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function refreshSNlist(itemListStr) {
+    var tempArr = JSON.parse(itemListStr);
+    if (tempArr && $util.isArray(tempArr)) {
+      itemList = tempArr;
+      $upRefresh.analysisData(itemList, itemList);
+    }
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    // loadItemList();
+  }
+
+</script>
+
+</html>

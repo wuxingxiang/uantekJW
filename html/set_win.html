@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style>
+    body{
+      margin: 0px;
+      padding: 0px;
+      background-color: #fff;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    #title:after{
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom:0;
+      background: #dcdee3;
+      right:0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }
+
+    #saveBtn{
+      width: 50px;
+      height: 30px;
+      border-radius: 0.15rem;
+      background-color: #1eb1ed;
+      color: #fff;
+      line-height: 30px;
+      font-size: 0.8rem;
+      text-align: center;
+      position: absolute;
+      bottom: 11px;
+      right: 0.8rem;
+      font-size: 0.6rem;
+    }
+
+    #saveBtnTap{
+      width: 120px;
+      height: 60px;
+      position: absolute;
+      bottom: 0px;
+      right: 0rem;
+    }
+
+    </style>
+
+</head>
+<body>
+    <header >
+      <i class="back" tapmode onclick="api.closeWin();"></i>
+      <div id="title">设置</div>
+    </header>
+    <!-- <div id="saveBtn" tapmode >保存</div> -->
+    <!-- <div id="saveBtnTap" tapmode onclick="saveBtnClick();"></div> -->
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script//md5.js"></script>
+
+<script type="text/javascript">
+
+    apiready = function(){
+        api.parseTapmode();
+        var header = $api.dom('header');
+        // $api.fixStatusBar( $api.dom('header') );
+        var height =  api.winHeight- header.offsetHeight;
+        var topY = header.offsetHeight;
+        var systemType = api.systemType;
+
+        // api.setStatusBarStyle({
+        //     style: 'dark',
+        //     color: '#fff'
+        // });
+        api.openFrame({
+            name: 'set',
+            url:  'set_frame.html',
+            rect: {
+              x: 0,
+              y: topY,
+              w: api.winWidth,
+              h: height
+            },
+            pageParam: {
+            },
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: false,
+            hScrollBarEnabled: false,
+        });
+    };
+
+    function saveBtnClick() {
+      api.execScript({
+          frameName: 'set_frame',
+          script: 'saveBtnClick();'
+      });
+    }
+
+
+
+</script>
+</html>

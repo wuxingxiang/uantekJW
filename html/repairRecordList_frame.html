@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>AUI快速完成布局</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body{
+      background-color: #fff;
+    }
+
+    .timeDiv{
+      width: 6rem;
+      text-align: center;
+    }
+    #count{
+      width: 4rem;
+    }
+
+    #completeCount{
+      width: 4rem;
+    }
+
+    .order_item{
+      padding: 0.4rem 0rem;
+      position: relative;
+    }
+
+    .status{
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #f94d7e;
+      font-size: 0.6rem;
+      text-align: center;
+    }
+
+    .statusView{
+      width: 3.5rem;
+      text-align: center;
+    }
+
+
+    #item_list{
+
+    }
+
+    .EqpCode{
+      width: 3rem;
+    }
+
+    .subtractBtn{
+      height: 2rem;
+      width: 2rem;
+      background-position: center;
+	    background-repeat: no-repeat;
+      background-size: 1rem;
+      padding: 0px 0.3rem;
+    }
+
+    .addBtn{
+      background-image:  url(../image/common/common_add.png) ;
+    }
+
+    .reduce{
+      background-image:  url(../image/common/common_reduce.png) ;
+    }
+
+    input[type="tel"]{
+      border: 1px solid #d9d9d9;
+      height: 1.3rem;
+      text-align: center;
+      border-radius: 0.15rem;
+    }
+
+    #countInput{
+      width: 5rem;
+      height: 1.3rem;
+    }
+
+  </style>
+</head>
+<body>
+
+  <section id="item_list">
+
+
+  </section>
+
+<script id="template" type="text/x-dot-template">
+   {{~it:value:index}}
+      <div class="font_size_16 order_item">
+        <div class="item_row font_size_16 color_black">
+          <div class="font_size_16">不良类型：</div>
+          <div class="item_sub_left font_size_16 item_sub_nowrap">{{=value.DefectName}}</div>
+        </div>
+
+        <div class="item_row color_darkgray font_size_14 mt4">
+          <div class="item_sub_left color_darkgray font_size_14">修理数：{{=value.RepairQTY}}</div>
+          <div class="status">{{=value.Audit}}</div>
+        </div>
+
+        <div class="item_row color_darkgray font_size_14 mt4">
+          <div class="">修理时间：</div>
+          <div class="">{{=value.CreateDate}}</div>
+        </div>
+        <div class="separate_line"></div>
+      </div>
+  {{~}}
+ </script>
+
+
+ <!-- <div class="item_row">
+   <div class="subtractBtn reduce" tapmode onclick="subtractBtnClick('reduce',{{=index}});"></div>
+   <input id="countInput" class='font_size_16' maxlength = '5' value="{{=value.inputValue}}" type="tel" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" onBlur="InputEnd(this,'{{=index}}')" oninput="OnInput(this,'{{=index}}');" placeholder="请输入数量">
+   <div class="subtractBtn addBtn" tapmode  onclick="subtractBtnClick('add',{{=index}});"></div>
+ </div> -->
+
+</body>
+<script type="text/javascript" src="../script/api.js" ></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+    var PageNum  = 1;
+    var PageSize = 20;
+    var itemList = [];
+
+    apiready = function () {
+      var body = $api.dom('body');
+      $upRefresh.addHtml(body,'暂无修理记录');
+      $showErrorDiv.addErrorHtml(body);
+      initEventListenner();
+      $upRefresh.analysisData(itemList,itemList);
+      loadItemList();
+    }
+
+    // 初始化事件监听
+    function initEventListenner() {
+      api.setRefreshHeaderInfo({
+          visible: true,
+          loadingImg: 'widget://image/refresh.png',
+          bgColor: '#fff',
+          textColor: '#8c9098',
+          textDown: '下拉刷新...',
+          textUp: '松开刷新...',
+          showTime: true
+      }, function(ret, err){
+        loadItemList();
+      });
+    }
+
+    function loadItemList() {
+      var parDic = api.pageParam.OrderNo;
+      Getrepairedlistbyorderno(parDic,function(ret){
+        api.refreshHeaderLoadDone();
+        console.log(JSON.stringify(ret));
+        itemList = [];
+        if (ret.code == 200) {
+          if (ret.data) {
+            itemList = ret.data;
+          }
+          $showErrorDiv.loadSucceed();
+        }else {
+          $showErrorDiv.loadError();
+          api.toast({
+              msg: ret.info,
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+        $upRefresh.analysisData(ret.data,itemList);
+      },function(err){
+        $showErrorDiv.loadError();
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+    function loadMoreItemList() {
+      $upRefresh.loadMoreHeader();
+      api.refreshHeaderLoadDone();
+
+      PageNum ++;
+      var parDic = {
+        EqpId:api.pageParam.EqpId,
+        PageSize:PageSize,
+        PageNum:PageNum
+      }
+
+      Postworkorderfinishhist(parDic,function(ret){
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data && ret.data.length > 0) {
+            itemList = itemList.concat(ret.data);
+          }
+          $showErrorDiv.loadSucceed();
+          $upRefresh.analysisData(ret.data,itemList);
+        }else {
+          PageNum--;
+          api.toast({
+              msg: ret.info,
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+      },function(err){
+        PageNum--;
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+// ================数据处理=========================
+   function setOrderNum(_OrderNum) {
+     OrderNum = _OrderNum;
+   }
+
+// ================点击事件=========================
+
+
+  function itemClick(index) {
+    console.log(index);
+    api.actionSheet({
+        cancelTitle: '取消',
+        buttons: ['工单投入','工单完成']
+    }, function(ret, err){
+      if( ret ){
+        var tempModel = itemList[index];
+
+        if (ret.buttonIndex == 1 || ret.buttonIndex == 2) {
+          var DevotStr  = '';
+          var FinishStr = '';
+          var showHint  = true;
+
+          switch (tempModel.Status) {
+            case 'Recived':
+              {
+                DevotStr = '该工单未确认，无法投入';
+                FinishStr = '该工单未确认，无法完成';
+              }
+              break;
+            case 'Release':
+              {
+                FinishStr = '该工单未投入，无法完成';
+                if (ret.buttonIndex == 1) {
+                  showHint = false;
+                  api.openWin({
+                      name: 'OrderDevot_nav',
+                      url:  'OrderDevot_win.html',
+                      slidBackEnabled:false,
+                      pageParam:tempModel,
+                      animation: {
+                          type: 'movein',
+                          subType: 'from_right'
+                      }
+                  });
+                }
+              }
+              break;
+            case 'Pause':
+              {
+                DevotStr = '该工单挂起，无法投入';
+                FinishStr = '该工单挂起，无法完成';
+              }
+              break;
+            case 'WIP':
+              {
+                showHint = false;
+                if (ret.buttonIndex == 2) {
+                  api.openWin({
+                      name: 'OrderComplete_nav',
+                      url:  'OrderComplete_win.html',
+                      slidBackEnabled:false,
+                      pageParam:itemList[index],
+                      animation: {
+                          type: 'movein',
+                          subType: 'from_right'
+                      }
+                  });
+                }
+
+                if (ret.buttonIndex == 1) {
+                  api.openWin({
+                      name: 'OrderDevot_nav',
+                      url:  'OrderDevot_win.html',
+                      slidBackEnabled:false,
+                      pageParam:tempModel,
+                      animation: {
+                          type: 'movein',
+                          subType: 'from_right'
+                      }
+                  });
+                }
+              }
+              break;
+            case 'Finish':
+              {
+                DevotStr  = '该工单已完成，无法投入';
+                FinishStr = '该工单已完成，无法完成';
+              }
+              break;
+            case 'Close':
+              {
+                DevotStr = '该工单已结束，无法投入';
+                FinishStr = '该工单已结束，无法完成';
+              }
+              break;
+            default:
+             break;
+          };
+
+          if (showHint) {
+            if (ret.buttonIndex == 1) {
+              api.toast({
+                  msg: DevotStr,
+                  duration: 1500,
+                  location: 'middle'
+              });
+            }else {
+              api.toast({
+                  msg: FinishStr,
+                  duration: 1500,
+                  location: 'middle'
+              });
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function OnInput(tag,index) {
+    if (itemList.length > index) {
+      var  tempItem = itemList[index];
+      if (!tag.value) {
+        tempItem.inputValue = 0;
+      }else {
+        tempItem.inputValue = parseInt(tag.value);
+      }
+    }
+  }
+
+  function InputEnd(tag,index) {
+    if (itemList.length > index) {
+      var  tempItem = itemList[index];
+
+      var count = parseInt(tag.value);
+      if (count > tempItem.Qty) {
+        tag.value = tempItem.Qty;
+        tempItem.inputValue = tempItem.Qty;
+        api.toast({
+            msg: '修理数不能大于不良总数',
+            duration: 1500,
+            location: 'middle'
+        });
+        return;
+      }
+    }
+
+    $upRefresh.analysisData(itemList,itemList);
+  }
+
+  function subtractBtnClick(type,index) {
+    console.log(itemList.length);
+    console.log(index);
+
+    if (itemList.length <= index) {
+      return;
+    }
+
+    var tempItem = itemList[index];
+    var count = tempItem.inputValue;
+
+    switch (type) {
+      case 'add':
+        {
+          if (count > tempItem.Qty) {
+            tempItem.inputValue = tempItem.Qty;
+            api.toast({
+                msg: '修理数不能大于不良总数',
+                duration: 1500,
+                location: 'middle'
+            });
+          }else {
+            count += 1;
+          }
+        }
+        break;
+      case 'reduce':
+        {
+          if (count <= 0) {
+            count = 1;
+          }else {
+            count -= 1;
+          }
+        }
+        break;
+      default:
+        break;
+    }
+    console.log(count);
+
+    tempItem.inputValue = count;
+    $upRefresh.analysisData(itemList,itemList);
+
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+</html>

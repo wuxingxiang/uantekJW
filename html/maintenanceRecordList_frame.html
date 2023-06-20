@@ -1,0 +1,341 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style type="text/css">
+    body{
+      background-color: #fff;
+    }
+
+    .eqpitem{
+      padding: 0.5rem 0px;
+      position: relative;
+    }
+
+    .statusBtn{
+      padding: 0.1rem 0.3rem;
+      padding-top: 0.2rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.6rem;
+      min-width: 1.8rem;
+      text-align: center;
+    }
+
+    .itemContent{
+      -webkit-line-clamp: 2;
+      padding-right: 2rem;
+    }
+
+    #emptyDiv{
+      height: 90%;
+
+    }
+
+    </style>
+</head>
+<body>
+
+  <section id="item_list">
+
+
+  </section>
+
+<script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+       <div class="eqpitem" onclick="itemClick({{=index}})">
+         <div class="color_black font_size_16">{{=value.RecordDate}}</div>
+         <div class="item_row mt6" style="align-items: flex-start;">
+           <div class="itemContent font_size_16 color_darkgray item_sub_wrap" >{{=value.Content}}</div>
+         </div>
+
+         <div class="separate_line"></div>
+       </div>
+   {{~}}
+  </script>
+
+  <!-- <div class="itemContent font_size_14 color_darkgray mt6" >{{=value.FualtName}}</div> -->
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/zepto.touchWipe.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+     var itemList = [];
+     apiready = function(){
+
+       var body = $api.dom('body');
+       $upRefresh.addHtml(body,'暂无维修记录');
+       itemList = api.pageParam.MaintenaceRecordList;
+       console.log(JSON.stringify(api.pageParam));
+
+       $upRefresh.analysisData(itemList,itemList);
+       initEventListenner();
+    };
+
+    // 初始化事件监听
+    function initEventListenner() {
+      api.setRefreshHeaderInfo({
+          visible: true,
+          loadingImg: 'widget://image/refresh.png',
+          bgColor: '#fff',
+          textColor: '#8c9098',
+          textDown: '下拉刷新...',
+          textUp: '松开刷新...',
+          showTime: true
+      }, function(ret, err){
+        setTimeout(function () {
+          api.refreshHeaderLoadDone();
+        }, 500);
+      });
+    }
+
+     function loadItemList() {
+       $upRefresh.loadListHeader();
+       lastId = '';
+
+       PageNum = 1;
+
+       var parDic = {
+         PageNum:PageNum,
+         PageSize:20
+       };
+       GetEqpRepairList(parDic,function(ret){
+         if (ret.code == 200) {
+           itemList = [];
+           if (ret.data&&ret.data.length > 0) {
+             itemList = ret.data;
+             itemList.forEach(function (val ,index, arr) {
+               switch (val.Status) {
+                 case 'Repair':
+                   {
+                     val.StatusName = '待确认';
+                   }
+                   break;
+                 case 'Reject':
+                   {
+                     val.StatusName = '已驳回';
+                   }
+                   break;
+                 case 'Agree':
+                   {
+                     val.StatusName = '已确认';
+                   }
+                   break;
+                 case 'Working':
+                   {
+                     val.StatusName = '维修中';
+                   }
+                   break;
+                 case 'Finish':
+                   {
+                     val.StatusName = '已维修';
+                   }
+                   break;
+                 default:
+                  {
+                    val.StatusName = '待确认';
+                  }
+                   break;
+               }
+             });
+           }
+
+           $upRefresh.analysisData(ret.data,itemList);
+         }else {
+           api.toast({
+               msg: ret.info,
+               duration: 1500,
+               location: 'middle'
+           });
+           $showErrorDiv.loadError();
+         }
+         api.refreshHeaderLoadDone();
+
+       },function(err){
+         api.toast({
+             msg: '请求失败',
+             duration: 1500,
+             location: 'middle'
+         });
+         $showErrorDiv.loadError();
+         api.refreshHeaderLoadDone();
+       });
+     }
+
+     function loadMoreItemList() {
+       $upRefresh.loadMoreHeader();
+       PageNum++;
+       var parDic = {
+         PageNum:PageNum,
+         PageSize:20
+       };
+       GetEqpRepairList(parDic,function(ret){
+         if (ret.code == 200) {
+           if (ret.data&&ret.data.length > 0) {
+             itemList = itemList.concat(ret.data);
+           }
+
+           itemList.forEach(function (val ,index, arr) {
+             switch (val.Status) {
+               case 'Repair':
+                 {
+                   val.StatusName = '待确认';
+                 }
+                 break;
+               case 'Reject':
+                 {
+                   val.StatusName = '已驳回';
+                 }
+                 break;
+               case 'Agree':
+                 {
+                   val.StatusName = '已确认';
+                 }
+                 break;
+               case 'Working':
+                 {
+                   val.StatusName = '维修中';
+                 }
+                 break;
+               case 'Finish':
+                 {
+                   val.StatusName = '已维修';
+                 }
+                 break;
+               default:
+                {
+                  val.StatusName = '待确认';
+                }
+                 break;
+             }
+           });
+           $upRefresh.analysisData(ret.data,itemList);
+         }else {
+           PageNum --;
+           api.toast({
+               msg:ret.info,
+               duration: 1500,
+               location: 'middle'
+           });
+           $upRefresh.loadError(itemList);
+         }
+       },function(err){
+         PageNum --;
+         api.toast({
+             msg: '请求失败',
+             duration: 1500,
+             location: 'middle'
+         });
+         $upRefresh.loadError(itemList);
+       });
+     }
+
+// ======================点击事件=================================
+
+     function itemClick(index){
+       api.openWin({
+           name: 'maintenanceRecord_nav',
+           url:  'maintenanceRecord_win.html',
+           slidBackEnabled:false,
+           pageParam:itemList[index],
+           animation: {
+               type: 'movein',
+               subType: 'from_right'
+           }
+       });
+     }
+
+     function requstReadNews(newsId) {
+       var parDic = {
+         Id: newsId
+       }
+       ReadNews(parDic,false,function(ret){
+
+       },function(err){
+
+       });
+     }
+
+     function gotoReplenishmentList() {
+       api.openWin({
+         name: 'replenishment_list_nav',
+           url: 'replenishment_list_win.html',
+           slidBackEnabled:false,
+           pageParam: {
+           },
+           animation: {
+               type: 'movein',
+               subType: 'from_right'
+           }
+       });
+     }
+
+     function functionName() {
+
+     }
+
+     function laodNewsByType(typeStr) {
+       newsType = typeStr-1;
+       loadItemList(true);
+     }
+
+     function fnLoadimage(el) {
+       $showErrorDiv.fnLoadimage(el);
+     }
+
+     function deleteItem(el,itemId,NoticeType,index) {
+       event.stopPropagation();
+       if (NoticeType != 'System') {
+         api.toast({
+             msg: '只有系统消息才能删除',
+             duration: 1500,
+             location: 'middle'
+         });
+         return;
+       }
+       var parDic = {
+         NoticeId:itemId
+       };
+       noticesDelete(parDic,function(ret){
+         if (ret.Code == 1) {
+           var parentEl = el.parentNode;
+           $api.remove(parentEl);
+           if (itemList.length > index) {
+             itemList.splice(index,1);
+           }
+         }else {
+           api.toast({
+               msg:ret.info,
+               duration: 1000,
+               location: 'middle'
+           });
+         }
+       },function(err){
+         api.toast({
+             msg: '删除失败',
+             duration: 1000,
+             location: 'middle'
+         });
+       });
+     }
+
+     function loadError() {
+     }
+
+</script>
+</html>

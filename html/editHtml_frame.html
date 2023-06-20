@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    body {
+      height: 100vh;
+      width: 100vw;
+      margin: 0px;
+      padding: 0px;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #content_view {
+      width: 100%;
+      border-radius: 0.5rem;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-flex-flow: column;
+      flex-flow: column;
+      justify-content: center;
+      padding: 2rem 0.9rem;
+    }
+
+    input[type="text"] {
+      height: 1.6rem;
+      background-color: #f6f6f6;
+      border-radius: 0.1rem;
+      padding: 0rem 0.2rem;
+      font-size: 0.7rem;
+
+      /*border: 1px solid #dfdfdf;*/
+    }
+
+    input[type="tel"] {
+      height: 1.6rem;
+      background-color: #f6f6f6;
+      border-radius: 0.1rem;
+      padding: 0rem 0.2rem;
+      font-size: 0.7rem;
+      /*border: 1px solid #dfdfdf;*/
+    }
+
+    input[type="password"] {
+      height: 1.6rem;
+      width: 10rem;
+      background-color: #fff;
+      border-radius: 0.1rem;
+      padding: 0rem 0.2rem;
+      font-size: 0.7rem;
+
+      /*border: 1px solid #dfdfdf;*/
+    }
+
+    input[type="tel"]::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.7rem;
+    }
+
+    input[type="text"]::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.7rem;
+    }
+
+    input[type="password"]::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.7rem;
+    }
+
+    .loginBtn {
+      width: 13rem;
+      height: 2rem;
+      border-radius: 1rem;
+      line-height: 2rem;
+      text-align: center;
+      margin: auto;
+      margin-top: 4rem;
+      font-size: 0.8rem;
+      color: white;
+      background-color: #1eb1ed;
+    }
+
+    .itemText {
+      min-width: 75px;
+    }
+
+    #MQTTPort {
+      width: 3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <section id='content_view' class="font_size_14">
+    <div class="item_row">
+      <div class="font_size_14 mr4 color_black itemText">连接地址</div>
+      <input id="htmlUrl" class="item_sub_left " type="text" placeholder="请输入网址">
+    </div>
+
+    <div class="item_row mt16">
+      <div class="item_row item_sub_left mr16">
+        <div class="font_size_14 mr4 color_black itemText" id="MQTTTitle">MQTT地址</div>
+        <input id="MQTTUrl" class="item_sub_left " type="text" placeholder="请输入网址">
+      </div>
+      <div class="font_size_14  color_black">端口：</div>
+      <input id="MQTTPort" class="align_center" type="tel" maxlength="4" placeholder="" onkeypress="keyPress()">
+    </div>
+
+    <div class="item_row mt16">
+      <div class="font_size_14 mr4 color_black itemText">备注名称</div>
+      <input id="remark" class="item_sub_left input_view" maxlength='10' type="text" placeholder="请输入备注名称">
+    </div>
+
+    <div class="loginBtn" tapmode="highlight" onclick="login();">保存</div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/md5.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+
+<script type="text/javascript">
+  var ip = '';
+  var agree = true;
+
+  apiready = function () {
+    api.parseTapmode();
+    var header = $api.byId('header');
+
+    var mainUrl = $api.getStorage('mainUrlJW');
+    if (mainUrl) {
+      var htmlUrlDiv = $api.byId('htmlUrl');
+      htmlUrlDiv.value = mainUrl.mainUrl;
+
+      var MQTTUrlDiv = $api.byId('MQTTUrl');
+      MQTTUrlDiv.value = mainUrl.Host;
+
+      var MQTTPortDiv = $api.byId('MQTTPort');
+      MQTTPortDiv.value = mainUrl.Port;
+      
+      var remarkDiv = $api.byId('remark');
+      remarkDiv.value = mainUrl.remark;
+    }
+
+    var MQTTTitle = $api.byId('MQTTTitle');
+    var width = $api.offset(MQTTTitle).w;
+    var content_view = $api.byId('content_view');
+    var itemTextDivs = $api.domAll(content_view, '.itemText');
+
+    if (itemTextDivs && itemTextDivs.length > 0) {
+      console.log(itemTextDivs);
+      for (var i = 0; i < itemTextDivs.length; i++) {
+        $api.css(itemTextDivs[i], 'width:' + width + 'px;');
+      }
+    }
+  };
+
+  // =============================================
+  function login() {
+    var htmlUrl = $api.dom('#htmlUrl').value;
+    var remark = $api.dom('#remark').value;
+    var MQTTUrl = $api.dom('#MQTTUrl').value;
+    var MQTTPort = $api.dom('#MQTTPort').value;
+
+    htmlUrl = htmlUrl.toLowerCase();
+    
+    if (!$util.isUrl(htmlUrl)) {
+      api.toast({
+        msg: '请输入正确的请求网址',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var IPArr = MQTTUrl.split('//');
+    if(IPArr.length > 0){
+      MQTTUrl = IPArr[IPArr.length - 1];
+    }
+
+    if (!$util.isIP(MQTTUrl)) {
+      api.toast({
+        msg: '请先输入正确的MQTT的IP地址',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (MQTTPort.length <= 0) {
+      api.toast({
+        msg: '请先输入端口',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+    
+    if (!htmlUrl.endsWith("/")) {
+      htmlUrl = htmlUrl+ '/'
+    }
+      
+    var htmlObj = {
+      mainUrl: htmlUrl,
+      remark: remark,
+      Host: MQTTUrl,
+      Port: parseInt(MQTTPort),
+      HostUrl:'tcp://'+MQTTUrl+":"+MQTTPort
+    }
+
+    $api.setStorage('mainUrlJW', htmlObj);
+    api.closeWin();
+  }
+
+  function judgeIndexOf(item, itemArr) {
+    var flag = false;
+    if (itemArr.length > 0) {
+      itemArr.forEach(function (val, index, arr) {
+        if (val.htmlText == item.htmlText) {
+          flag = true;
+        }
+      });
+    }
+    return flag;
+  }
+
+  function keyPress() {
+    var keycode = event.keyCode;
+    if ((keycode >= 48) && (keycode <= 57)) {
+      event.returnValue = true;
+    } else {
+      event.returnValue = false;
+    }
+  };
+
+
+</script>
+
+</html>

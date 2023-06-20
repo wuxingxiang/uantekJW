@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style>
+    body{
+      margin: 0px;
+      padding: 0px;
+      background-color: #f2f2f2;
+      width: 100%;
+      height: 100%;
+    }
+
+
+    #title:after{
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom:0;
+      background: #dcdee3;
+      right:0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }
+
+    #selectItemContent{
+      background-color: #fff;
+      height: 40px;
+      width: 100%;
+      position:relative;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      color: #10131b;
+      font-size: 0.7rem;
+      background-image:  url(../image/common/cell_line_vr.png) ;
+      background-position: center bottom 0px;
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+
+      padding: 0px 16px;
+    }
+
+    .selectItem {
+      position: relative;
+      flex: 1;
+      line-height: 40px;
+      height: 40px;
+    }
+
+    #comfirmBtn{
+      position: absolute;
+      right: 16px;
+      bottom: 0px;
+      width: 43px;
+      height: 44px;
+      line-height: 44px;
+      color: #1e8ae7;
+      text-align: right;
+      background:  url(../image/common/common_right_add_btn.png) no-repeat;
+      background-position: center right;
+      background-repeat: no-repeat;
+      background-size: 15px;
+    }
+
+    #saveBtn{
+      width: 2.6rem;
+      height: 1.3rem;
+      line-height: 1.3rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.7rem;
+    }
+
+    .saveBtnView{
+      width: 3.6rem;
+      height: 100%;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+
+    .toolItemTitle{
+      padding: 0.4rem 0.9rem;
+      background-color: #1eb1ed;
+    }
+
+    .selectIcon{
+      width: 1.4rem;
+      height: 1.4rem;
+      background-position: center left;
+    }
+
+    .lifetime{
+      padding: 0px 0.1rem;
+      width: 5rem;
+      text-align: center;
+    }
+
+    </style>
+
+</head>
+<body>
+    <header >
+      <i class="back" tapmode onclick="api.closeWin();"></i>
+      <div id="title">用户列表</div>
+      <!-- <div class="saveBtnView" tapmode onclick="saveBtnClick();">
+        <div id="saveBtn" >选取</div>
+      </div> -->
+    </header>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script//md5.js"></script>
+
+<script type="text/javascript">
+    var searchActOpened = false;
+    var frameName = 'userList';
+    apiready = function(){
+        api.parseTapmode();
+        var header = $api.dom('header');
+        // $api.fixStatusBar( $api.dom('header') );
+
+        var offset = $api.offset(header);
+
+        var topY = offset.t+offset.h;
+        var height =  api.winHeight- topY;
+        var systemType = api.systemType;
+
+        api.openFrame({
+            name: frameName,
+            url:  frameName+ '_frame.html',
+            rect: {
+              x: 0,
+              y: topY,
+              w: api.winWidth,
+              h: height
+            },
+            pageParam: api.pageParam,
+            bounces: false,
+            bgColor: 'rgba(255,255,255,1)',
+            vScrollBarEnabled: false,
+            hScrollBarEnabled: false,
+        });
+    };
+
+
+    function saveBtnClick() {
+      api.execScript({
+          frameName: frameName,
+          script: "rightBtnClick()"
+      });
+    }
+
+</script>
+</html>

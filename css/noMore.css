@@ -1,0 +1,69 @@
+/*
+ * =========================================================================
+ * APIClud - AUI UI 框架    流浪男  QQ：343757327  http://www.auicss.com
+ * Verson 2.1
+ * =========================================================================
+ */
+ /*初始化类*/
+@charset "UTF-8";
+#emptyDiv
+{
+	position: absolute;
+	height: 90vh;
+	width: 100%;
+	display: none;;
+	align-items: center;
+	justify-content: center;
+}
+.emptyContent
+{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	-webkit-box-orient: vertical;
+	-webkit-flex-flow: column;
+	flex-flow: column;
+}
+
+.emptyImage
+{
+	height: 81px;
+	width: 76px;
+	background-image:  url(../image/common/common_empty.png) ;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 76px 81px;
+}
+.hintText
+{
+	margin-top: 10px;
+	font-size: 0.75rem;
+	color: #a2a5a7;
+	text-align: center;
+}
+
+.show
+{
+	display: flex;
+}
+
+#noMoreView
+{
+	height: 44px;
+	width: 100%;
+	text-align: center;
+	line-height: 44px;
+	color: #a2a5a7;
+	font-size: 14px;
+	display: none;
+}
+
+.Loading {
+	 width: 100%;
+	 height: 50px;
+	 line-height: 50px;
+	 text-align: center;
+	 display: none;
+	 background: url(../image/loading_more.gif) no-repeat 35% center;
+	 background-size: 25px 25px;
+}

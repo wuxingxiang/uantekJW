@@ -1,0 +1,481 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/addPhotos.css" />
+  <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    html,
+    body {
+      min-height: 100%;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    body {
+      background-color: #fff;
+      padding-bottom: 0.3rem;
+    }
+
+    .selectItem {
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.8rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color: #efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+    .statusBtn {
+      padding: 0.1rem 0.3rem;
+      padding-top: 0.2rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.6rem;
+      min-width: 1.8rem;
+    }
+
+    textarea {
+      height: 2rem;
+      width: 100%;
+      padding: 3px;
+      font-size: 0.8rem;
+      border: 1px solid #d9d9d9;
+      border-radius: 0.2rem;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.8rem;
+    }
+
+    #image_show {
+      display: flex;
+      flex-flow: wrap row;
+    }
+
+    .selectIcon {
+      width: 1.5rem;
+      height: 1.5rem;
+      background: url(../image/common/common_select.png) no-repeat;
+      background-position: center;
+      background-size: 0.9rem;
+      margin-bottom: 0.1rem
+    }
+
+    .selected {
+      background-image: url(../image/common/common_select.png);
+    }
+
+    .unSelected {
+      background-image: url(../image/common/common_unSelected_icon.png);
+    }
+
+    #bottomView {
+      position: fixed;
+      bottom: 0px;
+      padding: 0.6rem 0px;
+      width: 100%;
+      box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .controlBtn {
+      margin: 0px 1rem;
+      height: 2.2rem;
+      line-height: 2.2rem;
+      border-radius: 1.1rem;
+      background-color: #1eb1ed;
+      color: #fff;
+      font-size: 0.8rem;
+    }
+
+    .addBtn {
+      width: 1.2rem;
+      height: 1.2rem;
+      background-image: url(../image/common/common_right_add_btn.png);
+      background-position: center right;
+      background-repeat: no-repeat;
+      -webkit-background-size: 1rem;
+      background-size: 1rem;
+    }
+
+    .maintainItem {
+      padding: 0.4rem 0px;
+      height: 3rem;
+    }
+
+    .maintainName {
+      background-color: #efefef;
+      border-radius: 0.1rem;
+      padding: 0.15rem 0.3rem;
+      font-size: 0.7rem;
+    }
+
+    #maintainView {
+      min-height: 6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #emptyDiv {
+      height: 6rem;
+    }
+
+    .wrapper {
+      height: 3rem;
+    }
+
+    .deleteBtn {
+      width: 80px;
+      background-color: #ff0000;
+      z-index: 1000;
+    }
+
+    .container {}
+  </style>
+</head>
+
+<body>
+
+
+  <section>
+    <div class="item_row pt20">
+      <div class="leftTitle font_size_16" id="title">设备：</div>
+      <div class="item_sub_left font_size_16 pr8" id="EqpDiv">CNC 车床 G89</div>
+      <div class="statusBtn" id="Status"></div>
+    </div>
+
+    <div class="item_row mt8" style="">
+      <div class="font_size_16 leftTitle" id="title">计划保养时间：</div>
+      <div class="font_size_16 item_sub_left item_sub_nowrap" id="PlanDate"></div>
+    </div>
+  </section>
+
+  <section class="mt8">
+    <div class="item_row mb4">
+      <div class="font_size_20 font_bold" id="title">保养项目</div>
+      <div class="font_size_12 item_sub_left color_gray" id="title">（ 点击保养项可编辑 ）</div>
+
+      <div class="addBtn font_size_12" onclick="addBtnClick()"></div>
+    </div>
+
+    <div id="maintainView">
+      <div id="item_list">
+      </div>
+    </div>
+  </section>
+
+  <section class="image_list_content" id="imagesView">
+    <div class="image_list_title">上传图片（最多9张）</div>
+    <div id="imagesView_take" class="image_lists">
+
+    </div>
+  </section>
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+       <div class='wrapper'>
+         <div class="container maintainItem" ontouchstart="return touchstartF(event,this);" ontouchmove="return touchmoveF(event,this);" onclick='itemClick({{=index}});'>
+
+           <div class="font_size_16 mr6 item_sub_nowrap">{{=value.MaintainItemName}}</div>
+           {{? value.MaintainItemContent}}
+              <div class="font_size_14 color_darkgray mt2 item_sub_nowrap">{{=value.MaintainItemContent}}</div>
+           {{??}}
+              <div class="font_size_14 color_darkgray mt2 item_sub_nowrap">未输入保养内容</div>
+           {{?}}
+           <div class="separate_line"></div>
+         </div>
+
+         <div class="deleteBtn" onclick="return toDelete({{=index}},this);"></div>
+       </div>
+   {{~}}
+  </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/photosGet.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+
+<script type="text/javascript">
+  var pictures = new Array;
+  var currentSelectType = 'R';
+  var itemList = new Array;
+  var maintainModel = null;
+  var hasUpload = false;
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml($api.byId('maintainView'), '暂无保养项目');
+    $showErrorDiv.addErrorHtml(body);
+    betrothScreen();
+    loadMaintainInfo();
+  };
+
+  function betrothScreen() {
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    if (appType == 'PDA') {
+      var body = $api.dom('body');
+      var imagesNode = $api.byId('imagesView_take');
+      $photosGet.addPhotoHtml(body, imagesNode);
+    } else {
+      var imagesView = $api.byId('imagesView');
+      imagesView.style.display = 'none';
+    }
+  }
+
+  function fillInfo() {
+    if (!maintainModel) {
+      return;
+    }
+    var EqpDiv = $api.byId('EqpDiv');
+    EqpDiv.innerHTML = maintainModel.EqpCode;
+
+    var status = $api.byId('Status');
+    status.innerHTML = maintainModel.Status;
+    if (maintainModel.Status == '已保养') {
+      $api.css(status, 'color:#323232;background-color:#d9d9d9;');
+    }
+
+
+    var PlanDate = $api.byId('PlanDate');
+    PlanDate.innerHTML = maintainModel.PlanDate;
+
+
+    if (maintainModel.MaintainList && maintainModel.MaintainList.length > 0) {
+      itemList = maintainModel.MaintainList;
+    }
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function loadMaintainInfo() {
+    var parDic = api.pageParam.MaintainId;
+    GetMaintainInfo(parDic, function (ret) {
+      if (ret.code == 200) {
+        maintainModel = ret.data;
+        fillInfo();
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+
+    });
+  }
+
+  function UploadData() {
+
+    api.showProgress({
+      title: '数据上传中...',
+      modal: true
+    });
+
+    var parDic = {
+      MaintainId: api.pageParam.MaintainId,
+      EqpId: api.pageParam.EqpId,
+      MaintainList: itemList,
+      ImageList: pictures,
+    }
+
+    PostMaintainEqpSubmit(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      api.execScript({
+        name: 'maintainList_nav',
+        frameName: 'maintainList',
+        script: 'loadItemList();'
+      });
+
+      if (ret.code == 200) {
+        setTimeout(function () {
+          api.closeWin();
+        }, 600);
+
+        hasUpload = true;
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+
+    });
+  }
+
+  // ==============================================
+
+  function touchstartF(event) {
+    $slideDelete.touchstartF(event);
+
+  };
+  function touchmoveF(event, e) {
+    $slideDelete.touchmoveFWithLeft(event, e, -80);
+  };
+
+  function toDelete(index, tag) {
+    if (itemList.length > index) {
+      itemList.splice(index, 1);
+      $upRefresh.analysisData(itemList, itemList);
+    }
+  }
+
+  function addPhoto() {
+    api.actionSheet({
+      cancelTitle: '取消',
+      buttons: ['拍照', '从相册选择']
+    }, function (ret, err) {
+      if (ret) {
+        if (ret.buttonIndex == 1) {
+          $photosGet.takePhoto(pictures);
+        } else if (ret.buttonIndex == 2) {
+          $photosGet.pickPhoto(pictures);
+        }
+      }
+    });
+  }
+
+  function deleteImage(index) {
+    event.stopPropagation();
+    $photosGet.deleteImage(pictures, index);
+  }
+
+  function previewImage(index) {
+
+    event.stopPropagation();
+    $photosGet.previewImage(pictures, index);
+  }
+
+  function submitBtnClick() {
+
+    if (!maintainModel) {
+      api.toast({
+        msg: '加载失败,请重新打开页面',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+    if (hasUpload == true) {
+      return;
+    }
+    uploadFileToLocatServer(pictures, 'EQM', function (updataSuccee) {
+      if (updataSuccee) {
+        UploadData();
+      } else {
+        api.hideProgress();
+        api.toast({
+          msg: '上传图片失败,请重试',
+          duration: 1000,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function itemClick(index) {
+    var maintainItem = itemList[index];
+    api.openFrame({
+      name: 'maintainItemAdd',
+      url: 'maintainItemAdd_frame.html',
+      rect: {
+        x: 0,
+        y: 0,
+        w: api.frameWidth,
+        h: api.winHeight
+      },
+      pageParam: maintainItem,
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0.5)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+  }
+
+  function addBtnClick() {
+    api.openFrame({
+      name: 'maintainItemAdd',
+      url: 'maintainItemAdd_frame.html',
+      rect: {
+        x: 0,
+        y: 0,
+        w: api.frameWidth,
+        h: api.winHeight
+      },
+      pageParam: null,
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0.5)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+  }
+
+  function addmaintain(maintainStr) {
+    var maintainModel = JSON.parse(maintainStr);
+    if (maintainModel) {
+      var contain = true;
+      itemList.forEach(function (val, subIndex, arr) {
+        if (val.MaintainItemId == maintainModel.MaintainItemId) {
+          val.MaintainItemName = maintainModel.MaintainItemName;
+          val.MaintainItemContent = maintainModel.MaintainItemContent;
+          contain = false;
+          return false;
+        }
+      });
+
+      if (contain == true) {
+        itemList.push(maintainModel);
+      }
+      $upRefresh.analysisData(itemList, itemList);
+    }
+    console.log(JSON.stringify(maintainModel));
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadMaintainInfo();
+  }
+
+</script>
+
+</html>

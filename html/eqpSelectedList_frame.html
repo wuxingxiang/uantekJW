@@ -1,0 +1,420 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body,
+    html {
+      background-color: #fff;
+      height: 100%;
+      position: relative;
+    }
+
+    .SNNum {
+      -webkit-line-clamp: 1;
+      padding: 0.4rem 0rem;
+    }
+
+    .deleteBtn {
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.1rem;
+      background-color: #f94d7e;
+      font-size: 0.5rem;
+      color: #fff;
+      margin-left: 1rem;
+    }
+
+    .orderItem {
+      padding: 0.5rem 0px;
+    }
+
+    .statusBtn {
+      padding: 0.15rem 0.4rem;
+      padding-top: 0.2rem;
+      border-radius: 0.2rem;
+      color: #fff;
+      font-size: 0.7rem
+    }
+
+    .selectIcon {
+      width: 2rem;
+      height: 2rem;
+      background: url(../image/common/common_select.png) no-repeat;
+      background-position: center;
+      background-size: 1.2rem;
+      z-index: 10000;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="" id="item_list">
+
+  </section>
+
+  <!--doT template-->
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+        <div class="orderItem item_row" tapmode onclick='itemSelected({{=index}});'>
+          <div class="item_sub_left pr8">
+            <div class="font_size_16  ">{{=value.EqpCode}}</div>
+            <div class="font_size_14 color_darkgray mt4 item_sub_wrap color_black">{{=value.EqpName}}</div>
+            {{? value.OrderNo}}
+               <div class="font_size_14 color_darkgray mt4">工单：{{=value.OrderNo}}</div>
+            {{??}}
+               <div class="font_size_14 color_darkgray mt4">工单：暂无工单</div>
+            {{?}}
+          </div>
+
+          {{? value.selected}}
+             <div class="selectIcon"></div>
+          {{?}}
+
+          <div class="separate_line"></div>
+        </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/upRefreshMore.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+  var selectedList = [];
+
+  var LineId = '';
+  var ProcessId = '';
+  var EqpType = '';
+
+  var PageSize = 20;
+  var PageNum = 1;
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无相关设备');
+    $showErrorDiv.addErrorHtml(body);
+    initEventListenner();
+    $upRefresh.analysisData(itemList, itemList);
+
+    if (api.pageParam.ProcessId) {
+      ProcessId = api.pageParam.ProcessId;
+    }
+    loadItemList();
+  }
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+        loadItemList();
+      }, 400);
+    });
+  }
+
+  function loadItemList() {
+
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+    var selectEqpList = $api.getStorage('selectEqpList');
+
+    if (appType == 'UNPDA' && selectEqpList && selectEqpList.length > 0) {
+      itemList = selectEqpList;
+      console.log(JSON.stringify(itemList));
+      itemList.forEach(function (val, index) {
+        val.selected = false;
+        for (var i = 0; i < selectedList.length; i++) {
+          if (selectedList[i].Id == val.Id) {
+            val.selected = true;
+            break;
+          }
+        }
+        val.appType = appType;
+      });
+
+      var tempList = itemList.slice(0, 10);
+      $upRefresh.analysisData(tempList, itemList);
+      api.refreshHeaderLoadDone();
+      return;
+    }
+
+    var OrderNoHist = '';
+    if (api.pageParam.OrderNoHist) {
+      OrderNoHist = api.pageParam.OrderNoHist;
+    }
+
+    PageNum = 1;
+    var parDic = {
+      LineId: LineId,
+      ProcessId: ProcessId,
+      EqpType: EqpType,
+      OrderNoHist: OrderNoHist,
+      OrderNo: api.pageParam.OrderNo
+    }
+    GetEqplist(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data) {
+          // setBgColor(ret.data);
+          ret.data.forEach(function (val, index) {
+            val.selected = false;
+            for (var i = 0; i < selectedList.length; i++) {
+              if (selectedList[i].Id == val.Id) {
+                val.selected = true;
+                break;
+              }
+            }
+          });
+          itemList = ret.data;
+        }
+        $upRefresh.analysisData(ret.data, itemList);
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.refreshHeaderLoadDone();
+      $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadMoreItemList() {
+    $upRefresh.loadMoreHeader();
+    PageNum++;
+
+    var OrderNoHist = '';
+    if (api.pageParam.OrderNoHist) {
+      OrderNoHist = api.pageParam.OrderNoHist;
+    }
+    var parDic = {
+      LineId: LineId,
+      ProcessId: ProcessId,
+      EqpType: EqpType,
+      OrderNoHist: OrderNoHist,
+      OrderNo: api.pageParam.OrderNo,
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+    GetEqplist(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          // setBgColor(ret.data);
+          ret.data.forEach(function (val, index) {
+            val.selected = false;
+            for (var i = 0; i < selectedList.length; i++) {
+              if (selectedList[i].Id == val.Id) {
+                val.selected = true;
+                break;
+              }
+            }
+          });
+          itemList = itemList.concat(ret.data);
+        }
+        $upRefresh.analysisData(ret.data, itemList);
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.refreshHeaderLoadDone();
+      $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function setBgColor(tempList) {
+    tempList.forEach(function (val, index) {
+      if (!val.Status) {
+        val.Status = '未知';
+      }
+      switch (val.StatusCode) {
+        case 'RUNNING':
+          {
+            val.bgColor = '#006612';
+          }
+          break;
+        case 'FAULT':
+          {
+            val.bgColor = '#FF0000';
+          }
+          break;
+        case 'IDLE':
+          {
+            val.bgColor = '#FFB236';
+          }
+          break;
+        case 'OTHER':
+          {
+            val.bgColor = '#808080';
+          }
+          break;
+        default:
+          {
+            val.bgColor = '#808080';
+          }
+          break;
+      }
+    });
+  }
+
+  function loadItemArr(itemType, callBack) {
+
+    var parUrl = '&LineId=' + LineId + '&ProcessId=' + ProcessId + '&EqpType=' + EqpType;
+    GetEqplist(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.ItemName;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  // ================数据处理=========================
+  function setEqpType(_EqpType) {
+    EqpType = _EqpType
+  }
+
+  function setProcessId(_ProcessId) {
+    ProcessId = _ProcessId;
+  }
+
+  function setLineId(_LineId) {
+    LineId = _LineId;
+  }
+
+  // =================点击事件========================
+  function itemSelected(index) {
+    if (index < itemList.length) {
+      var tempModel = itemList[index];
+      tempModel.itemType = api.pageParam.itemType;
+      if (api.pageParam.frameName) {
+        api.execScript({
+          name: api.pageParam.winName,
+          frameName: api.pageParam.frameName,
+          script: "selectedItem('" + JSON.stringify(tempModel) + "')"
+        })
+      } else {
+        api.execScript({
+          name: api.pageParam.winName,
+          script: "selectedItem('" + JSON.stringify(tempModel) + "')"
+        })
+      }
+      api.closeWin();
+    }
+  }
+
+  function resetBtnClick() {
+    LineId = '';
+    ProcessId = '';
+    EqpType = '';
+    loadItemList();
+
+  }
+
+  function saveBtnClick() {
+    loadItemList();
+  }
+
+  function comfirmBtnClick() {
+
+    if (selectedList.length <= 0) {
+      api.toast({
+        msg: '请选择设备',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (!api.pageParam.frameName) {
+      api.execScript({
+        name: api.pageParam.winName,
+        script: "selectItem('" + JSON.stringify(selectedList) + "')"
+      });
+    } else {
+      api.execScript({
+        name: api.pageParam.winName,
+        frameName: api.pageParam.frameName,
+        script: "selectItem('" + JSON.stringify(selectedList) + "')"
+      });
+    }
+    api.closeWin();
+
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+
+</script>
+
+</html>

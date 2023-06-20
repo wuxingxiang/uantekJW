@@ -1,0 +1,301 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style type="text/css">
+    body{
+      background-color: #fff;
+    }
+
+    .eqpitem{
+      padding: 0.5rem 0px;
+      position: relative;
+    }
+
+    .statusBtn{
+      padding: 0.1rem 0.3rem;
+      padding-top: 0.15rem;
+      border-radius: 0.15rem;
+      font-size: 0.6rem;
+      min-width: 1.8rem;
+    }
+
+    .itemContent{
+      -webkit-line-clamp: 2;
+    }
+
+    #emptyDiv{
+      height: 100%;
+    }
+
+    </style>
+</head>
+<body>
+
+  <section id="item_list">
+
+  </section>
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+       <div class="eqpitem" onclick="itemClick({{=index}})">
+         <div class="item_row font_size_14 mt4">
+           <div class="color_darkgray">保养时间：</div>
+           <div class="color_darkgray font_size_14 align_right">{{=value.MaintainDate}}</div>
+         </div>
+         <div class="separate_line"></div>
+       </div>
+   {{~}}
+  </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/zepto.touchWipe.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefreshMore.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+     var lastId = 0;
+     var itemList = [];
+     var noMore = false;
+     var newsType = -1;
+
+     var PageNum  = 1;
+     var PageSize = 20;
+
+     var startDate = '';
+     var endDate = '';
+
+     apiready = function(){
+       $upRefresh.addHtml($api.dom('body'),'暂无保养数据');
+       $upRefresh.analysisData(itemList,itemList);
+
+       initEventListenner();
+       setdate();
+
+       loadItemList();
+    };
+
+    // 初始化事件监听
+    function initEventListenner() {
+      api.setRefreshHeaderInfo({
+          visible: true,
+          loadingImg: 'widget://image/refresh.png',
+          bgColor: '#fff',
+          textColor: '#8c9098',
+          textDown: '下拉刷新...',
+          textUp: '松开刷新...',
+          showTime: true
+      }, function(ret, err){
+        setTimeout(function () {
+          api.refreshHeaderLoadDone();
+        }, 800);
+        loadItemList();
+      });
+    }
+
+    function setdate() {
+      var myDate = new Date();
+      var year =  myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+      var month = myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+      if (month<10) {
+        month = '0'+month;
+      }
+      var day = myDate.getDate();        //获取当前日(1-31)
+
+      if (day<10) {
+        day = '0'+day;
+      }
+
+      startDate = year+'-'+month+'-'+day;
+      endDate = year+'-'+month+'-'+day;
+    }
+
+    function loadItemList() {
+
+      PageNum = 1;
+      $upRefresh.loadListHeader();
+      var parDic = {
+        PageNum:PageNum,
+        PageSize:20,
+        StartTime:startDate +' 00:00:00',
+        EndTime:endDate+' 23:59:59',
+        EquipmentIds:api.pageParam.EquipmentIds,
+        IsMaintained:true
+      };
+      GetMaintainList(parDic,function(ret){
+        if (ret.code == 200) {
+          itemList = [];
+          if (ret.data&&ret.data.length > 0) {
+            itemList = ret.data;
+          }
+          $upRefresh.analysisData(ret.data,itemList);
+        }else {
+          api.toast({
+              msg: ret.info,
+              duration: 1500,
+              location: 'middle'
+          });
+         //  $upRefresh.loadError(itemList);
+        }
+        api.refreshHeaderLoadDone();
+
+      },function(err){
+        api.toast({
+            msg: '请求失败',
+            duration: 1500,
+            location: 'middle'
+        });
+       //  $upRefresh.loadError(itemList);
+        api.refreshHeaderLoadDone();
+      });
+    }
+
+    function loadMoreItemList() {
+      $upRefresh.loadMoreHeader();
+      PageNum++;
+      var parDic = {
+        PageNum:PageNum,
+        PageSize:20,
+        StartTime:startDate +' 00:00:00',
+        EndTime:endDate+' 23:59:59',
+        EquipmentIds:api.pageParam.EquipmentIds,
+        IsMaintained:true
+      };
+      GetMaintainList(parDic,function(ret){
+        if (ret.code == 200) {
+          if (ret.data&&ret.data.length > 0) {
+            itemList = itemList.concat(ret.data);
+          }
+
+          $upRefresh.analysisData(ret.data,itemList);
+        }else {
+          api.toast({
+              msg:ret.info,
+              duration: 1500,
+              location: 'middle'
+          });
+          $upRefresh.loadError(itemList);
+        }
+      },function(err){
+        api.toast({
+            msg: '请求失败',
+            duration: 1500,
+            location: 'middle'
+        });
+        $upRefresh.loadError(itemList);
+      });
+    }
+
+// ================数据处理=========================
+   function setStartDate(_startDate) {
+     startDate = _startDate
+   }
+
+   function setEndDate(_endDate) {
+     endDate = _endDate;
+   }
+
+// ======================点击事件=================================
+
+     function itemClick(index){
+       api.openWin({
+           name: 'maintainEqpDetail_nav',
+           url:  'maintainEqpDetail_win.html',
+           slidBackEnabled:false,
+           pageParam:itemList[index],
+           animation: {
+               type: 'movein',
+               subType: 'from_right'
+           }
+       });
+
+     }
+
+     function requstReadNews(newsId) {
+       var parDic = {
+         Id: newsId
+       }
+       ReadNews(parDic,false,function(ret){
+
+       },function(err){
+
+       });
+     }
+
+     function gotoReplenishmentList() {
+       api.openWin({
+         name: 'replenishment_list_nav',
+           url: 'replenishment_list_win.html',
+           slidBackEnabled:false,
+           pageParam: {
+           },
+           animation: {
+               type: 'movein',
+               subType: 'from_right'
+           }
+       });
+     }
+
+     function functionName() {
+
+     }
+
+     function laodNewsByType(typeStr) {
+       newsType = typeStr-1;
+       loadItemList(true);
+     }
+
+     function fnLoadimage(el) {
+       $showErrorDiv.fnLoadimage(el);
+     }
+
+     function deleteItem(el,itemId,NoticeType,index) {
+       event.stopPropagation();
+       if (NoticeType != 'System') {
+         api.toast({
+             msg: '只有系统消息才能删除',
+             duration: 1500,
+             location: 'middle'
+         });
+         return;
+       }
+       var parDic = {
+         NoticeId:itemId
+       };
+       noticesDelete(parDic,function(ret){
+         if (ret.Code == 1) {
+           var parentEl = el.parentNode;
+           $api.remove(parentEl);
+           if (itemList.length > index) {
+             itemList.splice(index,1);
+           }
+         }else {
+           api.toast({
+               msg:ret.Message,
+               duration: 1000,
+               location: 'middle'
+           });
+         }
+       },function(err){
+         api.toast({
+             msg: '删除失败',
+             duration: 1000,
+             location: 'middle'
+         });
+       });
+     }
+
+</script>
+</html>

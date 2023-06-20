@@ -1,0 +1,606 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #efefef;
+    }
+
+    .item_content {
+      background-color: #fff;
+      font-size: 0.8rem;
+    }
+
+
+    .comfirmBtn {
+      height: 2.2rem;
+      width: 15rem;
+      border-radius: 1.1rem;
+      background-color: #1eb1ed;
+      text-align: center;
+      line-height: 2.2rem;
+      color: #fff;
+      margin: auto;
+      /* margin-top: 2rem; */
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 2rem;
+    }
+
+    .item_row {
+      height: 2.6rem;
+      /* padding-right: 0.8rem; */
+    }
+
+    #versionUpdateBtn {
+      height: 1.2rem;
+      width: 4rem;
+      border-radius: 0.15rem;
+      background-color: #1eb1ed;
+      text-align: center;
+      line-height: 1.2rem;
+      font-size: 0.6rem;
+      color: #fff;
+    }
+
+    #bottomDiv {
+      width: 100%;
+      height: 2.25rem;
+      position: fixed;
+      bottom: 39px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0px 16px;
+    }
+
+    #loginOutBtn {
+      width: 11.5rem;
+      height: 2.25rem;
+      line-height: 2.25rem;
+      font-size: 17px;
+      text-align: center;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 11.5rem 2.25rem;
+    }
+
+    .loginOut {
+      background-image: url(../image/mine/login_out.png);
+    }
+
+    .loginIn {
+      background-image: url(../image/mine/login_in.png);
+    }
+
+    #versionGetBtn {
+      background-color: #1eb1ed;
+      padding: 0.2rem 0.5rem;
+      color: #fff;
+      font-size: 0.6rem;
+      border-radius: 0.2rem;
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <section class="item_content pt20">
+    <div class="item_row">
+      <div class="black_color">登录账号</div>
+      <div id='userName' class="item_sub_right color_darkgray"></div>
+    </div>
+
+    <div class="item_row">
+      <div class="mr28 item_sub_left">当前版本</div>
+      <div class="versonNum color_darkgray" id="version"></div>
+      <div id="versionGetBtn" onclick="versionGet();">版本更新</div>
+    </div>
+
+    <div class="item_row arrow" onclick="cleanCache();">
+      <div class="mr28 item_sub_left">清理缓存</div>
+      <div class="versonNum color_darkgray" id="catch"></div>
+    </div>
+
+    <!-- <div class="item_row arrow" onclick="selectedEqp();" id="eqpView">
+      <div class="mr32">关联设备</div>
+      <div class="color_darkgray item_sub_right ml10 item_sub_nowrap" id="eqpDiv"></div>
+    </div>
+
+    <div class="item_row arrow" onclick="chooseFacility();">
+      <div class="mr32">装配线</div>
+      <div class="color_darkgray item_sub_right ml10 item_sub_nowrap" id="Facility"></div>
+    </div>
+
+    <div class="item_row arrow" onclick="chooseWarehouse();">
+      <div class="mr32">仓库</div>
+      <div class="color_darkgray item_sub_right ml10 item_sub_nowrap" id="Warehouse"></div>
+    </div> -->
+
+  </section>
+
+  <section class="item_content mt8">
+    <div class="item_row arrow">
+      <div class="">密码设置</div>
+      <div id="changePsw" tapmode class="item_sub_right color_darkgray" onclick="changePsw()">修改密码</div>
+    </div>
+  </section>
+
+  <!-- <div class="comfirmBtn" onclick="saveBtnClick()">保存</div> -->
+
+  <!-- <div class="comfirm_bottom_div">
+      <div class="comfirmBtn" onclick="saveUserInfo()">确定</div>
+    </div> -->
+  <div id="bottomDiv">
+    <div class="loginOut" tapmode id='loginOutBtn' onclick="loginOutBtnClick()"></div>
+  </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var choosedImageModel = {};
+  var tempUserModel;
+
+  var FacilityArr = [];
+  var WarehouseArr = [];
+
+  apiready = function () {
+    var appVersion = api.appVersion;
+    var versionDiv = $api.byId('version');
+    versionDiv.innerHTML = appVersion;
+
+    var userModel = $api.getStorage('userInfoJW');
+    fillDefualtDate(userModel);
+
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+  }
+
+  function fillDefualtDate(tempModel) {
+    var loginOutBtn = $api.byId('loginOutBtn');
+    var userNameDiv = $api.byId('userName');
+
+    var Facility = $api.getStorage('Facility');
+    var FacilityDiv = $api.byId('Facility');
+
+    if (Facility) {
+      FacilityDiv.innerHTML = Facility.name;
+    }
+
+    var Warehouse = $api.getStorage('Warehouse');
+    var WarehouseDiv = $api.byId('Warehouse');
+    if (Warehouse) {
+      WarehouseDiv.innerHTML = Warehouse.Value;
+    }
+
+    if (tempModel) {
+      userNameDiv.innerHTML = tempModel.username;
+      if ($api.hasCls(loginOutBtn, 'loginIn')) {
+        $api.removeCls(loginOutBtn, 'loginIn');
+      }
+      $api.addCls(loginOutBtn, 'loginOut');
+
+    } else {
+      userNameDiv.innerHTML = '尚未登录';
+
+      if ($api.hasCls(loginOutBtn, 'loginOut')) {
+        $api.removeCls(loginOutBtn, 'loginOut');
+      }
+      $api.addCls(loginOutBtn, 'loginIn');
+    }
+
+    api.getCacheSize(function (ret) {
+      var size = ret.size / 1024 / 1024;
+      var catchDiv = $api.byId('catch');
+      catchDiv.innerHTML = Math.abs(size.toFixed(1)) + "M";
+    });
+  }
+
+  function loadItemArr(itemType, callBack) {
+    var parUrl = itemType;
+    GetSeletItemList(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.Value;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: '暂无数据',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadFacilityArr(callBack) {
+    var parUrl = {
+      Code: "AssemblyLine"
+    };
+
+    GetMap(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.data.length > 0) {
+          var tempArr = ret.data.data;
+          FacilityArr = tempArr;
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: '暂无数据',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  // ========================事件点击交互=====================================
+  function changePsw() {
+    api.openWin({
+      name: 'forgetPassWord_nav',
+      url: 'forgetPassWord.html',
+      pageParam: {},
+      nimation: {
+        type: 'movein',
+        subType: 'from_right',
+        duration: 300
+      }
+    });
+  }
+
+  function loginOutBtnClick() {
+    api.sendEvent({
+      name: 'loginOut',
+      extra: {
+
+      }
+    });
+    $api.rmStorage('userInfoJW');
+  }
+
+  function chooseFacility() {
+    if (FacilityArr.length <= 0) {
+      loadFacilityArr(function (itemArr) {
+        if (itemArr) {
+          chooseFacility();
+        }
+      });
+      return;
+    }
+
+    var depth = 1;
+    showSelector(FacilityArr, depth, function (flag, FacilityModel) {
+      if (flag) {
+        $api.setStorage('Facility', FacilityModel);
+        var FacilityDiv = $api.byId('Facility');
+        FacilityDiv.innerHTML = FacilityModel.name;
+        $api.css(FacilityDiv, 'color:#323232;');
+        api.sendEvent({
+          name: 'loginSucceed',
+          extra: {
+          }
+        });
+      }
+    });
+  }
+
+  function chooseWarehouse() {
+    if (WarehouseArr.length <= 0) {
+      loadItemArr('Warehouse', function (itemArr) {
+        WarehouseArr = itemArr;
+        if (itemArr.length > 0) {
+          chooseWarehouse();
+        }
+      });
+      return;
+    }
+
+    showSelector(WarehouseArr, 1, function (flag, itemModel) {
+      if (flag) {
+        $api.setStorage('Warehouse', itemModel);
+        var WarehouseDiv = $api.byId('Warehouse');
+        WarehouseDiv.innerHTML = itemModel.name;
+        $api.css(WarehouseDiv, 'color:#323232;');
+      } else {
+        api.toast({
+          msg: '选取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+
+
+  function cleanCache() {
+    api.showProgress({
+      title: '正在清理...',
+      modal: false
+    });
+
+    setTimeout(function () {
+      api.clearCache(function () {
+        api.toast({
+          msg: '清理完成',
+          duration: 1500,
+          location: 'middle'
+        });
+        api.hideProgress();
+        var catchDiv = $api.byId('catch');
+        catchDiv.innerHTML = "0M";
+      });
+    }, 800);
+  }
+
+  function showSelector(itemArr, depth, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 6,
+        col: depth,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempModel = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          var index = ret.selectedInfo.length;
+          tempModel = ret.selectedInfo[index - 1];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+    });
+  }
+
+  function versionGet() {
+    var ClientDeviceInfo = 'ios';
+    var version = api.appVersion;
+    if (api.systemType == "android") {
+      ClientDeviceInfo = 'android';
+    }
+    var parDic = {
+      versionno: version,
+      clienttype: ClientDeviceInfo
+    }
+    var currentDate = $util.getCurrentDate();
+    SystemVersionGet(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data.isupdate) {
+          if (version >= ret.data.versionno) {
+            api.toast({
+              msg: '已经为最新版本',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+
+          var DownloadURL = ret.data.url;
+          if (!ret.data.isforce) {
+            api.confirm({
+              title: '更新版本',
+              msg: ret.data.message,
+              buttons: ['更新', '取消']
+            }, function (subret, err) {
+              if (subret.buttonIndex == 1) {
+                $util.confirmPer('storage', function (flag) {
+                  if (api.systemType == "android") {
+                    installAppAndroid(DownloadURL);
+                  } else {
+                    installAppIOS(DownloadURL);
+                  }
+                });
+              }
+            });
+          } else {
+            if (version < ret.data.versionno) {
+              api.alert({
+                title: '更新版本',
+                msg: ret.data.message,
+              }, function (ret, err) {
+                if (ret) {
+                  $util.confirmPer('storage', function (flag) {
+                    if (api.systemType == "android") {
+                      installAppAndroid(DownloadURL);
+                    } else {
+                      installAppIOS(DownloadURL);
+                    }
+                  });
+                }
+              });
+            }
+          }
+        } else {
+          api.toast({
+            msg: '已经为最新版本',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      }
+    }, function (err) {
+      api.toast({
+        msg: '获取数据失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function installAppIOS(DownloadURL) {
+    api.installApp({
+      appUri: DownloadURL
+    });
+  }
+
+  function installAppAndroid(DownloadURL) {
+    api.showProgress({
+      title: '下载更新',
+      text: '开始下载',
+      modal: true
+    });
+
+    api.download({
+      url: DownloadURL,
+      report: true
+    }, function (ret, err) {
+      if (ret && 0 == ret.state) {/* 下载进度 */
+        api.showProgress({
+          title: '下载更新中...',
+          text: '已下载  ' + ret.progress + '%',
+          modal: true
+        });
+      }
+      if (ret && 1 == ret.state) {/* 下载完成 */
+        api.hideProgress();
+        var savePath = ret.savePath;
+        api.installApp({
+          appUri: savePath
+        });
+      }
+      if (ret && ret.state == 2) {
+        api.toast({
+          msg: ' 下载失败',
+          duration: 1500,
+          location: 'middle'
+        });
+        api.hideProgress();
+      }
+    });
+  }
+
+  function selectedEqp() {
+    api.openWin({
+      name: 'eqpSelectedMultiList',
+      url: 'eqpSelectedMultiList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName: 'set_nav',
+        frameName: 'set',
+      },
+      animation: {
+        type: 'none',
+        subType: 'from_bottom'
+      }
+    });
+  }
+
+
+  function selectItems(itemListStr) {
+    var eqpArr = JSON.parse(itemListStr);
+    if (eqpArr && eqpArr.length > 0) {
+      $api.setStorage('selectEqpList', eqpArr);
+      fillEqpSelected(eqpArr);
+    }
+  }
+
+  function fillEqpSelected(eqpArr) {
+    var html = '';
+    eqpArr.forEach(function (val, index) {
+      if (html) {
+        html += '，';
+      }
+      html += val.EqpCode;
+    });
+    var eqpDiv = $api.byId('eqpDiv');
+    eqpDiv.innerHTML = html;
+  }
+
+</script>
+
+</html>

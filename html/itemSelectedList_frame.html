@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style type="text/css">
+    body{
+      background-color: #fff;
+    }
+
+
+    .item_row{
+      padding: 0.5rem 0px;
+    }
+
+
+    .avator
+    {
+      height: 2.5rem;
+      width: 2.5rem;
+      margin-right: 0.4rem;
+    }
+
+    .name
+    {
+      font-size: 0.7rem;
+      color: #10131b;
+      -webkit-line-clamp: 2;
+    }
+
+
+    .detaitContent
+    {
+      flex: 1;
+    }
+
+    .yundeng
+    {
+      margin-top: 0.3rem;
+      font-size: 0.6rem;
+      color: #666666;
+    }
+
+
+
+    .status
+    {
+      background-color: #1e8ae7;
+      color: #fff;
+      border-radius: 0.2rem;
+      padding: 0.1rem 0.4rem;
+      margin-left: 0.4rem;
+      font-size: 0.6rem;
+    }
+
+    .searchBg
+    {
+      height: 35px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius:18px;
+      background-color: #efefef;
+      flex: 1;
+    }
+
+    .searchContent
+    {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .search_icon
+    {
+      height: 35px;
+      width: 1.6rem;
+      background: url(../image/common/search_icon.png) no-repeat center;
+      background-size: 14px;
+    }
+    .searchText
+    {
+      font-size: 13px;
+      color: #9399a5;
+      flex: 1;
+      text-align: left;
+      height: 35px;
+      /*margin-top: 0.2rem;*/
+      line-height: 35px;
+    }
+    input[type="text"]{
+      height: 30px;
+      font-size: 0.7rem;
+      /*padding-top: 0.1rem;*/
+      line-height: 30px;
+    }
+
+    input::-webkit-input-placeholder {
+    		color: #b9babe;
+        font-size: 0.7rem;
+    }
+
+    </style>
+</head>
+<body>
+
+  <section>
+    <div class="item_row">
+      <div class="searchBg">
+        <div class="searchContent">
+          <div class="search_icon"></div>
+          <input id="searchText" class="item_sub_left" type="text" placeholder="搜索">
+        </div>
+      </div>
+    </div>
+  </section>
+
+<script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+      <div class="item_row" tapmode onclick="itemSelected({{=index}});">
+        <div class="name">{{=value.Value}}</div>
+        <div class="separate_line"></div>
+      </div>
+
+   {{~}}
+  </script>
+
+   <section id="item_list">
+
+   </section>
+
+</body>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/echo.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/db.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/simpStrTransToTd.js"></script>
+
+<script type="text/javascript">
+     var lastId = '';
+     var searchActOpened = false;
+     var itemList = [];
+     var dataList = [];
+
+     var keyword = '';
+
+     var timeoutId ;
+     apiready = function(){
+       $upRefresh.addHtml($api.dom('body'),'暂无数据');
+
+       var body = $api.dom('body');
+       $showErrorDiv.addErrorHtml(body);
+
+       keybordTap();
+       initEventListenner();
+       loadItemList();
+     };
+
+     function keybordTap() {
+       //回车事件绑定
+       $('#searchText').bind('keyup', function(event) {
+         if (event.keyCode == "13") {
+           console.log(JSON.stringify(event.target.value));
+           loadItemList();
+         }
+       });
+     }
+
+      function initEventListenner() {
+        api.setRefreshHeaderInfo({
+            visible: true,
+            loadingImg: 'widget://image/refresh.png',
+            bgColor: '#fff',
+            textColor: '#8c9098',
+            textDown: '下拉刷新...',
+            textUp: '松开刷新...',
+            showTime: true
+        }, function(ret, err){
+          setTimeout(function () {
+            api.refreshHeaderLoadDone();
+          }, 1000);
+          loadItemList();
+        });
+      }
+
+     function loadItemList() {
+       if (itemList.length > 0) {
+         refreshItemList();
+         return;
+       }
+       var parUrl = api.pageParam.itemType;
+       GetSeletItemList(parUrl,function(ret){
+         if (ret.code == 200) {
+           if (ret.data && ret.data.length > 0) {
+             dataList = ret.data;
+             refreshItemList();
+           }else {
+             api.toast({
+                 msg: '暂无数据',
+                 duration: 1500,
+                 location: 'middle'
+             });
+           }
+         }else {
+           api.toast({
+               msg: '获取失败',
+               duration: 1500,
+               location: 'middle'
+           });
+         }
+
+       },function(err){
+         api.toast({
+             msg: '加载失败',
+             duration: 1500,
+             location: 'middle'
+         });
+       });
+     }
+
+     function refreshItemList() {
+       var tempArr =  new Array;
+       var searchText = $api.byId('searchText');
+       var keyWork = searchText.value;
+       itemList  = [];
+       if ($util.isEmpty(keyWork)) {
+         itemList = dataList;
+       }else {
+         var TraditionalStr = $trans.traditionalized(keyWork);
+
+         api.showProgress({
+           title: '检索中...',
+           modal: true
+         });
+         console.log(keyWork);
+         dataList.forEach(function (val, index ,arr) {
+           if ((val.Value && (val.Value.indexOf(keyWork) != -1 || val.Value.indexOf(TraditionalStr) != -1)) || (val.Code && val.Code.indexOf(keyWork) != -1)) {
+             itemList.push(val);
+           }
+         });
+
+         setTimeout(function () {
+           api.hideProgress();
+         }, 500);
+       }
+
+       $upRefresh.analysisData(itemList,itemList);
+     }
+
+  // ====================点击事件====================
+
+     function itemSelected(index) {
+       if (itemList.length > index) {
+         if (api.pageParam.frameName) {
+           api.execScript({
+               name: api.pageParam.winName,
+               frameName: api.pageParam.frameName,
+               script: "selectCommentItem('"+JSON.stringify(itemList[index])+"')"
+           });
+         }else {
+           api.execScript({
+               name: api.pageParam.winName,
+               script: "selectCommentItem('"+JSON.stringify(itemList[index])+"')"
+           });
+         }
+         api.closeWin();
+       }
+     }
+
+
+</script>
+</html>

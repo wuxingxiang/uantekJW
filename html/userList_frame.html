@@ -1,0 +1,631 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <!-- <link rel="stylesheet" type="text/css" href="../css/style.css" /> -->
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    #inputView {
+      border: 1px solid #d9d9d9;
+      height: 1.7rem;
+      border-radius: 0.15rem;
+      padding-left: 0.2rem;
+    }
+
+    #scanResualt {
+      height: 1.7rem;
+      line-height: 1.7rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      font-size: 0.8rem;
+    }
+
+    .tapDownBtn {
+      height: 100%;
+      width: 1rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center;
+      background-size: 0.6rem;
+      z-index: 10000;
+    }
+
+    #EqpNumInput {
+      position: absolute;
+      top: 0px;
+      left: 0.2rem;
+      right: 1rem;
+      bottom: 0rem;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    .inputView {
+      height: 1.5rem;
+      line-height: 1.5rem;
+      text-align: center;
+      padding-right: 1.2rem;
+    }
+
+    .itemTitle {
+      padding: 0.8rem 0px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    #topView {
+      /*box-shadow: 0 1px 10px rgba(160,160,160,.2);*/
+      padding-bottom: 0.6rem;
+      padding-top: 0.8rem;
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      right: 0px;
+    }
+
+    .selectIcon {
+      width: 1.4rem;
+      height: 1.4rem;
+      background: url(../image/common/common_unSelected_icon.png) no-repeat;
+      background-position: center left;
+      background-size: 0.8rem;
+    }
+
+    .selected {
+      background-image: url(../image/common/common_select.png);
+    }
+
+    .unSelected {
+      background-image: url(../image/common/common_unSelected_icon.png);
+    }
+
+    #bottomView {
+      position: fixed;
+      bottom: 0px;
+      padding: 0.6rem 0px;
+      width: 100%;
+      box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .toolItem {
+      padding: 0.5rem 0px;
+    }
+
+
+    input[type="text"] {
+      border: 1px solid #d9d9d9;
+      font-size: 0.7rem;
+      padding: 0px 3px;
+      width: 100%;
+      height: 1.6rem;
+      line-height: 1.6rem;
+      border-radius: 0.1rem;
+      text-align: center;
+    }
+
+    #emptyDiv {
+      height: 80vh;
+    }
+
+    .searchBg {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 18px;
+      background-color: #efefef;
+      flex: 1;
+    }
+
+    .searchContent {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 1.6rem;
+    }
+
+    .search_icon {
+      height: 35px;
+      width: 1.6rem;
+      background: url(../image/common/search_icon.png) no-repeat center;
+      background-size: 14px;
+    }
+
+    #searchText {
+      font-size: 13px;
+      flex: 1;
+      text-align: left;
+      height: 1.6rem;
+      margin-top: 0.1rem;
+      line-height: 1.6rem;
+      border: 0px solid #9399a5;
+      box-sizing: border-box;
+    }
+
+    input::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.7rem;
+      height: 1.5rem;
+      line-height: 1.5rem;
+    }
+
+    #selectItemContent {
+      background-color: #fff;
+      height: 40px;
+      width: 100%;
+      position: relative;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      color: #10131b;
+      font-size: 0.7rem;
+      background-image: url(../image/common/cell_line_vr.png);
+      background-position: center bottom 0px;
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+
+      padding: 0px 16px;
+    }
+
+    .selectItem {
+      position: relative;
+      flex: 1;
+      line-height: 40px;
+      height: 40px;
+    }
+
+    #comfirmBtn {
+      position: absolute;
+      right: 16px;
+      bottom: 0px;
+      width: 43px;
+      height: 44px;
+      line-height: 44px;
+      color: #1e8ae7;
+      text-align: right;
+      background: url(../image/common/common_right_add_btn.png) no-repeat;
+      background-position: center right;
+      background-repeat: no-repeat;
+      background-size: 15px;
+    }
+
+    #saveBtn {
+      width: 2.6rem;
+      height: 1.3rem;
+      line-height: 1.3rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.7rem;
+    }
+
+    .saveBtnView {
+      width: 3.6rem;
+      height: 100%;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+
+    .toolItemTitle {
+      padding: 0.4rem 0.8rem;
+      background-color: #1eb1ed;
+    }
+
+    .lifetime {
+      padding: 0px 0.1rem;
+      width: 3.6rem;
+      text-align: center;
+    }
+
+    .toolCode {
+      padding: 0px 0.1rem;
+      width: 4.5rem;
+      text-align: center;
+    }
+
+    .remark {
+      width: 4.6rem;
+
+    }
+  </style>
+</head>
+
+<body class="">
+  <section id="searchView">
+    <div class="item_row mt8 mb8">
+      <div class="searchBg">
+        <div class="searchContent">
+          <div class="search_icon"></div>
+          <input id="searchText" class="item_sub_left" type="text" placeholder="搜索">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="item_normal" id="itemListView">
+    <div class="" id="item_list">
+
+    </div>
+  </section>
+
+  <!--doT template-->
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+        <div class="item_row list_item" onclick="itemClick({{=index}});">
+          <div class="item_sub_left item_sub_nowrap font_size_16 pr8">{{=value.F_RealName}}</div>
+          <div class="separate_line"></div>
+        </div>
+    {{~}}
+ </script>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/upRefreshMore.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+  var dataList = [];
+
+  var EqpObj = null;
+  var EqpArr = [];
+
+  var reasonArr = [];
+  var canTap = true;
+  var selectAll = false;
+  var selectedType = 'Change';
+  var PageNum = 1;
+  var PageSize = 20;
+
+  apiready = function () {
+    var body = $api.byId('itemListView');
+
+    var offset = $api.offset(body);
+    var height = api.frameHeight - offset.t;
+    $api.css(body, 'min-height: ' + height + 'px;');
+
+    $upRefresh.addHtml(body, '暂无数据');
+    $showErrorDiv.addErrorHtml(body);
+    initEventListenner();
+    $upRefresh.analysisData(itemList, itemList);
+    loadItemList();
+    keybordTap();
+    initEventListenner();
+  }
+
+
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+        loadItemList();
+        api.refreshHeaderLoadDone();
+      }, 400);
+    });
+  }
+
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#searchText').bind('keyup', function (event) {
+      if (event.keyCode == "13") {
+        loadItemList();
+      }
+    });
+  }
+
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+        loadItemList();
+      }, 400);
+    });
+  }
+
+  function loadItemList() {
+    PageNum = 1;
+    var parDic = {
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+
+    userListGet(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          dataList = ret.data;
+          searchData();
+        }
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+      refreshItemList();
+    }, function (err) {
+      $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadMoreItemList() {
+    $upRefresh.loadMoreHeader();
+    api.refreshHeaderLoadDone();
+
+    var searchText = $api.byId('searchText');
+    if (!$util.isEmpty(searchText.value)) {
+      console.log(222);
+      return;
+    }
+
+    PageNum++;
+    var parDic = {
+      PageSize: PageSize,
+      PageNum: PageNum
+    }
+
+    userListGet(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          dataList = itemList.concat(ret.data);
+        }
+        searchData();
+      } else {
+        PageNum--;
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+      $showErrorDiv.loadSucceed();
+    }, function (err) {
+      PageNum--;
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UploadData() {
+    var tempArr = new Array;
+    itemList.forEach(function (val, index, arr) {
+      if (val.selected) {
+        tempArr.push(val);
+      }
+    });
+
+    if (tempArr.length <= 0) {
+      api.toast({
+        msg: '暂未选择刀具/模具',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var countInput = $api.byId('countInput');
+    var parDic = {
+      EqpId: api.pageParam.EqpId,
+      Operation: 'Install',
+      ToolList: tempArr
+    }
+
+    PostToolChange(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        api.execScript({
+          name: api.pageParam.winName,
+          frameName: api.pageParam.frameName,
+          script: 'loadItemList();'
+        });
+
+        setTimeout(function () {
+          api.closeWin();
+        }, 1200);
+      }
+
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    }, function (err) {
+      api.toast({
+        msg: '保存失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+
+  function searchData() {
+    var searchText = $api.byId('searchText');
+    if (!$util.isEmpty(searchText.value)) {
+      itemList = [];
+      dataList.forEach(function (val) {
+        if (val.F_RealName.indexOf(searchText.value) != -1) {
+          itemList.push(val);
+        }
+      });
+    }else{
+      itemList = dataList;
+    }
+
+    refreshItemList();
+  }
+
+  function refreshItemList() {
+    api.refreshHeaderLoadDone();
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  // =========================================
+
+  function itemClick(index) {
+    if (index < itemList.length) {
+      var tempModel = itemList[index];
+      tempModel.itemType = api.pageParam.itemType;
+      if (api.pageParam.frameName) {
+        api.execScript({
+          name: api.pageParam.winName,
+          frameName: $api.pageParam.frameName,
+          script: "selectedItem('" + JSON.stringify(tempModel) + "')"
+        })
+      } else {
+        api.execScript({
+          name: api.pageParam.winName,
+          script: "selectedItem('" + JSON.stringify(tempModel) + "')"
+        })
+      }
+      api.closeWin();
+    }
+  }
+
+  function inputClick() {
+    event.stopPropagation();
+  }
+
+  function valueInputEnd(index, el) {
+    event.stopPropagation();
+    if (itemList.length > index) {
+      itemList[index].Position = el.value;
+    }
+
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function OnValueInput(index, el) {
+    event.stopPropagation();
+    if (itemList.length > index) {
+      itemList[index].Position = el.value;
+    }
+  }
+
+  function rightBtnClick() {
+    var tempArr = new Array;
+    itemList.forEach(function (val, index, arr) {
+      if (val.selected) {
+        tempArr.push(val);
+      }
+    });
+
+    if (tempArr.length <= 0) {
+      api.toast({
+        msg: '暂未选择刀具/模具',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    api.execScript({
+      name: api.pageParam.winName,
+      frameName: api.pageParam.frameName,
+      script: "refreshItemList('" + JSON.stringify(tempArr) + "');"
+    });
+    api.closeWin();
+  }
+
+  function selectedAll() {
+    selectAll = !selectAll;
+    selectAllItem(selectAll);
+    if (selectAll) {
+      itemList.forEach(function (val, index, arr) {
+        val.selected = true;
+      });
+    } else {
+      itemList.forEach(function (val, index, arr) {
+        val.selected = false;
+      });
+    }
+    $upRefresh.analysisData(itemList, itemList);
+
+  }
+
+  function selectAllItem(flag) {
+    selectAll = flag;
+    var selectAllIcon = $api.byId('selectAllIcon');
+    if (flag) {
+      if ($api.hasCls(selectAllIcon, 'unSelected')) {
+        $api.removeCls(selectAllIcon, 'unSelected');
+      }
+      $api.addCls(selectAllIcon, 'selected');
+    } else {
+      if ($api.hasCls(selectAllIcon, 'selected')) {
+        $api.removeCls(selectAllIcon, 'selected');
+      }
+      $api.addCls(selectAllIcon, 'unSelected');
+    }
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+
+</html>

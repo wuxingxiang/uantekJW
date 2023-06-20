@@ -1,0 +1,714 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    .order_item {
+      padding: 0.5rem 0px;
+      position: relative;
+    }
+
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .detailData {
+      padding: 0.5rem 0.3rem;
+      position: relative;
+    }
+
+    .status {
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #f94d7e;
+      font-size: 0.6rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+
+
+    #item_list {}
+
+    .selectedIcon img {
+      height: 1rem;
+      width: 1rem;
+    }
+
+    .leftSeperate {
+      width: 0.6rem;
+      height: 10px;
+    }
+
+    .Unit {
+      text-align: center;
+      width: 4rem;
+    }
+
+    .list_item_sub {
+      padding: 0.25rem 0px;
+    }
+
+    .AddBtn {
+      position: fixed;
+      bottom: 1rem;
+      right: 0rem;
+      height: 5rem;
+      width: 5rem;
+      background: url(../image/common/add_big_icon.png) no-repeat;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 5rem;
+      z-index: 1000;
+    }
+
+    .itemView {
+      padding: 0.3rem 0.4rem;
+      border-radius: 0.2rem;
+      background-color: #efefef;
+      margin-top: 0.5rem;
+      margin-left: 0.5rem;
+    }
+
+    .flex-vertical {
+      -webkit-box-orient: vertical;
+      -webkit-flex-flow: column;
+      flex-flow: column;
+    }
+
+    .tapView {
+      height: 100%;
+      width: 4.6rem;
+    }
+
+    .operationView {
+      padding: 0.1rem 0.5rem;
+      display: flex;
+    }
+
+    .tapBotton {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.15rem;
+      font-size: 0.6rem;
+      color: #fff;
+      text-align: center;
+      margin: 0.2rem 0px;
+    }
+
+    .colorBgGray {
+      background-color: #9d9d9d;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section id="item_list">
+
+  </section>
+  <!-- <div class="AddBtn" onclick="addUnisonBtnClick()"></div> -->
+
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+    <div class="font_size_14 order_item">
+        <div class="item_normal {{=value.arrowCls}} mt6"  onclick="itemClick({{=index}});">
+          <div class="item_row font_size_16 " style='align-items: flex-start;'>
+            <div class="item_sub_left font_size_16">{{=value.FacilityName}}</div>
+          </div>
+
+          <div class="item_row color_darkgray mt8">
+            <div class="item_row item_sub_left mr4" style='align-items: flex-start;'>
+              <div class="">当前工单：</div>
+              <div class="item_sub_left item_sub_nowrap pr12">{{=value.CurrentWO}}</div>
+            </div>
+  
+            <div class="item_row ml4" style='flex:0.7;'>
+              <div class="">状态：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.Statuscd}}</div>
+            </div>
+          </div>
+          <div class="item_row color_darkgray font_size_14 mt6">
+            <div class="font_size_14">换型工单：</div>
+            <div class="item_sub_left font_size_14">{{=value.ToggleWO}}</div>
+          </div>
+        </div>
+
+        {{? value.IsOpen == true && value.ToggleWO}}
+          {{~value.ProcessList:subValue:subIndex}}
+          <div class="itemView item_row" onclick="subItemClick({{=index}},{{=subIndex}});">
+            <div class="item_sub_left">
+                <div class="">{{=subValue.ProcessName}}</div>
+                <div class="item_row color_darkgray font_size_14 mt8">
+                  <div class="item_row color_darkgray item_sub_left mr4">
+                    <div class="font_size_14 color_darkgray">当前工单：</div>
+                    <div class="item_sub_left color_darkgray item_sub_nowrap">{{=subValue.CurrentWO}}</div>
+                  </div>
+    
+                  <div class="item_row color_darkgray item_sub_left ml4" style=flex:0.8;'>
+                    <div class="color_darkgray">状态：</div>
+                    <div class="item_sub_left item_sub_nowrap color_darkgray">{{=subValue.Statuscd}}</div>
+                  </div>
+                </div>
+                <div class="item_row color_darkgray item_sub_left mt6" style=flex:0.7;'>
+                  <div class="color_darkgray">换型工单：</div>
+                  <div class="item_sub_left item_sub_nowrap color_darkgray">{{=subValue.ToggleWO}}</div>
+                </div>
+            </div>
+            <div class ='tapView item_center'>
+            {{? subValue.Statuscd == 'Toggle'}}
+              <div class="operationView flex-vertical ml4">
+                <div class="tapBotton color_bg_main" onclick='operationBtnTap("complete",{{=index}},{{=subIndex}});'>换型完成</div>
+                <div class="tapBotton colorBgGray" onclick='operationBtnTap("cancel",{{=index}},{{=subIndex}});'>换型取消</div>
+              </div>
+            {{?}}
+            </div>
+          </div>
+          {{~}}
+        {{?}}
+        <div class="separate_line"></div>
+      </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var PageNum = 1;
+  var PageSize = 20;
+  var itemList = [];
+
+  var LocationId = '';
+  var WarehouseId = '';
+  var InStockTypeId = '';
+
+  var startDate = '';
+  var endDate = '';
+
+  var OrderNum = '';
+  var sarePart = '';
+  var Supplier = '';
+  var selectedItem = null;
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无数据');
+    $showErrorDiv.addErrorHtml(body);
+    $upRefresh.analysisData(itemList, itemList);
+    initEventListenner();
+    loadItemList();
+    // setdate();
+  }
+
+  function setdate() {
+    var myDate = new Date();
+    var year = myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+    var month = myDate.getMonth() + 1;       //获取当前月份(0-11,0代表1月)
+    if (month < 10) {
+      month = '0' + month;
+    }
+    var day = myDate.getDate();        //获取当前日(1-31)
+
+    if (day < 10) {
+      day = '0' + day;
+    }
+
+    endDate = year + '-' + month + '-' + day;
+    startDate = $util.GetDateStr(endDate, -2);
+  }
+
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+        loadItemList();
+        api.refreshHeaderLoadDone();
+      }, 400);
+    });
+  }
+
+  function loadStorageCode() {
+    var parDic = '';
+    GetOtherStorageCode(parDic, function (ret) {
+      api.refreshHeaderLoadDone();
+      console.log(JSON.stringify(ret));
+      itemList = [];
+      if (ret.code == 200 && ret.data && ret.data.Code) {
+        openStockDetail(ret.data.Code);
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '获取入库code失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadItemList() {
+    var parUrl = "";
+    GetFacilityProcessEquipment(parUrl, function (ret) {
+      api.refreshHeaderLoadDone();
+      itemList = [];
+      if (ret.code == 200) {
+        if (ret.data) {
+          itemList = ret.data;
+          itemList.forEach(function (val, index, arr) {
+            val.IsOpen = false;
+            if (val.ToggleWO && val.ProcessList.length > 0) {
+              val.arrowCls = 'arrow_down';
+            }
+          });
+        }
+        $upRefresh.analysisData(itemList, itemList);
+        $showErrorDiv.loadSucceed();
+      } else {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      // $showErrorDiv.loadError();
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadMoreItemList() {
+    $upRefresh.loadMoreHeader();
+    api.refreshHeaderLoadDone();
+
+    PageNum++;
+    var parDic = {
+      PoNo: OrderNum,
+      ConsumableCode: sarePart,
+      WarehouseId: WarehouseId,
+      InputType: InStockTypeId,
+      StartDate: startDate ? startDate + ' 00:00:00' : '1970-01-01 00:00:00',
+      EndDate: endDate ? endDate + ' 23:59:59' : '2200-01-01 23:59:59',
+      PageSize: PageSize,
+      PageNum: PageNum,
+    }
+
+    GetPreGodownEntryList(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          ret.data.forEach(function (val, index, arr) {
+            val.IsOpen = false;
+            val.arrowCls = 'arrow_down';
+          });
+          itemList = itemList.concat(ret.data);
+        }
+        $showErrorDiv.loadSucceed();
+        $upRefresh.analysisData(ret.data, itemList);
+      } else {
+        PageNum--;
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      PageNum--;
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UploadData() {
+    if (!selectedItem) {
+      api.toast({
+        msg: '请选择需要提交的物料',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (!WarehouseToId) {
+      api.toast({
+        msg: '请选择入库仓库',
+        duration: 1500,
+        location: 'middle'
+      });
+
+      return;
+    }
+    if (!LocationId) {
+      api.toast({
+        msg: '请选择库位',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var parDic = {
+      PreinspectionId: selectedItem.Id,
+      WarehouseId: WarehouseToId,
+      BinCode: LocationId,
+      LabelList: selectedItem.LabelList
+    };
+
+    GodownEntrySubmit(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        api.execScript({
+          name: api.pageParam.winName,
+          frameName: api.pageParam.frameName,
+          script: "loadItemList()"
+        });
+
+        var itemListDiv = $api.byId('item_list');
+        var items = $api.domAll(itemListDiv, '.order_item');
+        var index = 0;
+        var contain = false;
+        itemList.forEach(function (val, subIndex) {
+          if (selectedItem.Id == val.Id) {
+            contain = true;
+            index = subIndex;
+            return;
+          }
+        });
+        if (items && items.length > 0 && contain && items.length >= index) {
+          var Node = items[index]
+          $api.remove(Node);
+          itemList.splice(index, 1);
+        }
+
+        if (itemList.length <= 0) {
+          $upRefresh.analysisData(itemList, itemList);
+        }
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function remodelFinish(parameter, callBack) {
+    PostOrderProcessChange(parameter, function (ret) {
+      console.log(JSON.stringify(ret));
+      var flag = false;
+      if (ret.code == 200) {
+        flag = true;
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle'
+      });
+      callBack(flag);
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      callBack(false);
+    });
+  }
+
+  function remodelCancell(parameter, callBack) {
+    PostProcessCancle(parameter, function (ret) {
+      console.log(JSON.stringify(ret));
+      var flag = false;
+
+      if (ret.code == 200) {
+        flag = true;
+      }
+      callBack(flag);
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle'
+      });
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      callBack(false);
+    });
+  }
+
+
+  // ================数据处理=========================
+  function setStartDate(_startDate) {
+    startDate = _startDate
+  }
+
+  function setEndDate(_endDate) {
+    endDate = _endDate;
+  }
+
+  function setSupplier(_Supplier) {
+    Supplier = _Supplier;
+  }
+
+  function setOrderNum(_OrderNum) {
+    OrderNum = _OrderNum;
+  }
+
+  function setSarePart(_sarePart) {
+    sarePart = _sarePart;
+  }
+
+  function setLocationId(_LocationId) {
+    LocationId = _LocationId;
+  }
+
+  function setWarehouseId(_WarehouseId) {
+    WarehouseId = _WarehouseId;
+  }
+
+  function setInStockTypeId(_InStockTypeId) {
+    InStockTypeId = _InStockTypeId;
+  }
+
+  function refreshItemSelectIcon(flag) {
+    itemList.forEach(function (val, index) {
+      val.selected = flag
+    });
+
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  // ================点击事件=========================
+
+  function saveBtnClick() {
+    UploadData();
+  }
+
+  function operationBtnTap(tapType, index, subIndex) {
+
+    event.stopPropagation();
+
+    if (itemList.length > index) {
+      var itemModel = itemList[index];
+      if (itemModel && $util.isArray(itemModel.ProcessList) && itemModel.ProcessList.length > subIndex) {
+        var subModel = itemModel.ProcessList[subIndex];
+        if (subModel) {
+          switch (tapType) {
+            case 'complete':
+              {
+                var userInfo = $api.getStorage('userInfoJW');
+                var parameter = {
+                  FacilityId: itemModel.FacilityId,
+                  ProcessId: subModel.ProcessId,
+                  Operator: userInfo.userid
+                }
+                remodelFinish(parameter, function (flag) {
+                  if (flag) {
+                    subModel.Statuscd = 'Done';
+                    $upRefresh.analysisData(itemList, itemList);
+                  }
+                });
+              }
+              break;
+            case 'cancel':
+              {
+                api.confirm({
+                  title: '提示',
+                  msg: '是否确认取消换型',
+                  buttons: ['确认', '取消']
+                }, function (subret, err) {
+                  if (subret.buttonIndex == 1) {
+                    var userInfo = $api.getStorage('userInfoJW');
+                    var parameter = {
+                      FacilityId: itemModel.FacilityId,
+                      ProcessId: subModel.ProcessId,
+                      Operator: userInfo.userid
+                    }
+                    remodelCancell(parameter, function (flag) {
+                      if (flag) {
+                        subModel.Statuscd = 'Done';
+                        $upRefresh.analysisData(itemList, itemList);
+                      }
+                    });
+                  }
+                });
+              }
+              break;
+            default:
+              break;
+          };
+        }
+      }
+    }
+  }
+
+  function itemClick(tapIndex) {
+    if (itemList.length > tapIndex) {
+      var itemModel = itemList[tapIndex];
+      if (!itemModel.ToggleWO) {
+        return;
+      }
+
+      itemList.forEach(function (val, index) {
+        if (val.ToggleWO && val.ProcessList.length > 0) {
+          if (tapIndex == index) {
+            val.IsOpen = !val.IsOpen;
+            if (val.IsOpen == true) {
+              val.arrowCls = 'arrow_up';
+            } else {
+              val.arrowCls = 'arrow_down';
+            }
+          } else {
+            val.IsOpen = false;
+            val.arrowCls = 'arrow_down';
+          }
+        }
+      });
+      $upRefresh.analysisData(itemList, itemList);
+    }
+  }
+
+  function subItemClick(index, subIndex) {
+    if (itemList.length > index) {
+      var itemModel = itemList[index];
+      if (itemModel.ToggleWO && itemModel.ProcessList.length > subIndex) {
+        var subItem = itemModel.ProcessList[subIndex];
+        if (subItem && $util.isArray(subItem.EquipmentList) && subItem.EquipmentList.length > 0) {
+          api.openFrame({
+            name: 'orderToggleDetail',
+            url: 'orderToggleDetail_mark.html',
+            rect: {
+              marginTop: 0, // main页面距离win顶部的高度
+              marginBottom: 0, // main页面距离win底部的高度
+              w: 'auto' // main页面的宽度 自适应屏幕宽度
+            },
+            reload: true,
+            pageParam: {
+              ItemList: subItem.EquipmentList
+            },
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0.3)',
+            vScrollBarEnabled: false,
+            hScrollBarEnabled: false,
+          });
+        } else {
+          api.toast({
+            msg: '暂无设备',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      }
+
+    }
+  }
+
+  function selectedIconTap(index) {
+    event.stopPropagation();
+    if (itemList.length > index) {
+      var tempModel = itemList[index];
+      var selected = tempModel.selected;
+      itemList.forEach(function (val, index) {
+        val.selected = false;
+      });
+
+      selectedItem = tempModel;
+      tempModel.selected = !selected;
+      $upRefresh.analysisData(itemList, itemList);
+    }
+  }
+
+  function addUnisonBtnClick() {
+    // loadStorageCode();
+    openStockDetail();
+  }
+
+  function openStockDetail(code) {
+    api.openWin({
+      name: 'sarePartStockDetail_nav',
+      url: 'sarePartStockDetail_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+
+</html>

@@ -1,0 +1,995 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>底部导航</title>
+  <link rel="stylesheet" type="text/css" href="../css/api.css" />
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/style.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    html,
+    body {
+      font-size: 14px;
+      height: 100%;
+    }
+
+    body {
+      background-color: #fff;
+      height: 100%;
+    }
+
+    .item_title {
+      width: 20%;
+      justify-content: center;
+      align-content: center;
+    }
+
+    .typeName {
+      position: relative;
+      margin-top: 0.35rem;
+      font-size: 0.8rem;
+      text-align: center;
+      min-width: 5rem;
+    }
+
+    .menuItem {
+      position: relative;
+      width: 100%;
+    }
+
+    .menuIcon {
+      height: auto;
+      width: 65%;
+      margin: auto;
+      border-radius: 0.25rem;
+    }
+
+    .item_view {
+      width: 25%;
+      margin-top: 0.8rem;
+      padding: 0rem 0rem;
+      padding-bottom: 0.4rem;
+      float: left;
+    }
+
+    canvas {
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+
+    #grapContent {
+      display: block;
+      position: relative;
+      /*height: 15rem;*/
+      flex: 1;
+      width: 100%;
+    }
+
+    .content {
+      width: 100%;
+    }
+
+    .detailData {
+      box-shadow: 0 0 20px rgba(160, 160, 160, .2);
+      border-radius: 0.3rem;
+      margin: 0rem 0.75rem;
+      padding: 0.5rem 0px;
+      background-color: #eeeeee;
+    }
+
+    #user_avator {
+      height: 2.3rem;
+      width: 2.3rem;
+      border-radius: 50%;
+      margin-right: 0.8rem;
+      border: 0.1rem solid #fff;
+    }
+
+    .item_icon {
+      height: 2.5rem;
+      width: 2.2rem;
+      background-position: center right 0px;
+      background-repeat: no-repeat;
+      background-size: 1.5rem;
+      box-sizing: border-box;
+      background-image: url(../image/mine/mine_set_icon.png);
+    }
+
+    /* 设置滚动条的样式 */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    /* 滚动条滑块 */
+    ::-webkit-scrollbar-thumb {
+      background: #fff;
+    }
+
+    #bottom {
+      height: 100px;
+      overflow: hidden;
+      overflow-y: scroll;
+    }
+
+    .discover {
+      overflow: hidden;
+      height: 7.5rem;
+      position: relative;
+      padding: 0.6rem 0px;
+    }
+
+    .discover .nav {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      position: absolute;
+      z-index: 1;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      display: block;
+      white-space: nowrap;
+      /*height: 4rem;*/
+      padding: 0rem 0.9rem;
+    }
+
+    .discover .nav .item {
+      color: #8c8c8c;
+      width: 6rem;
+      text-align: center;
+      margin-right: 1rem;
+      background-color: #fff;
+      display: inline-block;
+      position: relative;
+      border-radius: 0.2rem;
+      padding: 0.5rem 0px;
+      /*box-shadow: 0 0 0.2rem rgba(150,150,150,.2);*/
+      box-sizing: border-box;
+    }
+
+    .item_image {
+      width: 3rem;
+      height: 3rem;
+      margin: 0px 0.7rem;
+      margin-top: 0.4rem;
+      border-radius: 0.25rem;
+    }
+
+    .discover .nav :last-child {
+      margin-right: 0rem;
+    }
+
+    #itemMenuView {
+      width: 100%;
+      height: 100%;
+      padding: 0.3rem 0.2rem;
+      flex: 1;
+      padding-bottom: 1.1rem;
+      box-sizing: border-box;
+    }
+
+    .companyHint {
+      position: fixed;
+      bottom: 0.2rem;
+      right: 0rem;
+      font-size: 0.7rem;
+      text-align: right;
+      padding-right: 0.8rem;
+      z-index: 11000;
+    }
+
+    #item_list {
+      height: 100%;
+      overflow-y: scroll;
+    }
+  </style>
+</head>
+
+<body class="pt10 pb10">
+  <section id="itemMenuView" class="item_center">
+    <div style="width:100%;" id="item_list">
+    </div>
+  </section>
+
+  <div class="companyHint color_gray item_row">
+    <div class="">Copyright © 2021-2030 Uantek Co. ,Ltd</div>
+    <div id="webDiv" class="align_right ml20">Helpdesk: www.uantek.com</div>
+  </div>
+
+  <!--doT template-->
+  <script id="template" type="text/x-dot-template">
+   {{~it:value:index}}
+       <div class="item_sub_center item_center item_view"  onclick="itemMenuClick(this,'{{=value.Url}}')">
+         <div class="menuItem">
+           <div class="image_box menuIcon">
+             <img  data-url="{{=value.IconPath}}" src="../image/common/photo_default.png"  onload="fnLoadimage(this)">
+           </div>
+           <div class="typeName color_darkgray item_sub_nowrap">{{=value.Name}}</div>
+         </div>
+       </div>
+   {{~}}
+</script>
+
+</body>
+
+</html>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+  var MQTTService;
+
+  var receiveCallback;
+
+  var connectStatus = true;
+
+  var loadErrorCount = 0;
+
+  apiready = function () {
+    // $api.fixStatusBar($api.dom('body'));
+    var body = $api.dom('body');
+    $showErrorDiv.addErrorHtml(body);
+    $upRefresh.addHtml(body, '暂无任何权限');
+
+    MQTTService = api.require('MQTTService');
+    initEventListenner();
+    setAppInfo();
+    versionGet();
+
+    // api.setStatusBarStyle({
+    //   style: 'dark',
+    //   color: '#efefef'
+    // });
+
+    // $api.rmStorage('SDDInfo');
+
+    var uiMode = api.uiMode;
+    if (uiMode != 'pad') {
+      var webDiv = $api.byId('webDiv');
+      webDiv.style.display = 'none';
+    }
+
+    var userInfo = $api.getStorage('userInfoJW');
+    // console.log(JSON.stringify(userInfo));
+    if (!userInfo) {
+      showLoginCtr();
+      return;
+    }
+
+    loadMenuArr(true);
+    // setLoadInterval();
+
+    MQTTLoginOut();
+    setTimeout(function () {
+      setMQTTConfig();
+    }, 500);
+
+    receiveCallback = function (ret) {
+      if (ret) {
+        // if (ret.Module == 'Authority') {
+        //   loadMenuArr(true);
+        // }
+
+        var userModel = $api.getStorage('userInfoJW');
+        if (!userModel) {
+          MQTTLoginOut();
+          return;
+        }
+
+        api.notification({
+          sound: 'widget://res/shake_match.mp3',
+          notify: {
+            title: ret.MsgTitle,
+            content: ret.MsgContent,
+            updateCurrent: false,
+            extra: {
+              appParam: {
+                Module: ret.Module,
+                ObjId: ret.ObjId
+              }
+            }
+          }
+        });
+      }
+    };
+  }
+
+  function initEventListenner() {
+    api.addEventListener({
+      name: 'loginSucceed'
+    }, function (ret, err) {
+      setTimeout(function () {
+        setMQTTConfig();
+        loadMenuArr(true);
+        $api.setStorage('userInfoJW', ret.value);
+      }, 100);
+      setLoadInterval();
+    });
+
+    api.addEventListener({
+      name: 'loginOut'
+    }, function (ret, err) {
+      MQTTLoginOut();
+      clearInterval();
+      setTimeout(function () {
+        showLoginCtr();
+      }, 200);
+    });
+
+    // api.addEventListener({
+    //   name:'appintent'
+    // },function(ret,err){
+    //   if (ret && ret.appParam) {
+    //     var appParam = ret.appParam;
+    //     openNoticeWin(appParam.Module,appParam.ObjId);
+    //   }
+    // });
+
+    api.addEventListener({
+      name: 'resume'
+    }, function (ret, err) {
+      versionGet();
+      var userInfo = $api.getStorage('userInfoJW');
+      console.log(JSON.stringify(userInfo));
+      if (userInfo) {
+        MQTTLoginOut();
+        setTimeout(function () {
+          setMQTTConfig();
+        }, 500);
+      } else {
+        MQTTLoginOut();
+      }
+      // if (connectStatus == false) {
+
+      // }
+    });
+
+    api.addEventListener({
+      name: 'noticeclicked'
+    }, function (ret, err) {
+      if (ret && ret.value) {
+        var tempModel = JSON.parse(ret.value);
+        if (tempModel && tempModel.appParam) {
+          var appParam = tempModel.appParam;
+          openNoticeWin(appParam.Module, appParam.ObjId);
+        }
+      }
+    });
+  }
+
+  function setLoadInterval() {
+    setInterval(function () {
+      loadMenuArr(false);
+    }, 60 * 60 * 1000);
+  }
+
+  function setMQTTConfig() {
+    var uiMode = api.uiMode;
+    // if (uiMode == 'pad') {
+    //   return;
+    // }
+    var config = $api.getStorage('MQTTInfoJW');
+    if (config) {
+      var resultCallback = function (ret, err) {
+        console.log(JSON.stringify(ret));
+        if (ret == '1') {
+          connectStatus = true;
+        } else {
+          connectStatus = false;
+        }
+
+        if (ret && ret.code == 200 && receiveCallback) {
+          receiveCallback(ret.payload);
+        }
+      }
+      if (MQTTService) {
+        console.log(JSON.stringify(config));
+
+        MQTTService.startService(config, resultCallback);
+        if (receiveCallback) {
+          // MQTTService.receiveMessage(receiveCallback);
+        }
+      }
+    }
+  }
+
+  function MQTTLoginOut() {
+
+    var uiMode = api.uiMode;
+    // if (uiMode == 'pad') {
+    //   return;
+    // }
+    console.log('推出登陆');
+    if (MQTTService) {
+      MQTTService.disconnect();
+    }
+  }
+
+  function setAppInfo() {
+    var GUid = $api.getStorage('GUid');
+    if (!GUid) {
+      GUid = api.systemType + $util.guid();
+    }
+    api.setGlobalData({
+      key: 'Mark',
+      value: GUid
+    });
+
+    var uiMode = api.uiMode;
+    api.setGlobalData({
+      key: 'APPTYPE',
+      value: 'PDA'
+    });
+
+    if (uiMode == 'pad') {
+      width = 90;
+      api.setGlobalData({
+        key: 'APPTYPE',
+        value: 'UNPDA'
+      });
+    }
+  }
+
+  function showMenuIcons() {
+    $upRefresh.analysisData(itemList, itemList);
+    //重新解析tapmode
+    var uiMode = api.uiMode;
+
+    var itemMenuView = $api.byId('itemMenuView');
+    if (itemMenuView) {
+      var menuIcons = $api.domAll(itemMenuView, '.menuIcon');
+      if (menuIcons && menuIcons.length > 0) {
+        var offset = $api.offset(menuIcons[0]);
+        width = offset.w;
+        if (uiMode == 'pad') {
+          width = 90;
+        } else {
+          if (width > 80) {
+            width = 56;
+          }
+        }
+
+        if (menuIcons && menuIcons.length > 0) {
+          for (var i = 0; i < menuIcons.length; i++) {
+            $api.css(menuIcons[i], 'width:' + width + 'px;height:' + width + 'px;');
+          }
+        }
+      }
+
+      var itemViews = $api.domAll(itemMenuView, '.item_view');
+      if (itemViews && itemViews.length <= 3) {
+        for (var i = 0; i < itemViews.length; i++) {
+          var width = parseInt(100 / itemViews.length);
+          $api.css(itemViews[i], 'width:' + width + '%;height:' + width + '%;');
+        }
+      } else {
+        if (uiMode == 'pad') {
+          for (var i = 0; i < itemViews.length; i++) {
+            $api.css(itemViews[i], 'width:20%');
+          }
+        }
+      }
+    }
+  }
+
+  function openNoticeWin(Module, ObjId) {
+    var userInfo = $api.getStorage('userInfoJW');
+    if (!ObjId || !userInfo) {
+      return;
+    }
+
+    var Objs = ObjId.split(',');
+    var ObjArr = [];
+    if (Objs.length) {
+      Objs.forEach(function (val, index) {
+        if (val) {
+          ObjArr.push(val);
+        }
+      });
+    }
+
+    switch (Module) {
+      case 'EqpRepair':
+        {
+          if ($util.isArray(ObjArr) && ObjArr.length == 1 && ObjArr[0]) {
+            api.openWin({
+              name: 'maintenanceEqp_nav',
+              url: 'maintenanceEqp_win.html',
+              slidBackEnabled: false,
+              reload: true,
+              pageParam: {
+                RepairId: ObjArr[0]
+              },
+              animation: {
+                type: 'movein',
+                subType: 'from_right'
+              }
+            });
+          } else {
+            api.openWin({
+              name: 'maintenanceList_nav',
+              url: 'maintenanceList_win.html',
+              slidBackEnabled: false,
+              pageParam: {
+              },
+              animation: {
+                type: 'movein',
+                subType: 'from_right'
+              }
+            });
+          }
+        }
+        break;
+      case 'EqpInspection':
+        {
+          api.openWin({
+            name: 'eqpSpotCheckList_nav',
+            url: 'eqpSpotCheckList_win.html',
+            slidBackEnabled: false,
+            reload: true,
+            pageParam: {
+              EqpId: ObjArr[0]
+            },
+            animation: {
+              type: 'movein',
+              subType: 'from_right'
+            }
+          });
+        }
+        break;
+      case 'EqpMaintain':
+        {
+          if ($util.isArray(ObjArr) && ObjArr.length == 1 && ObjArr[0]) {
+            api.openWin({
+              name: 'maintainEqp_nav',
+              url: 'maintainEqp_win.html',
+              slidBackEnabled: false,
+              reload: true,
+              pageParam: {
+                MaintainId: ObjArr[0]
+              },
+              animation: {
+                type: 'movein',
+                subType: 'from_right'
+              }
+            });
+          } else {
+            api.openWin({
+              name: 'maintainList_nav',
+              url: 'maintainList_win.html',
+              slidBackEnabled: false,
+              pageParam: {
+              },
+              animation: {
+                type: 'movein',
+                subType: 'from_right'
+              }
+            });
+          }
+        }
+        break;
+      case 'SystemNotice':
+        {
+          api.openWin({
+            name: 'messageList_nav',
+            url: 'messageList_win.html',
+            slidBackEnabled: false,
+            pageParam: {
+            },
+            animation: {
+              type: 'movein',
+              subType: 'from_right'
+            }
+          });
+        }
+        break;
+      case 'QCNotice':
+        {
+
+        }
+        break;
+      case 'ToolNotice':
+        {
+          if ($util.isArray(ObjArr) && ObjArr.length == 1 && ObjArr[0]) {
+            api.openWin({
+              name: 'toolChangeList_nav',
+              url: 'toolChangeList_win.html',
+              slidBackEnabled: false,
+              reload: true,
+              pageParam: {
+                EqpId: ObjArr[0]
+              },
+              animation: {
+                type: 'movein',
+                subType: 'from_right'
+              }
+            });
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function showLoginCtr() {
+    setTimeout(function () {
+      api.openWin({
+        name: 'login',
+        url: 'login_frame.html',
+        slidBackEnabled: false,
+        pageParam: {
+        },
+        animation: {
+          type: 'none',
+          subType: 'from_bottom'
+        }
+      });
+    }, 100);
+  }
+
+  function installAppIOS(DownloadURL) {
+    api.installApp({
+      appUri: DownloadURL
+    });
+  }
+
+  function installAppAndroid(DownloadURL) {
+    api.showProgress({
+      title: '下载更新',
+      text: '开始下载',
+      modal: true
+    });
+
+    api.download({
+      url: DownloadURL,
+      report: true
+    }, function (ret, err) {
+      if (ret && 0 == ret.state) {/* 下载进度 */
+        api.showProgress({
+          title: '下载更新中...',
+          text: '已下载  ' + ret.progress + '%',
+          modal: true
+        });
+      }
+      if (ret && 1 == ret.state) {/* 下载完成 */
+        api.hideProgress();
+        var savePath = ret.savePath;
+        api.installApp({
+          appUri: savePath
+        });
+      }
+      if (ret && ret.state == 2) {
+        api.toast({
+          msg: ' 下载失败',
+          duration: 1500,
+          location: 'middle'
+        });
+        api.hideProgress();
+      }
+    });
+  }
+
+  //=================网络请求==============
+
+  function versionGet() {
+    var ClientDeviceInfo = 'ios';
+    var version = api.appVersion;
+    if (api.systemType == "android") {
+      ClientDeviceInfo = 'android';
+    }
+    var parDic = {
+      versionno: version,
+      clienttype: ClientDeviceInfo
+    }
+    var currentDate = $util.getCurrentDate();
+    SystemVersionGet(parDic, function (ret) {
+      if (ret.code == 200) {
+        if (ret.data.isupdate) {
+          var DownloadURL = ret.data.url;
+          if (!ret.data.isforce) {
+            var VersionObj = $api.getStorage('VersionUpData');
+            if (VersionObj && VersionObj.VersionNo >= ret.data.versionno && currentDate == VersionObj.currentDate) {
+              return;
+            }
+            api.confirm({
+              title: '更新版本',
+              msg: ret.data.message,
+              buttons: ['更新', '取消']
+            }, function (subret, err) {
+              if (subret.buttonIndex == 1) {
+                $util.confirmPer('storage', function (flag) {
+                  if (api.systemType == "android") {
+                    installAppAndroid(DownloadURL);
+                  } else {
+                    installAppIOS(DownloadURL);
+                  }
+                });
+              } else {
+                var tempVersionObj = {
+                  VersionNo: ret.data.versionno,
+                  currentDate: currentDate
+                }
+                $api.setStorage('VersionUpData', tempVersionObj);
+              }
+            });
+          } else {
+            if (version < ret.data.versionno) {
+              api.alert({
+                title: '更新版本',
+                msg: ret.data.message,
+              }, function (ret, err) {
+                if (ret) {
+                  $util.confirmPer('storage', function (flag) {
+                    if (api.systemType == "android") {
+                      installAppAndroid(DownloadURL);
+                    } else {
+                      installAppIOS(DownloadURL);
+                    }
+                  });
+                }
+              });
+            }
+          }
+        }
+      }
+    }, function (err) {
+      console.log(JSON.stringify(err));
+    });
+  }
+
+  function loadMenuArr(flag) {
+    var uiMode = api.uiMode;
+    var parDic = ''
+
+    // itemList = [{ "Id": "", "Code": "QueryOrder", "Name": "工单投入", "Url": "QueryOrder", "IconPath": "/main/file/showAppIcon/e354b2a4-e651-44cf-8d28-ddfc2b411111" },
+    //  { "Id": "", "Code": "lineStatus", "Name": "产线状态", "Url": "lineStatus", "IconPath": "/main/file/showAppIcon/a8688571-84e9-4242-aedc-0a66b6edae34" }, 
+    //  { "Id": "", "Code": "LOTQuery", "Name": "Lot查询", "Url": "LOTQuery", "IconPath": "/main/file/showAppIcon/0861fda7-d460-485a-9f85-cec92016934c" },
+    //  { "Id": "", "Code": "ICCartBin", "Name": "IC卡绑定", "Url": "ICCartBin", "IconPath": "/main/file/showAppIcon/0861fda7-d460-485a-9f85-cec92016934c" },
+    //  { "Id": "", "Code": "eqpSpotCheckList", "Name": "设备点检", "Url": "eqpSpotCheckList", "IconPath": "/main/file/showAppIcon/ebc177a3-3267-438f-b3ae-69e40b390000" }, 
+    //  { "Id": "", "Code": "eqpRepairs", "Name": "设备报修", "Url": "eqpRepairs", "IconPath": "/main/file/showAppIcon/79da7acf-2928-4025-992e-55c87c56daaa" }, 
+    //  { "Id": "", "Code": "maintenanceList", "Name": "设备维修", "Url": "maintenanceList", "IconPath": "/main/file/showAppIcon/15d2cbd6-ef86-4b5d-997b-2eff7f41c888" }, 
+    //  { "Id": "", "Code": "maintainList", "Name": "设备保养", "Url": "maintainList", "IconPath": "/main/file/showAppIcon/3f186034-f1dc-401f-80b0-f107a77f3ddd" }, 
+    //  { "Id": "", "Code": "InputSNBadness", "Name": "不良录入", "Url": "InputSNBadness", "IconPath": "/main/file/showAppIcon/caf72f70-0153-411d-8d91-8666a545a666" }, 
+    //  { "Id": "", "Code": "repairList", "Name": "修理", "Url": "repairList", "IconPath": "/main/file/showAppIcon/6fe36606-9f11-4a89-be6c-1497a7e3c71a" }, 
+    //  { "Id": "", "Code": "sparePartOperation", "Name": "备件安/卸", "Url": "sparePartOperation", "IconPath": "/main/file/showAppIcon/362c4546-cbcc-49a5-8f2f-3ec93c019999" }, 
+    // //  { "Id": "", "Code": "sparePartReplace", "Name": "备件更换", "Url": "sparePartReplace", "IconPath": "/main/file/showAppIcon/362c4546-cbcc-49a5-8f2f-3ec93c019999" }, 
+    //  { "Id": "", "Code": "sarePartDetailStockList", "Name": "备件库存", "Url": "sarePartDetailStockList", "IconPath": "/main/file/showAppIcon/c2152622-c448-45ba-a6e6-34733524e1f3" }, 
+    //  { "Id": "", "Code": "sarePartOperationRecoderList", "Name": "备件履历", "Url": "sarePartOperationRecoderList", "IconPath": "/main/file/showAppIcon/2558b6b4-7608-41e3-8e12-55ae6ff5013f" }, 
+    //  { "Id": "", "Code": "sarePartStockList", "Name": "备件入库", "Url": "sarePartStockList", "IconPath": "/main/file/showAppIcon/d6d34676-7fc3-4e2d-957b-31d0148dd4c9" }, 
+    //  { "Id": "", "Code": "sarePartStockOutList", "Name": "备件出库", "Url": "sarePartStockOutList", "IconPath": "/main/file/showAppIcon/a8688571-84e9-4242-aedc-0a66b6edae34" }, 
+    //  { "Id": "", "Code": "messageList", "Name": "消息", "Url": "messageList", "IconPath": "/main/file/showAppIcon/62188c16-236c-4f68-acb2-4acc26390eee" }, 
+    //  { "Id": "", "Code": "set", "Name": "设置", "Url": "set", "IconPath": "/main/file/showAppIcon/c0c1cf5a-94db-454c-bb71-5bf245e6d000" }]
+    //  jugeMenuArr(itemList);
+    // return;
+
+    if (uiMode == 'pad') {
+      Padlist(parDic, flag, function (ret) {
+        if (ret.code == 200) {
+          jugeMenuArr(ret.data);
+          $showErrorDiv.loadSucceed();
+          loadErrorCount = 0;
+        } else {
+          // itemList = $api.getStorage('menuItems');
+          // analyzeMenu();
+          if (itemList.length <= 0) {
+            $showErrorDiv.loadError();
+          }
+          loadErrorCount++;
+          if (loadErrorCount >= 3) {
+            showLoginCtr();
+          }
+        }
+      }, function (err) {
+        $showErrorDiv.loadError();
+        api.toast({
+          msg: '加载失败',
+          duration: 1500,
+          location: 'middle'
+        });
+
+        loadErrorCount++;
+        if (loadErrorCount >= 3) {
+          showLoginCtr();
+        }
+      });
+    } else {
+      Phonelist(parDic, flag, function (ret) {
+        if (ret.code == 200) {
+          jugeMenuArr(ret.data);
+          $showErrorDiv.loadSucceed();
+          loadErrorCount = 0;
+        } else {
+          if (itemList.length <= 0) {
+            $showErrorDiv.loadError();
+          }
+
+          loadErrorCount++;
+          if (loadErrorCount >= 3) {
+            showLoginCtr();
+          }
+        }
+      }, function (err) {
+        $showErrorDiv.loadError();
+        loadErrorCount++;
+        if (loadErrorCount >= 3) {
+          showLoginCtr();
+        }
+        api.toast({
+          msg: '加载失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      });
+    }
+  }
+
+  // ====================================
+  function jugeMenuArr(menuArr) {
+
+    // if (itemList && itemList.length > 0 && menuArr && menuArr.length > 0) {
+    //   var tempArr1 = [];
+    //   itemList.forEach(function (val, index) {
+    //     tempArr1.push(val.Url);
+    //   });
+
+    //   var tempArr2 = [];
+    //   menuArr.forEach(function (val, index) {
+    //     tempArr2.push(val.Url);
+    //   });
+
+    //   var tempArr3 = [];
+    //   itemList.forEach(function (val, index) {
+    //     tempArr3.push(val.Id);
+    //   });
+
+    //   var tempArr4 = [];
+    //   menuArr.forEach(function (val, index) {
+    //     tempArr4.push(val.Id);
+    //   });
+
+    //   if ($util.scalarArrayEquals(tempArr1, tempArr2) && $util.scalarArrayEquals(tempArr3, tempArr4)) {
+    //     console.log(222);
+    //     // return;
+    //   }
+    // }
+    itemList = menuArr;
+    $api.setStorage('menuItems', itemList);
+    analyzeMenu();
+  }
+
+  function analyzeMenu() {
+    var memuList = [];
+
+    if (!itemList || itemList.length <= 0) {
+      // itemList = [{
+      //   Name: '消息',
+      //   IconPath: '../image/home/message_icon.png',
+      //   Url: 'messageList'
+      // }];
+    }
+    var containSet = false;
+    itemList.forEach(function (val, index) {
+      val.IconPath = mainUrl + val.IconPath;
+      if (val.Url == 'set') {
+        containSet = true;
+      }
+    });
+
+    if (containSet == false) {
+      itemList.push({
+        Name: '设置',
+        IconPath: '../image/home/set_icon.png',
+        Url: 'set'
+      });
+    }
+    var itemListDiv = $api.byId('item_list');
+    if (itemList.length <= 20) {
+      $api.css(itemListDiv, 'height: auto;');
+    } else {
+      $api.css(itemListDiv, 'height: 100%;padding-top:0rem;');
+    }
+    showMenuIcons();
+  }
+
+  //=================点击事件==============
+  function pushLogin() {
+    var userInfo = $api.getStorage('userInfoJW');
+    if (!userInfo) {
+      showLoginCtr();
+      return;
+    }
+  }
+
+  function itemMenuClick(tag, link) {
+    // var UsbIC = api.require('ICModule');
+    // var param = {
+
+    // };
+
+    // var resultCallback = function (ret, err) {
+    //   console.log(JSON.stringify(ret));
+    //   if (ret && ret.code == 200) {
+    //     alert(ret.result);
+    //   }
+    // }
+
+    // UsbIC.readIcContent(param, resultCallback);
+    // return;
+
+    if (link == 'ICCartBin') {
+      binICCartWithUserId();
+      return;
+    }
+
+    var winName = link + '_nav';
+    var Url = link + '_win.html';
+    api.openWin({
+      name: winName,
+      url: Url,
+      slidBackEnabled: false,
+      softInputMode: 'pan',
+      pageParam: {
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function binICCartWithUserId() {
+    var userInfo = $api.getStorage('userInfoJW');
+    console.log(JSON.stringify(userInfo));
+
+    api.openFrame({
+      name: 'ICCartBin',
+      url: 'ICCartBin_mark.html',
+      rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+        marginTop: 0, // main页面距离win顶部的高度
+        marginBottom: 0, // main页面距离win底部的高度
+        w: 'auto' // main页面的宽度 自适应屏幕宽度
+      },
+      pageParam: {
+      },
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0.3)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+  }
+
+  function openSetFrame() {
+    api.openWin({
+      name: 'set_nav',
+      url: 'set_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadMenuArr(true);
+  }
+
+</script>

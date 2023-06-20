@@ -1,0 +1,121 @@
+/*
+ * =========================================================================
+ * APIClud - AUI UI 框架    流浪男  QQ：343757327  http://www.auicss.com
+ * Verson 2.1
+ * =========================================================================
+ */
+ /*初始化类*/
+@charset "UTF-8";
+
+.image_list_content
+{
+  padding: 0.5rem 16px;
+  font-size: 0.7rem;
+  padding-top: 0px;
+}
+
+.image_list_title
+{
+	font-size: 0.8rem;
+	padding-top: 0.7rem;
+	padding-bottom: 0.4rem;
+	color: #10131b;
+	font-weight: bold;;
+}
+
+
+.image_lists :nth-child(4n)
+{
+	margin-right: 0px;
+}
+
+.image_lists
+{
+	display:flex;
+	flex-flow: wrap row;
+}
+
+
+.image_box_parent
+{
+	padding: 0.2rem;
+	position: relative;
+	height: 3.8rem;
+	width: 3.8rem;
+	box-sizing: border-box;
+}
+
+
+.image_box_UNPDA
+{
+	margin-bottom: 0.4rem;
+	margin-right: 0.4rem;
+	position: relative;
+	height: 4rem;
+	width: 4rem;
+}
+
+
+.image_box{
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	border-radius: 0.2rem;
+}
+
+.image_box img{
+	position:absolute;
+	height: 100%;
+	top:50%;
+	left:50%;
+	transform: translate(-50%,-50%);
+}
+
+img{
+	max-width: 10000px;
+}
+
+.image_box_H{
+	position: relative;
+	overflow: hidden;
+	border-radius: 0.2rem;
+}
+
+.image_box_H img{
+	position:absolute;
+	height: 100%;
+	top:50%;
+	left:50%;
+	transform: translate(-50%,-50%);
+}
+
+.image_box_W{
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	border-radius: 0.2rem;
+}
+
+.image_box_W img{
+
+	position:absolute;
+	width: 100%;
+	top:50%;
+	left:50%;
+	transform: translate(-50%,-50%);
+}
+
+.imgae_delete
+{
+	height: 30px;
+	width: 30px;
+	position: absolute;
+	right: -3px;
+	top: -10px;
+	background: url(../image/common/photo_delete_btn.png) no-repeat;
+	background-position: center right;
+	background-size: 16px;
+	z-index: 10;
+}

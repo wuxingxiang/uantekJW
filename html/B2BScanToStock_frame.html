@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+    .timeDiv {
+      width: 6rem;
+      text-align: center;
+    }
+
+    #count {
+      width: 4rem;
+    }
+
+    #completeCount {
+      width: 4rem;
+    }
+
+    .detailData {
+      padding: 0.5rem 0.3rem;
+      position: relative;
+    }
+
+    .status {
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.1rem;
+      color: #fff;
+      background-color: #f94d7e;
+      font-size: 0.6rem;
+      text-align: center;
+    }
+
+    .statusView {
+      width: 3.5rem;
+      text-align: center;
+    }
+
+    .wrapper {
+      height: auto;
+      min-width: 2rem;
+    }
+
+
+    .deleteBtn {
+      width: 100px;
+    }
+
+    .Unit {
+      text-align: center;
+      width: 5rem;
+    }
+
+    .selectedIcon img {
+      height: 1rem;
+      width: 1rem;
+    }
+    .scanView {
+      text-align: center;
+      width: 2rem;
+    }
+
+    .separate_line{
+      left: 0.8rem;
+      right: 0.8rem;
+    }
+
+   
+  </style>
+</head>
+
+<body>
+
+  <div id="item_list">
+
+  </div>
+  <!-- <div class="status">{{=value.StatusName}}</div> -->
+
+<script id="template" type="text/x-dot-template">
+  {{~it:value:index}}
+    <div class="wrapper">
+      <div class="font_size_14 container color_bg_main list_item" style='padding:0.5rem 0.8rem;' ontouchstart="return touchstartF(event,this);" ontouchmove="return touchmoveF(event,this);" tapmode>
+        <div class="item_row" style='align-items:flex-start'>
+          <div class="item_sub_left font_size_16 mr6">{{=value.MtrlCode}} <span class='ml12'></span> {{=value.MtrlName}}</div>
+        </div>
+        <div class="item_normal {{=value.arrowCls}} color_darkgray mt6">
+          <div class="item_row color_darkgray mt6">
+            <div class="item_row color_darkgray item_sub_left" style='align-items: flex-start;'>
+              <div class="">单号：</div>
+              <div class="item_sub_left pr12">{{=value.OrderNo}}</div>
+            </div>
+          </div>
+
+          <div class="item_row color_darkgray mt6" style='align-items: flex-start;'>
+            <div class="">供应商：</div>
+            <div class="item_sub_left item_sub_nowrap">{{=value.VendorName}}</div>
+          </div>
+
+          <div class="item_row color_darkgray mt6">
+            <div class="item_row color_darkgray item_sub_left mr4" style='align-items: flex-start;'>
+              <div class="">Barcode：</div>
+              <div class="item_sub_left pr12">{{=value.SN}}</div>
+            </div>
+            <div class="item_row color_darkgray item_sub_left ml4" style='flex:0.6;'>
+              <div class="">收料数：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.ShippingQty}}</div>
+            </div>
+          </div>
+
+          <div class="item_row color_darkgray mt6">
+            <div class="item_row color_darkgray item_sub_left mr4" style='align-items: flex-start;'>
+              <div class="">时间：</div>
+              <div class="item_sub_left item_sub_nowrap pr12">{{=value.InputDate}}</div>
+            </div>
+            <div class="item_row color_darkgray item_sub_left ml4" style='flex:0.6;'>
+              <div class="">IQC状态：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.IsIQC}}</div>
+            </div>
+          </div>
+
+          <div class="item_row color_darkgray mt6">
+            <div class="item_row color_darkgray item_sub_left mr4" style='align-items: flex-start;'>
+              <div class="">IQC_OK数：</div>
+              <div class="item_sub_left item_sub_nowrap pr12">{{=value.QCQty}}</div>
+            </div>
+  
+            <div class="item_row color_darkgray ml4" style='flex:0.6;'>
+              <div class="">IQC_NG数：</div>
+              <div class="item_sub_nowrap item_sub_left">{{=value.NgQty}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="separate_line"></div>
+      </div>
+      <div class="deleteBtn" onclick="return toDelete({{=index}},event,this);"></div>
+    </div>
+  {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+
+  apiready = function () {
+    var body = $api.dom('body');
+    $upRefresh.addHtml(body, '暂无数据');
+    $upRefresh.analysisData(itemList, itemList);
+  }
+
+  function refreshItemList(itemListStr) {
+    var tempArr = JSON.parse(itemListStr);
+    if (tempArr && $util.isArray(tempArr)) {
+      itemList = tempArr;
+      $upRefresh.analysisData(itemList, itemList);
+    }
+  }
+
+  function touchstartF(event) {
+    $slideDelete.touchstartF(event);
+  };
+
+  function touchmoveF(event, e) {
+    $slideDelete.touchmoveFWithLeft(event, e, -100);
+  };
+
+  function toDelete(index, event, tag) {
+    if (itemList.length > index) {
+      itemList.splice(index, 1);
+      $upRefresh.analysisData(itemList, itemList);
+      api.execScript({
+        name: 'B2BScanToStock_nav',
+        script: 'deleteItem(' + index + ')'
+      })
+    }
+  }
+
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    // loadItemList();
+  }
+
+</script>
+
+</html>

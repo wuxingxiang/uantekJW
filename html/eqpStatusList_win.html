@@ -1,0 +1,466 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+    <style>
+    body{
+      margin: 0px;
+      padding: 0px;
+      background-color: #fff;
+      width: 100%;
+      height: 100%;
+    }
+
+    header{
+      background-color: #efefef;
+    }
+
+    #saveBtn{
+      width: 2.2rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+      border-radius: 0.15rem;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.6rem;
+    }
+
+    .saveBtnView{
+      height: 100%;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+
+    .itemView{
+      height: 100%;
+      padding-left: 1rem;
+    }
+
+    .selectItemView{
+      box-sizing: border-box;
+    }
+
+    .selectItem{
+      height: 1.6rem;
+      line-height: 1.6rem;
+      font-size: 0.7rem;
+      background:  url(../image/common/more_down.png) no-repeat;
+      background-position: center right 0.2rem;
+      background-size: 0.6rem;
+      background-color:#efefef;
+      border-radius: 0.15rem;
+      padding-right: 0.8rem;
+    }
+
+
+    </style>
+
+</head>
+<body>
+    <header>
+      <i class="back" tapmode onclick="api.closeWin();"></i>
+      <div id="title">设备状态</div>
+      <div class="saveBtnView item_row" >
+        <div class="itemView item_sub_center" tapmode onclick="saveBtnClick('reset');">
+          <div id="saveBtn" class="color_bg_darkgray">重置</div>
+        </div>
+        <div class="itemView item_sub_center" tapmode onclick="saveBtnClick('query');">
+          <div id="saveBtn" class='color_bg_main' >查询</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="item_row mt10 pb8" id="selectView">
+      <div class="item_row item_sub_left" id="PADView">
+        <div class="selectItemView item_sub_left">
+          <div id='Facility' class="selectItem item_sub_center color_darkgray item_sub_nowrap" onclick='itemSelect("Facility");'>请选择产线</div>
+        </div>
+      </div>
+
+      <div class="item_row item_sub_left ml12">
+        <div class="selectItemView item_sub_left">
+          <div id='EqpType' class="selectItem item_sub_center color_darkgray item_sub_nowrap" onclick='itemSelect("EqpType");'>请选择设备类型</div>
+        </div>
+      </div>
+
+      <div class="item_row item_sub_left ml12">
+        <div class="selectItemView item_sub_left">
+          <div id='Process' class="selectItem item_sub_center color_darkgray item_sub_nowrap" onclick='itemSelect("Process");'>请选择工序</div>
+        </div>
+      </div>
+
+      <!-- <div class="separate ml8" id="PADView"></div> -->
+    </section>
+
+
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+
+
+<script type="text/javascript">
+    var ProcessObj = null;
+    var EqpTypeObj = null;
+    var FacilityObj = null;
+
+    var ProcessArr = [];
+    var EqpTypeArr = [];
+    var FacilityArr = [];
+    apiready = function(){
+        api.parseTapmode();
+        var header = $api.dom('header');
+        // $api.fixStatusBar(header);
+
+        var selectView = $api.byId('selectView');
+        var offset = $api.offset(selectView);
+        var topY = offset.t + offset.h;
+
+        var height =  api.winHeight- topY;
+
+        api.openFrame({
+            name: 'eqpStatusList',
+            url:  'eqpStatusList_frame.html',
+            rect: {
+              x: 0,
+              y: topY,
+              w: api.winWidth,
+              h: height
+            },
+            pageParam: api.pageParam,
+            softInputMode:'pan',
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0)',
+            vScrollBarEnabled: false,
+            hScrollBarEnabled: false,
+        });
+    };
+
+
+// =================网络请求=========================
+    function loadEqpArr(callBack) {
+      var parUrl = '&EqpType=&LineId=&ProcessId='
+      GetEqplist(parUrl,function(ret){
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data && ret.data.length > 0) {
+            var tempArr = ret.data;
+            tempArr.forEach(function (val,index,arr) {
+              val.name = val.EqpName;
+            });
+            callBack(tempArr);
+          }else {
+            api.toast({
+                msg: '暂无数据',
+                duration: 1500,
+                location: 'middle'
+            });
+          }
+        }else {
+          api.toast({
+              msg: '获取失败',
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+
+      },function(err){
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+    function loadItemArr(itemType,callBack) {
+      var parUrl = itemType;
+      GetSeletItemList(parUrl,function(ret){
+        console.log(JSON.stringify(ret));
+        if (ret.code == 200) {
+          if (ret.data && ret.data.length > 0) {
+            var tempArr = ret.data;
+            tempArr.forEach(function (val,index,arr) {
+              val.name = val.Value;
+            });
+            callBack(tempArr);
+          }else {
+            api.toast({
+                msg: '暂无数据',
+                duration: 1500,
+                location: 'middle'
+            });
+          }
+        }else {
+          api.toast({
+              msg: '获取失败',
+              duration: 1500,
+              location: 'middle'
+          });
+        }
+
+      },function(err){
+        api.toast({
+            msg: '加载失败',
+            duration: 1500,
+            location: 'middle'
+        });
+      });
+    }
+
+// =================事件点击=========================
+    function selectCommentItem(itemStr) {
+      var tempItem = JSON.parse(itemStr);
+      var itemTypeDiv =$api.byId(this.itemType);
+      itemTypeDiv.innerHTML = tempItem.Value;
+      ProcessObj = tempItem;
+      api.execScript({
+          frameName: 'eqpStatusList',
+          script: "setProcessId('"+tempItem.Key+"');"
+      });
+
+    }
+
+    function itemSelect(itemType) {
+      switch (itemType) {
+        case 'Facility':
+         {
+           if (FacilityArr.length <= 0) {
+             loadItemArr(itemType,function(itemArr) {
+               FacilityArr = itemArr;
+               if (itemArr.length > 0) {
+                 itemSelect(itemType);
+               }
+             });
+             return;
+           }
+           showSelector(FacilityArr,function(flag,tempModel) {
+             if (flag == true) {
+               var itemTypeDiv =$api.byId(itemType);
+               itemTypeDiv.innerHTML = tempModel.Value;
+               $api.css(itemTypeDiv, 'color:#323232;');
+               FacilityObj = tempModel;
+
+               api.execScript({
+                   frameName: 'eqpStatusList',
+                   script: "setLineId('"+tempModel.Key+"');"
+               });
+
+             }else {
+               api.toast({
+                 msg: '选取失败',
+                 duration: 1000,
+                 location: 'middle'
+               });
+             }
+           });
+         }
+         break;
+       case 'EqpType':
+         {
+           if (EqpTypeArr.length <= 0) {
+             loadItemArr(itemType,function(itemArr) {
+               EqpTypeArr = itemArr;
+               if (itemArr.length > 0) {
+                 itemSelect(itemType);
+               }
+             });
+             return;
+           }
+
+           showSelector(EqpTypeArr,function(flag,tempModel) {
+             if (flag == true) {
+               var itemTypeDiv =$api.byId(itemType);
+               itemTypeDiv.innerHTML = tempModel.Value;
+               $api.css(itemTypeDiv, 'color:#323232;');
+               EqpTypeObj = tempModel;
+
+               api.execScript({
+                   frameName: 'eqpStatusList',
+                   script: "setEqpType('"+tempModel.Key+"');"
+               });
+             }else {
+               api.toast({
+                 msg: '选取失败',
+                 duration: 1000,
+                 location: 'middle'
+               });
+             }
+           });
+         }
+         break;
+       case 'Process':
+         {
+           this.itemType = itemType;
+           api.openWin({
+               name: 'itemSelectedList_nav',
+               url:  'itemSelectedList_win.html',
+               slidBackEnabled:false,
+               pageParam:{
+                 itemType:itemType,
+                 winName:'eqpStatusList_nav',
+               },
+               animation: {
+                   type: 'movein',
+                   subType: 'from_right'
+               }
+           });
+           return;
+
+           if (ProcessArr.length <= 0) {
+             loadItemArr(itemType,function(itemArr) {
+               ProcessArr = itemArr;
+               if (itemArr.length > 0) {
+                 itemSelect(itemType);
+               }
+             });
+             return;
+           }
+
+           showSelector(ProcessArr,function(flag,tempModel) {
+             if (flag == true) {
+               var itemTypeDiv =$api.byId(itemType);
+               itemTypeDiv.innerHTML = tempModel.Value;
+               $api.css(itemTypeDiv, 'color:#323232;');
+               ProcessObj = tempModel;
+
+               api.execScript({
+                   frameName: 'eqpStatusList',
+                   script: "setProcessId('"+tempModel.Key+"');"
+               });
+             }else {
+               api.toast({
+                 msg: '选取失败',
+                 duration: 1000,
+                 location: 'middle'
+               });
+             }
+           });
+         }
+         break;
+       default:
+         break;
+      }
+    }
+
+    function showSelector(itemArr,callBack) {
+      var UIActionSelector = api.require('UIActionSelector');
+      if (!UIActionSelector) {
+        return;
+      }
+
+      UIActionSelector.open({
+                 datas: itemArr,
+                 layout: {
+                     row: 6,
+                     col: 1,
+                     height: 44,
+                     size: 16,
+                     sizeActive: 16,
+                     rowSpacing: 0,
+                     colSpacing: 0,
+                     maskBg: 'rgba(0,0,0,0.2)',
+                     bg: '#fff',
+                     color: '#8c9098',
+                     colorActive: '#10131b',
+                     colorSelected: '#10131b'
+                 },
+                 animation: true,
+                 cancel: {
+                     text: '取消',
+                     size: 18,
+                     w: 80,
+                     h: 35,
+                     bgActive: '#8c9098',
+                     colorActive: '#fff',
+                     color: '#555555',
+                     bg: '#d9d9d9'
+                 },
+                 ok: {
+                     text: '确定',
+                     size: 18,
+                     w: 80,
+                     h: 35,
+                     color: '#fff',
+                     bg: '#1eb1ed',
+                     colorActive: '#fff',
+                     bgActive: '#8c9098',
+                 },
+                 title: {
+                     text: '请选择',
+                     size: 18,
+                     h: 60,
+                     bg: '#fff',
+                     color: '#10131b'
+                 },
+                 fixedOn: api.frameName
+             }, function(ret, err) {
+                console.log(JSON.stringify(ret));
+                var tempModel = null;
+
+                if (ret&&ret.eventType =='ok') {
+                  if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+                    tempModel = ret.selectedInfo[0];
+                    callBack(true,tempModel);
+                  }else{
+                     callBack(false,tempModel);
+                  }
+                }
+             });
+       }
+
+    function saveBtnClick(tapType) {
+
+      if (tapType == 'reset') {
+        var FacilityDiv =$api.byId('Facility');
+        FacilityDiv.innerHTML = '请选择产线';
+        $api.css(FacilityDiv, 'color:#555555;');
+        FacilityObj = null;
+        api.execScript({
+            frameName: 'eqpStatusList',
+            script: "setLineId('');"
+        });
+
+        var EqpTypeDiv =$api.byId('EqpType');
+        EqpTypeDiv.innerHTML = '请选择设备类型';
+        $api.css(EqpTypeDiv, 'color:#555555;');
+        EqpTypeObj = null;
+        api.execScript({
+            frameName: 'eqpStatusList',
+            script: "setEqpType('');"
+        });
+
+        var ProcessDiv =$api.byId('Process');
+        ProcessDiv.innerHTML = '请选择工序';
+        $api.css(ProcessDiv, 'color:#555555;');
+        ProcessObj = null;
+        api.execScript({
+            frameName: 'eqpStatusList',
+            script: "setProcessId('');"
+        });
+        return;
+      }
+
+      api.execScript({
+          frameName: 'eqpStatusList',
+          script: "saveBtnClick()"
+      });
+    }
+
+</script>
+</html>

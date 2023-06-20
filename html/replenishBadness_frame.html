@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>AUI快速完成布局</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style type="text/css">
+    body{
+      background-color: #fff;
+      /*height: 100%;*/
+      position: relative;
+    }
+
+
+    .SNNum{
+      -webkit-line-clamp: 1;
+      padding: 0.4rem 0rem;
+    }
+
+
+    .deleteBtn{
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.1rem;
+      background-color: #f94d7e;
+      font-size: 0.5rem;
+      color: #fff;
+      margin-left: 1rem;
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <section class="">
+    <div class="" id="item_list">
+    </div>
+  </section>
+
+  <!--doT template-->
+  <script id="template" type="text/x-dot-template">
+    {{~it:value:index}}
+        <div class="item_row" >
+          <div class="SNNum item_sub_left item_sub_wrap">{{=value.SN}}</div>
+          <div class="deleteBtn" onclick="deleteBtnClick('{{=value.SN}}');">删除</div>
+          <div class="separate_line"></div>
+        </div>
+    {{~}}
+ </script>
+
+</body>
+<script type="text/javascript" src="../script/api.js" ></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+
+<script type="text/javascript">
+    var itemList = [];
+    apiready = function () {
+      var body = $api.dom('body');
+      $upRefresh.addHtml(body,'暂无SN录入数据');
+      $upRefresh.analysisData(itemList,itemList);
+
+    }
+    // 初始化事件监听
+    function initEventListenner() {
+      api.setRefreshHeaderInfo({
+          visible: true,
+          loadingImg: 'widget://image/refresh.png',
+          bgColor: '#fff',
+          textColor: '#8c9098',
+          textDown: '下拉刷新...',
+          textUp: '松开刷新...',
+          showTime: true
+      }, function(ret, err){
+        setTimeout(function () {
+          loadItemList(false);
+        }, 400);
+      });
+    }
+
+    function loadSNInfo(SNStr) {
+
+      var hasContain = false;
+      itemList.forEach(function (val,index,arr) {
+        if (val.SN == SNStr) {
+          hasContain = true;
+        }
+      });
+      if (hasContain) {
+        api.toast({
+            msg: '该SN已录入',
+            duration: 1500,
+            location: 'bottom'
+        });
+        return;
+      }
+
+      var itemObj = {
+        "SN":SNStr
+      }
+
+      itemList.unshift(itemObj);
+      var item_list = $api.byId('item_list');
+
+      var html =
+        '<div class="item_row container">'+
+          '<div class="SNNum item_sub_left item_sub_nowrap">'+SNStr+'</div>'+
+          '<div class="deleteBtn" onclick="deleteBtnClick('+"'"+SNStr+"'"+');">删除</div>'+
+          '<div class="separate_line"></div>'+
+        '</div>'
+      $api.prepend(item_list, html);
+
+      if (itemList.length > 0) {
+        var emptyDiv = $api.byId('emptyDiv');
+        if (emptyDiv) {
+          emptyDiv.style.display = 'none';
+        }
+      }
+    }
+
+    function deleteBtnClick(LotSN) {
+      var deleteIndex = 0;
+      console.log(JSON.stringify(itemList));
+      itemList.forEach(function (val,index,arr) {
+        if (val.SN == LotSN) {
+          deleteIndex = index;
+        }
+      });
+
+
+      if (itemList.length > deleteIndex) {
+        itemList.splice(deleteIndex,1);
+        api.execScript({
+            name: 'replenishBadness_nav',
+            script: 'focus();'
+        });
+      }
+
+      $upRefresh.analysisData(itemList,itemList);
+      console.log(deleteIndex);
+      return;
+
+      if (itemList.length > 0) {
+        var emptyDiv = $api.byId('emptyDiv');
+        if (emptyDiv) {
+          emptyDiv.style.display = 'none';
+        }
+      }
+    }
+
+   function loadError() {
+     loadItemList(true);
+   }
+
+
+   function uploadSNData(WorkOrderNo,FacilityId) {
+     if (itemList.length <= 0) {
+       api.toast({
+           msg: '请选扫描录入SN',
+           duration: 1500,
+           location: 'middle'
+       });
+       return;
+     }
+
+     var parDic = {
+       WorkOrderNo:WorkOrderNo,
+       FacilityId:FacilityId,
+       SnList:itemList
+     };
+
+     Postsnlabelsave(parDic,function(ret){
+       console.log(JSON.stringify(ret));
+       if (ret.code == 200) {
+         itemList = [];
+         $upRefresh.analysisData(itemList,itemList);
+
+       }
+       api.toast({
+           msg: ret.info,
+           duration: 1500,
+           location: 'middle'
+       });
+     },function(err){
+       api.toast({
+           msg: '录入失败',
+           duration: 1500,
+           location: 'middle'
+       });
+       api.execScript({
+           name: 'replenishBadness_nav',
+           script: 'focus();'
+       });
+     });
+   }
+
+
+
+
+</script>
+</html>

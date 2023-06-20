@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    body {
+      margin: 0px;
+      padding: 0px;
+      background-color: #f2f2f2;
+      width: 100%;
+      height: 100%;
+    }
+
+
+    #title:after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background: #dcdee3;
+      right: 0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }
+
+    #moreBtn {
+      width: 43px;
+      height: 44px;
+      line-height: 44px;
+      color: #1e8ae7;
+      text-align: right;
+      position: absolute;
+      bottom: 0px;
+      right: 16px;
+      /*background:  url(../image/common/common_right_add_btn.png) no-repeat;
+      background-position: center right;
+      background-repeat: no-repeat;
+      background-size: 15px;*/
+
+    }
+
+    #bottomView {
+      position: fixed;
+      bottom: 0px;
+      padding: 0.6rem 0px;
+      width: 100%;
+      box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .controlBtn {
+      height: 2.2rem;
+      line-height: 2.2rem;
+      border-radius: 1.1rem;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    .controlBtn_bg_C {
+      background-color: #1eb1ed;
+    }
+
+    #bottomView:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #dcdee3;
+      right: 0;
+      height: 1px;
+      -webkit-transform: scaleY(0.2);
+      transform: scaleY(0.2);
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+    }
+
+    #saveBtn {
+      width: 2.2rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+      border-radius: 0.15rem;
+      background-color: #f94d7e;
+      color: #fff;
+      font-size: 0.8rem;
+      text-align: center;
+      right: 0.8rem;
+      font-size: 0.6rem;
+    }
+
+    #saveBtnView {
+      width: 4.5rem;
+      height: 44px;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 0.8rem;
+    }
+
+    .btnView {
+      width: 50%;
+      padding: 0px 0.7rem;
+      box-sizing: border-box;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #repair {
+      display: none;
+    }
+
+    #comfirmView {
+      display: flex;
+    }
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <i class="back" tapmode onclick="api.closeWin();"></i>
+    <div id="title">设备维修</div>
+
+    <div id="saveBtnView" tapmode onclick="rightBtnClick();">
+      <div id="saveBtn">维修记录</div>
+    </div>
+
+  </header>
+
+  <section class="" id="bottomView">
+    <div class="item_row pl12 pr12" id="repair">
+      <div class="btnView item_row">
+        <div class="controlBtn controlBtn_bg_C" onclick="repairBtnClick();" id="leftTapBtn">故障维修</div>
+      </div>
+      <div class="btnView item_row">
+        <div class="controlBtn controlBtn_bg_C" onclick="completeBtnClick();">维修完成</div>
+      </div>
+    </div>
+
+    <div class="item_row pl12 pr12" id="comfirmView">
+      <div class="btnView item_row">
+        <div class="controlBtn controlBtn_bg_C" onclick="comfirmBtnClick('Agree');" id="leftTapBtn">故障确认
+        </div>
+      </div>
+      <div class="btnView item_row">
+        <div class="controlBtn color_bg_main" onclick="comfirmBtnClick('Reject');">驳回</div>
+      </div>
+    </div>
+
+    <div class="separate_line_top"></div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script//md5.js"></script>
+
+
+<script type="text/javascript">
+  var leftBtnType = 'Agree';
+  var Status = '';
+  apiready = function () {
+    api.parseTapmode();
+    var header = $api.dom('header');
+    // $api.fixStatusBar( $api.dom('header') );
+
+    var height = api.winHeight - header.offsetHeight;
+    var topY = header.offsetHeight;
+
+    var bottomView = $api.byId('bottomView');
+
+    if (api.pageParam.Status == 'Reject' || api.pageParam.Status == 'Repair') {
+      var saveBtnView = $api.byId('saveBtnView');
+      saveBtnView.style.display = 'none';
+    }
+
+
+    if (api.pageParam.Status == 'Reject' || api.pageParam.Status == 'Finish') {
+      bottomView.style.display = 'none';
+    } else {
+      var offset = $api.offset(bottomView);
+      height -= offset.h;
+    }
+
+    var titleDiv = $api.byId('title');
+    api.openFrame({
+      name: 'maintenanceEqp',
+      url: 'maintenanceEqp_frame.html',
+      rect: {
+        x: 0,
+        y: topY,
+        w: api.winWidth,
+        h: height
+      },
+      pageParam: api.pageParam,
+      bounces: false,
+      bgColor: 'rgba(255,255,255,1)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+
+    var btnViews = $api.domAll('.controlBtn');
+    if (btnViews.length) {
+      var appType = api.getGlobalData({
+        key: 'APPTYPE'
+      });
+
+      if (appType != 'PDA') {
+        for (var index = 0; index < btnViews.length; index++) {
+          var element = btnViews[index];
+          $api.css(element, 'width:60%');
+        }
+      }
+    }
+  };
+
+  function repairBtnClick() {
+    api.execScript({
+      frameName: 'maintenanceEqp',
+      script: "controlBtnClick('Working');"
+    });
+  }
+
+  function completeBtnClick() {
+    api.execScript({
+      frameName: 'maintenanceEqp',
+      script: "controlBtnClick('Finish');"
+    });
+  }
+
+  function comfirmBtnClick(status) {
+    api.execScript({
+      frameName: 'maintenanceEqp',
+      script: "ComfirmRepair('" + status + "');"
+    });
+  }
+
+  function rightBtnClick() {
+
+    api.execScript({
+      frameName: 'maintenanceEqp',
+      script: "rightBtnClick();"
+    });
+  }
+
+  function setStatus(status) {
+    Status = status;
+    var bottomView = $api.byId('bottomView');
+    var comfirmView = $api.byId('comfirmView');
+    var repair = $api.byId('repair');
+
+    if (Status == 'Repair') {
+      comfirmView.style.display = 'flex';
+      repair.style.display = 'none';
+    } else {
+      comfirmView.style.display = 'none';
+      repair.style.display = 'flex';
+    }
+
+    var saveBtnView = $api.byId('saveBtnView');
+    if (saveBtnView) {
+      if (Status == 'Reject' || Status == 'Repair') {
+        saveBtnView.style.display = 'none';
+      } else {
+        saveBtnView.style.display = 'flex';
+      }
+    }
+
+
+    var bottomView = $api.byId('bottomView');
+    var header = $api.dom('header');
+    var height = api.winHeight - header.offsetHeight;
+    var topY = header.offsetHeight;
+
+    if (Status == 'Reject' || Status == 'Finish') {
+      var offset = $api.offset(bottomView);
+      console.log(JSON.stringify(offset));
+      api.setFrameAttr({
+        name: 'maintenanceEqp',
+        rect: {
+          x: 0,
+          y: topY,
+          w: api.winWidth,
+          h: height
+        }
+      });
+
+      bottomView.style.display = 'none';
+    }
+  }
+
+
+</script>
+
+</html>

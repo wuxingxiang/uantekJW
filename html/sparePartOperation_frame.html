@@ -1,0 +1,1179 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <!-- <link rel="stylesheet" type="text/css" href="../css/style.css" /> -->
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+
+    }
+
+
+    .tapDownBtn {
+      height: 100%;
+      width: 1rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center;
+      background-size: 0.6rem;
+      z-index: 10000;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    input[type="text"] {
+      height: 1.6rem;
+      text-align: center;
+    }
+
+    .itemTitle {
+      padding: 0.8rem 0px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    #topView {
+      /*box-shadow: 0 1px 10px rgba(160,160,160,.2);*/
+      padding-bottom: 0.6rem;
+      padding-top: 0.8rem;
+      z-index: 1000;
+    }
+
+    .selectIcon {
+      width: 1.4rem;
+      height: 1.4rem;
+      background: url(../image/common/common_unSelected_icon.png) no-repeat;
+      background-position: center;
+      background-size: 0.8rem;
+    }
+
+    .selected {
+      background-image: url(../image/common/common_select.png);
+    }
+
+    .unSelected {
+      background-image: url(../image/common/common_unSelected_icon.png);
+    }
+
+    #bottomView {
+      position: fixed;
+      bottom: 0px;
+      padding: 0.6rem 0px;
+      width: 100%;
+      box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .toolItem {
+      padding: 0.5rem 0px;
+    }
+
+    .toolItemTitle {
+      padding: 0.4rem 0rem;
+      background-color: #efefef;
+      color: #666666;
+    }
+
+    .lifetime {
+      padding: 0px 0.1rem;
+      width: 4rem;
+      text-align: center;
+    }
+
+
+    #toolListView {
+      position: relative;
+    }
+
+    .usedCount {
+      width: 3rem;
+      text-align: center;
+    }
+
+
+
+    .addBtn {
+      width: 1.6rem;
+      height: 1.6rem;
+      background-image: url(../image/common/common_right_add_btn.png);
+      background-position: center right;
+      background-repeat: no-repeat;
+      -webkit-background-size: 1.4rem;
+      background-size: 1.4rem;
+    }
+
+    #saveBtn {
+      width: 12rem;
+      height: 2.2rem;
+      text-align: center;
+      line-height: 2.2rem;
+      font-size: 0.8rem;
+      background-color: #1eb1ed;
+      border-radius: 1.1rem;
+      color: #fff;
+    }
+
+    #saveBtnView {
+      padding: 0.5rem 0.9rem;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .lotNo {
+      width: 10rem;
+      text-align: center;
+    }
+
+    .scanTime {
+      width: 6rem;
+      text-align: center;
+    }
+
+    .HintText {
+      min-height: 2.8rem;
+      background-color: #efefef;
+      border-radius: 0.2rem;
+      margin-top: 0.4rem;
+    }
+
+    .HintTextPad {
+      height: 1.5rem;
+      background-color: #efefef;
+      border-radius: 0.2rem;
+    }
+
+    .itemView {
+      margin-top: 0.8rem;
+      border: 1px solid #9d9d9d;
+      border-radius: 0.25rem;
+      padding: 0.4rem 0.6rem;
+    }
+
+    .subItemView {
+      /* border: 1px solid #9d9d9d; */
+      background-color: #efefef;
+      border-radius: 0.2rem;
+      padding: 0.4rem 0.5rem;
+      padding-right: 0px;
+    }
+
+    .wrapper {
+      margin-top: 0.5rem;
+    }
+
+    .deleteBtn {
+      border-radius: 0.3rem;
+    }
+
+    .lotType {
+      width: 8rem;
+      padding-left: 0.3rem;
+    }
+
+    .listItem {
+      padding: 0.5rem 0px;
+      background-color: #fff;
+    }
+  </style>
+</head>
+
+<body class="">
+  <section class="" id="topView">
+    <div class="item_row item_sub_left">
+      <div class="font_size_16 mr12">扫描设备</div>
+      <div class="item_sub_right item_normal item_row inputView">
+        <!-- <div class="tapDownBtn"></div> -->
+        <input id="EqpNumInput" name='SNScan' autofocus="autofocus" class='item_sub_center font_size_16' maxlength='300'
+          value="" type="text" placeholder="请输入/扫描设备二维码">
+        <div class="deleteIcon" onclick="deleteBtnClick('EqpNumInput');"></div>
+      </div>
+      <div class="separate Hide" style="flex: 0.7;" id="separateView"></div>
+    </div>
+
+    <div class="mt8 color_darkgray">
+      <div class="item_row mt4" style="align-items: flex-start">
+        <div class="font_size_16">工单：</div>
+        <div id='OrderDiv' class="font_size_16"></div>
+      </div>
+
+      <div class="item_row mt4" style="align-items: flex-start">
+        <div class="font_size_16">产品：</div>
+        <div id='ProductDiv' class="font_size_16"></div>
+      </div>
+    </div>
+
+    <div class="item_row item_sub_left mt6">
+      <!-- <div class="mr8 font_size_16">外包号</div> -->
+      <div class="item_sub_right item_normal inputView item_row">
+        <div id="spareScanResualt"
+          class="scanResualt color_gray font_size_14 item_sub_nowrap font_size_16 item_sub_left">请扫描备件二维码</div>
+        <input id="spareInput" autofocus="autofocus" class='scanInput item_sub_right font_size_16' maxlength='300'
+          value="" type="text" oninput="OnInput(event,this)" onclick='SNClick("spareInput");' placeholder="">
+        <!-- 请输入SN -->
+      </div>
+    </div>
+
+    <div class="separate_line"></div>
+  </section>
+
+  <section id="titleView" class="Hide">
+    <div class="item_row toolItemTitle mt10">
+      <div class="lotType item_sub_nowrap pr4 font_size_16">备件类型</div>
+      <div class="item_sub_left item_sub_nowrap pl4 pr4 font_size_16">备件</div>
+      <div class="lotNo item_sub_nowrap pl4 pr4 font_size_16">备件Code</div>
+      <div class="font_size_16 pl4 pr4 lifetime">寿命</div>
+      <div class="font_size_16 pl4 pr4 lifetime">预警</div>
+      <div class="font_size_16 pl4 pr8 usedCount">使用数</div>
+    </div>
+  </section>
+
+  <section class="item_normal" id="itemListView">
+    <div class="" id="item_list">
+
+    </div>
+  </section>
+  <!--doT template-->
+  <script id="template_pad" type="text/x-dot-template">
+    {{~it:value:index}}
+      <div class="wrapper" style='margin-top:0px;'>
+        <div class="item_row listItem container"  ontouchstart="return touchstartF(event,this);" ontouchmove="return touchmoveF(event,this,{{=index}});" onclick="itemClick({{=index}},0);">
+          <div class="lotType item_sub_nowrap pr4 font_size_16">{{=value.SpareTypeName}}</div>
+          {{? value.SpareCode}}
+            <div class="item_sub_left item_sub_nowrap pl4 pr4 font_size_16">{{=value.SpareName}}</div>
+            <div class="lotNo item_sub_nowrap pl4 pr4 font_size_16">{{=value.SpareCode}}</div>
+            <div class="font_size_16 pl4 pr4 lifetime">{{=value.DesignLife}}</div>
+            <div class="font_size_16 pl4 pr4 lifetime">{{=value.WarningLife}}</div>          
+            <div class="font_size_16 pl4 pr8 usedCount">{{=value.CurrentLife}}</div>
+          {{??}}
+            <div class="item_sub_center pl4 item_center HintTextPad">
+              <div class="font_size_16">请扫安装备件</div>
+            </div>
+          {{?}}
+          <div class="separate_line"></div>
+        </div>
+        <div class="deleteBtn" onclick="return toDelete({{=index}},0,'{{=value.SpareCode}}');"></div>
+      </div>
+    {{~}}
+ </script>
+
+
+
+  <script id="template_pda" type="text/x-dot-template">
+  {{~it:value:index}}
+    <div class="itemView">
+      <div class="font_size_16">{{=value.SpareTypeName}}</div>
+      <div class="item_row font_size_16 mt4">
+        <div class="item_row color_darkgray item_sub_left mr4">
+          <div class="font_size_16">备件数：</div>
+          <div class="font_size_16">{{=value.SpareNum}}</div>
+        </div>
+        <div class="item_row item_sub_left color_darkgray ml4">
+          <div class="font_size_16">安装数：</div>
+          <div class="font_size_16">{{=value.installQty}}</div>
+        </div>
+      </div>
+      {{~value.InstalledSpareList:subValue:subIndex}}
+        {{? subValue.SpareCode}}
+          <div class="wrapper item_normal">
+            <div class="container subItemView" ontouchstart="return touchstartF(event,this);" ontouchmove="return touchmoveF(event,this,0);" onclick="itemClick({{=index}},{{=subIndex}});">
+              <div class="item_row color_darkgray item_sub_left">
+                <div class="font_size_14 color_darkgray">备件：</div>
+                <div class="item_sub_left color_darkgray item_sub_nowrap">{{=subValue.SpareName}}</div>
+              </div>
+              <div class="item_row color_darkgray font_size_14 mt4">
+                <div class="item_row color_darkgray item_sub_left mr4">
+                  <div class="font_size_14 color_darkgray">寿命：</div>
+                  <div class="item_sub_left color_darkgray item_sub_nowrap">{{=subValue.DesignLife}}</div>
+                </div>
+          
+                <div class="item_row color_darkgray item_sub_left ml4">
+                  <div class="color_darkgray">使用次数：</div>
+                  <div class="item_sub_left item_sub_nowrap color_darkgray">{{=subValue.CurrentLife}}</div>
+                </div>
+              </div>
+              <div class="item_row color_darkgray font_size_14 mt4">
+                <div class="item_row color_darkgray item_sub_left">
+                  <div class="color_darkgray mr8">SN：</div>
+                  <div class="item_sub_left item_sub_nowrap color_darkgray">{{=subValue.SpareCode}}</div>
+                </div>
+              </div>
+            </div>
+            <div class="deleteBtn" onclick="return toDelete({{=index}},{{=subIndex}},'{{=subValue.SpareCode}}');"></div>
+          </div>
+        {{??}}
+          <div class="item_center HintText">
+            <div class="font_size_16">请扫安装备件</div>
+          </div>
+        {{?}}
+      {{~}}
+    </div>
+  {{~}}
+</script>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+
+  var EqpModel = null;
+  var EqpArr = [];
+
+  var reasonArr = [];
+  var canTap = true;
+  var selectAll = false;
+  var selectedType = 'Change';
+
+  var PageSize = 20;
+  var PageNum = 1;
+  var appType = 'PDA';
+  apiready = function () {
+    var body = $api.dom('body');
+    betrothScreen();
+
+    var itemListView = $api.byId('itemListView');
+    var top = $api.offset(itemListView).t;
+    var height = api.frameHeight - top;
+    $api.css(itemListView, 'height:' + height + 'px;');
+
+    $upRefresh.addHtml(itemListView, '暂未安装备件');
+    refreshItemList();
+    keybordTap();
+  }
+
+  function betrothScreen() {
+    var separateView = $api.byId('separateView');
+    var titleView = $api.byId('titleView');
+
+    appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+    if (appType != 'PDA') {
+      separateView.style.display = 'block';
+      titleView.style.display = 'block';
+    }
+  }
+  // 初始化事件监听
+  function initEventListenner() {
+    api.setRefreshHeaderInfo({
+      visible: true,
+      loadingImg: 'widget://image/refresh.png',
+      bgColor: '#fff',
+      textColor: '#8c9098',
+      textDown: '下拉刷新...',
+      textUp: '松开刷新...',
+      showTime: true
+    }, function (ret, err) {
+      setTimeout(function () {
+      }, 400);
+    });
+  }
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#EqpNumInput').bind('keyup', function (event) {
+      console.log(JSON.stringify(event.target.value));
+      var currentScanStr = '';
+      if (event.keyCode == "13") {
+        if (event.target.value && event.target.value.length > 0) {
+          var scanStr = event.target.value;
+          event.target.value = '';
+          loadEqpInfo(scanStr);
+        }
+      }
+    });
+
+    //回车事件绑定
+    $('#spareInput').bind('keyup', function (event) {
+      console.log(JSON.stringify(event.target.value));
+      var currentScanStr = '';
+      var scanResualt = $api.byId('spareScanResualt');
+      if (event.keyCode == "13") {
+        var scanStr = event.target.value;
+        event.target.value = '';
+        // SNClick('spareInput');
+        if (!judgeTap()) {
+          return;
+        }
+        if (scanStr) {
+          spareOperationRequst(scanStr, 'INSTALL', function (flag, spareModel) {
+            if (flag) {
+              if (appType == 'PDA') {
+                scanSpare(spareModel);
+              }else{
+                scanSparePad(spareModel);
+              }
+            }
+          });
+        }
+      } else {
+        if (appType == 'PDA') {
+          if (this.value.length == 1) {
+            this.value = '';
+          }
+        }
+      }
+    });
+  }
+
+  function loadEqpInfo(scanStr) {
+    var parDic = scanStr;
+    isLoading = true;
+    EquipmentSpareTypeList(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data) {
+          EqpModel = ret.data;
+          var EqpNumInput = $api.byId('EqpNumInput');
+          fillItemInfo();
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function spareOperationRequst(barCode, ActionType, callBack) {
+
+    var parDic = {
+      WorkOrder: EqpModel.WorkOrder,
+      EquipmentId: EqpModel.EquipmentId,
+      ConsumableProductCode: EqpModel.ConsumableProductCode,
+      SpareBarcodeNo: barCode,
+      ActionType: ActionType,
+    };
+    SpareOperation(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      var spareModel = null;
+      if (ret.code == 200) {
+        if (ret.data.SpareCode) {
+          spareModel = ret.data;
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+      callBack(ret.code == 200, spareModel)
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UploadData() {
+    if (!EqpModel) {
+      api.toast({
+        msg: '请选择设备',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+
+    var tempArr = new Array;
+    itemList.forEach(function (val, index, arr) {
+      if (val.selected) {
+        tempArr.push(val);
+      }
+    });
+
+    if (tempArr.length <= 0) {
+      api.toast({
+        msg: '暂未选择刀具/模具',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    setTimeout(function () {
+      SNClick('EqpNumInput');
+    }, 100);
+
+    var countInput = $api.byId('countInput');
+    var parDic = {
+      EqpId: EqpModel.Id,
+      Operation: selectedType,
+      ToolList: tempArr
+    }
+    PostToolChange(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+      }
+
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    }, function (err) {
+      api.toast({
+        msg: '提交失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+  // =========================================
+
+  function fillItemInfo() {
+    SNClick('spareInput');
+    var EqpNumInput = $api.byId('EqpNumInput');
+    EqpNumInput.value = EqpModel.EquipmentName;
+
+    var OrderDiv = $api.byId('OrderDiv');
+    OrderDiv.innerHTML = EqpModel.WorkOrder;
+
+    var ProductDiv = $api.byId('ProductDiv');
+    ProductDiv.innerHTML = EqpModel.ConsumableProductCode;
+
+    if (appType == 'PDA') {
+      setItemListPDA();
+    } else {
+      setItemListPAD();
+    }
+    refreshItemList();
+  }
+
+  function setItemListPAD() {
+    var tempList = EqpModel.SpareTypeList;
+    itemList = [];
+    tempList.forEach(function (val, index) {
+      var spareList = val.InstalledSpareList;
+      if ($util.isArray(spareList) && spareList.length > 0) {
+        spareList.forEach(function (subVal) {
+          subVal.SpareTypeName = val.SpareTypeName;
+          subVal.SpareCount = val.SpareNum;
+        })
+
+        itemList = itemList.concat(spareList);
+      }
+      var installCount = val.InstalledSpareList.length;
+      while (installCount < val.SpareNum) {
+        itemList.push({
+          "SpareTypeName": val.SpareTypeName,
+          "SpareTypeCode": val.SpareTypeCode,
+          "SpareCode": "",
+          "SpareName": "",
+          "BarcodeNo": "",
+          "Description": "",
+          "DesignLife": '',
+          "WarningLife": '',
+          "CurrentLife": '',
+          SpareNum: val.SpareNum
+        });
+
+        installCount++;
+      }
+    });
+
+    console.log(JSON.stringify(itemList));
+  }
+
+  function setItemListPDA() {
+    var tempList = EqpModel.SpareTypeList;
+    itemList = [];
+    tempList.forEach(function (val, index) {
+      while (val.InstalledSpareList.length < val.SpareNum) {
+        val.InstalledSpareList.push({
+          SpareCode: ''
+        });
+      }
+
+      if (val.SpareNum > 0) {
+        itemList.push(val);
+      }
+    });
+
+    setInstallQty();
+  }
+
+  function setInstallQty() {
+    itemList.forEach(function (val) {
+      var count = 0;
+      if (val.InstalledSpareList.length > 0) {
+        val.InstalledSpareList.forEach(function (subVal) {
+          if (subVal.SpareCode) {
+            count++;
+          }
+        })
+      }
+      val.installQty = count;
+    });
+  }
+
+  function scanSpare(spareItem) {
+    var containSpareType = false;
+    var HintText = '';
+    itemList.forEach(function (val) {
+      if (val.SpareTypeId == spareItem.SpareTypeId) {
+        if (val.InstalledSpareList.length > 0 && val.SpareNum > 0) {
+          var contain = false;
+          val.InstalledSpareList.forEach(function (subVal) {
+            if (subVal.SpareCode == spareItem.SpareCode) {
+              contain = true;
+            }
+          });
+
+          if (contain) {
+            HintText = val.SpareTypeName + '-备件已安装，请扫描其他备件';
+          } else {
+            var needInstall = false;
+            for (var index = 0; index < val.InstalledSpareList.length; index++) {
+              var itemModel = val.InstalledSpareList[index];
+              if (itemModel && !itemModel.SpareCode) {
+                val.InstalledSpareList[index] = spareItem;
+                console.log(JSON.stringify(val.InstalledSpareList[index]));
+
+                needInstall = true;
+                break;
+              }
+            }
+
+            if (!needInstall) {
+              HintText = val.SpareTypeName + '-备件类型已安装完成，请扫描其他备件类型备件';
+            }
+          }
+        } else {
+          HintText = val.SpareTypeName + '-备件类型未设置数量';
+        }
+
+        containSpareType = true;
+      }
+    });
+
+    if (!containSpareType) {
+      HintText = '备件类型错误';
+    }
+
+    console.log(JSON.stringify(itemList));
+    if (HintText) {
+      api.toast({
+        msg: HintText,
+        duration: 1500,
+        location: 'middle'
+      });
+    } else {
+      refreshItemList();
+    }
+  }
+
+  function scanSparePad(spareItem) {
+    var HintText = '';
+    var contain = false;
+    var installAll = true;
+
+    var installIndex = 0;
+    itemList.forEach(function (subVal,index) {
+      if (subVal.SpareCode == spareItem.SpareCode) {
+        contain = true;
+      }
+
+      if (!subVal.SpareCode) {
+        installAll = false;
+        installIndex = index;
+      }
+    });
+
+    if (contain) {
+      HintText = val.SpareTypeName + '-备件已安装，请扫描其他备件';
+    }
+
+    if (installAll) {
+      HintText = '备件已安装完成';
+    }
+
+    console.log(JSON.stringify(itemList));
+    if (HintText) {
+      api.toast({
+        msg: HintText,
+        duration: 1500,
+        location: 'middle'
+      });
+    } else {
+      if (itemList.length > installIndex) {
+        itemList[installIndex] = spareItem;
+      }
+      refreshItemList();
+    }
+  }
+
+
+  function selectItem(itemStr) {
+    var tempItem = JSON.parse(itemStr);
+    console.log(itemStr);
+    if (tempItem) {
+      EqpModel = tempItem;
+      fillItemInfo();
+    }
+  }
+
+  function selectOrderItem(itemStr) {
+    var tempModel = JSON.parse(itemStr);
+    var OrderDiv = $api.byId('Order');
+    OrderDiv.innerHTML = tempModel.OrderNo;
+    $api.css(OrderDiv, 'color:#323232;');
+    OrderObj = tempModel;
+  }
+
+  function refreshItemList() {
+    var itemNode = 'template_pda'
+    if (appType != 'PDA') {
+      itemNode = 'template_pad'
+    }
+    $upRefresh.analysisDataAndNode(itemNode, itemList);
+  }
+
+
+  function judgeTap() {
+    if (!EqpModel) {
+      api.toast({
+        msg: '请先扫描设备',
+        duration: 1500,
+        location: 'middle'
+      });
+    }
+
+    return EqpModel;
+  }
+
+  // ==================交互事件=======================
+  function touchstartF(event) {
+    $slideDelete.touchstartF(event);
+  };
+
+  function touchmoveF(event, e,index) {
+    if (appType != 'PDA') {
+      if (itemList.length > index) {
+        if (itemList[index] && !itemList[index].SpareCode) {
+          return;
+        }
+      }
+    }
+    $slideDelete.touchmoveFWithLeft(event, e, -80);
+  };
+
+  function toDelete(index, subIndex, SpareCode) {
+    SNClick('spareInput');
+    event.stopPropagation();
+    api.confirm({
+      title: '提示',
+      msg: '是否确认卸载该备件',
+      buttons: ['确定', '取消']
+    }, function (subret, err) {
+      if (subret.buttonIndex == 1) {
+        spareOperationRequst(SpareCode, 'UNINSTALL', function (flag, spareModel) {
+          if (flag) {
+            deleteItem(index, subIndex);
+          }
+        });
+      }
+    });
+  }
+
+  function deleteItem(index, subIndex) {
+    if (itemList.length > index) {
+      var itemModel = itemList[index];
+      if (appType == 'PDA') {
+        if (itemModel.InstalledSpareList.length > subIndex) {
+          spareItem = itemModel.InstalledSpareList[subIndex];
+          itemModel.InstalledSpareList[subIndex] = {
+            SpareCode: ''
+          }
+        }
+        setInstallQty();
+      } else {
+        itemList[index] = {
+          SpareCode: '',
+          SpareTypeName: itemModel.SpareTypeName,
+          SpareTypeCode: itemModel.SpareTypeCode,
+        }
+      }
+    }
+
+    refreshItemList();
+  }
+
+  function deleteBtnClick(inputName) {
+    var inputDiv = $api.byId(inputName);
+    inputDiv.value = '';
+    SNClick(inputName);
+  }
+
+  function itemClick(index, subIndex) {
+    var SpareModel = null;
+    if (itemList.length > index) {
+      console.log(appType);
+      if (appType == 'PDA') {
+        var itemModel = itemList[index];
+        if ($util.isArray(itemModel.InstalledSpareList) && itemModel.InstalledSpareList.length > subIndex) {
+          SpareModel = itemModel.InstalledSpareList[subIndex];
+          SpareModel.SpareTypeName = itemModel.SpareTypeName;
+        }
+      } else {
+
+        SpareModel = itemList[index];
+      }
+    }
+
+    if (SpareModel && SpareModel.SpareCode) {
+      api.actionSheet({
+        title: '温馨提示',
+        buttons: ['更换备件']
+      }, function (ret, err) {
+        var index = ret.buttonIndex;
+        if (index == 1) {
+          api.openFrame({
+            name: 'sparePartReplace',
+            url: 'sparePartReplace_mark.html',
+            rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+              marginTop: 0, // main页面距离win顶部的高度
+              marginBottom: 0, // main页面距离win底部的高度
+              w: 'auto' // main页面的宽度 自适应屏幕宽度
+            },
+            pageParam: {
+              winName: api.winName,
+              frameName: api.frameName,
+              EqpModel: EqpModel,
+              itemModel: SpareModel
+            },
+            bounces: false,
+            bgColor: 'rgba(0,0,0,0.3)',
+            vScrollBarEnabled: false,
+            hScrollBarEnabled: false,
+          });
+        }
+      });
+    }
+  }
+
+  function showSelector(itemArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 6,
+        col: 1,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempName = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          tempModel = ret.selectedInfo[0];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+      if (ret.eventType == 'ok' || ret.eventType == 'cancel') {
+      }
+    });
+  }
+
+  function onOrderInputChange(tag) {
+
+  }
+
+  function OnInput(event, tag) {
+    if (appType == 'PDA') {
+      if (event.target.value.length == 1) {
+        event.target.value = '';
+      }
+    }
+
+  }
+
+  function SNClick(inputName) {
+    var input = $api.byId(inputName);
+    input.focus();
+    $api.attr(input, 'readOnly', true);
+    setTimeout(function () {
+      input.removeAttribute("readOnly")//延迟移除readonly属性
+    }, 30);
+  }
+
+  function tapDownBtnClick() {
+    event.stopPropagation();
+
+    api.openWin({
+      name: 'eqpSelectedList_nav',
+      url: 'eqpSelectedList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName: api.frameName + '_nav',
+        frameName: api.frameName
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+
+    return;
+    if (EqpArr.length <= 0) {
+      loadEqpArr(function (itemArr) {
+        EqpArr = itemArr;
+        if (itemArr.length > 0) {
+          tapDownBtnClick();
+        }
+      });
+      return;
+    }
+    showSelector(EqpArr, function (flag, tempModel) {
+      if (flag == true) {
+        var scanResualt = $api.byId('scanResualt');
+        scanResualt.innerHTML = tempModel.EqpCode;
+        $api.css(scanResualt, 'color:#323232;');
+        EqpModel = tempModel;
+
+      } else {
+        api.toast({
+          msg: '选取失败',
+          duration: 1000,
+          location: 'middle'
+        });
+      }
+    });
+  }
+
+  function showSelector(itemArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 6,
+        col: 1,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempModel = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          tempModel = ret.selectedInfo[0];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+    });
+  }
+
+
+  function selectItemClick(controlType) {
+
+    selectedType = controlType;
+    var items = $api.domAll('.operationType');
+    if (items) {
+      for (var i = 0; i < items.length; i++) {
+        if ($api.hasCls(items[i], 'selected')) {
+          $api.removeCls(items[i], 'selected');
+        }
+        $api.addCls(items[i], 'unSelected')
+      }
+    }
+    switch (controlType) {
+      case 'change':
+        {
+
+
+        }
+        break;
+
+      case 'uninstall':
+        {
+
+        }
+        break;
+      case 'install':
+        {
+
+        }
+        break;
+      default:
+        break;
+    }
+
+    var node = $api.byId(controlType);
+    if (node) {
+      if ($api.hasCls(node, 'unSelected')) {
+        $api.removeCls(node, 'unSelected');
+      }
+      console.log(222);
+      $api.addCls(node, 'selected')
+    }
+  }
+
+  function saveBtnClick() {
+    if (!EqpModel) {
+      api.toast({
+        msg: '请选择设备',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    if (itemList.length <= 0) {
+      api.toast({
+        msg: '暂无刀具/模具',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    UploadData();
+  }
+
+  function loadError() {
+  }
+
+</script>
+
+</html>

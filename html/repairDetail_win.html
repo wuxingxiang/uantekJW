@@ -1,0 +1,884 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+
+  <style>
+    .inputView {
+      border: 1px solid #d9d9d9;
+      height: 1.6rem;
+      border-radius: 0.15rem;
+      padding-left: 0.2rem;
+    }
+
+    #scanResualt {
+      height: 1.7rem;
+      line-height: 1.7rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      font-size: 0.8rem;
+    }
+
+    #SNScanInput {
+      position: absolute;
+      top: 0px;
+      left: 0.2rem;
+      right: 1rem;
+      bottom: 0rem;
+    }
+
+    #SNScanResualt {
+      height: 1.6rem;
+      line-height: 1.7rem;
+      text-align: center;
+      border-radius: 0.15rem;
+      font-size: 0.8rem;
+      width: 100%;
+    }
+
+    .deleteIcon {
+      width: 1.6rem;
+      height: 1.6rem;
+      background: url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-size: 0.8rem;
+    }
+
+    #PalletInput {
+      height: 1.6rem;
+      line-height: 1.6rem;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    input[type="text"] {
+      height: 1.6rem;
+      line-height: 1.6rem;
+    }
+
+    #topView {
+      z-index: 1000;
+    }
+
+    #saveBtn {
+      width: 12rem;
+      height: 2.2rem;
+      text-align: center;
+      line-height: 2.2rem;
+      font-size: 0.8rem;
+      background-color: #1eb1ed;
+      border-radius: 1.1rem;
+      color: #fff;
+    }
+
+    #saveBtnView {
+      position: fixed;
+      bottom: 0px;
+      padding: 0.5rem 0.9rem;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .searchBtn {
+      height: 1.6rem;
+      min-width: 3.6rem;
+      padding: 0px 0.6rem;
+      line-height: 1.7rem;
+      background-color: #1eb1ed;
+      border-radius: 0.15rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: white;
+      margin-left: 0.8rem;
+    }
+
+    .operationType {
+      font-size: 0.8rem;
+    }
+
+
+    #Nav_view {
+      height: 2.2rem;
+      border-bottom: 1px solid #9d9d9d;
+    }
+
+    .itemBtn {
+      height: 2.2rem;
+      /*margin-right:0.8rem;*/
+      width: 100%;
+      padding: 0px 0rem;
+      line-height: 2.2rem;
+      color: #323232;
+      font-size: 0.8rem;
+      text-align: center;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .itemBtn.active {
+      color: #f94d7e;
+      border-bottom: 2px solid #f94d7e;
+
+    }
+
+    .operationBtn {
+      height: 1.7rem;
+      width: 4rem;
+      line-height: 1.8rem;
+      border-radius: 0.15rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: white;
+      margin-left: 1rem;
+    }
+
+    #repPrintBtnView {
+      width: 60%;
+      padding: 0px 0.7rem;
+      box-sizing: border-box;
+      display: none;
+      margin: auto;
+    }
+
+    #ScanView {
+      display: none;
+    }
+
+    .packQty {
+      width: 4rem;
+    }
+
+    .packTime {
+      width: 7rem;
+      text-align: center;
+    }
+
+    .titleView {
+      padding-left: 0.8rem;
+      padding-right: 0.8rem;
+    }
+
+    .tapDownBtn {
+      height: 100%;
+      width: 1rem;
+      background: url(../image/common/more_down.png) no-repeat;
+      background-position: center;
+      background-size: 0.6rem;
+      z-index: 10000;
+    }
+
+    .tapView {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      width: 3rem;
+      z-index: 10001;
+    }
+
+    .itemTitle {
+      width: 4.2rem;
+    }
+
+    .createBtn {
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.15rem;
+      font-size: 0.7rem;
+      background-color: #1eb1ed;
+      color: #fff
+    }
+
+    #productListView {
+      position: absolute;
+      left: 5rem;
+      right: 0.8rem;
+      top: 2.4rem;
+      height: 10rem;
+      border: 1px solid #d9d9d9;
+      display: none;
+      z-index: 10000;
+      border-radius: 0.3rem;
+      padding: 0.5rem 0.6rem;
+      overflow-y: scroll;
+      background-color: #fff;
+    }
+
+    .item_list {
+      height: 100%;
+      width: 100%;
+    }
+
+    #Nav_view {
+      height: 2.2rem;
+      border-bottom: 1px solid #9d9d9d;
+    }
+
+    .list_item {
+      padding: 0.4rem 0px;
+    }
+
+    #bottomView{
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      right: 0px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <i class="back" tapmode onclick="api.closeWin();"></i>
+    <div id="title">不良完成</div>
+  </header>
+
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/PrintUtil.js"></script>
+
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript">
+
+  var frameName = 'repairDetail';
+  var currentTap = 1;
+
+  apiready = function () {
+    api.parseTapmode();
+    var header = $api.dom('header');
+    // $api.fixStatusBar( $api.dom('header') );
+
+    var offset = $api.offset(header);
+    var topY = offset.t + offset.h + 1;
+    var height = api.winHeight - topY;
+
+    winHeight = api.winHeight;
+    api.openFrame({
+      name: frameName,
+      url: frameName + '_frame.html',
+      rect: {
+        x: 0,
+        y: topY,
+        w: api.winWidth,
+        h: height
+      },
+      pageParam: api.pageParam,
+      bounces: false,
+      bgColor: 'rgba(0,0,0,0)',
+      vScrollBarEnabled: false,
+      hScrollBarEnabled: false,
+    });
+
+    var uiMode = api.uiMode;
+    if (uiMode != 'pad') {
+      var nodes = $api.domAll('.rightButton');
+      for (var index = 0; index < nodes.length; index++) {
+        var element = nodes[index];
+        $api.css(element,'padding-top: 0.3rem;');
+      }
+    }
+  };
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#LotNameInput').bind('keyup', function (event) {
+      if (event.keyCode == "13") {
+        loadLotName();
+      }
+    });
+  }
+
+  // ===============网络请求=======================
+  
+
+  function loadLotName() {
+    var LotNameInput = $api.byId('LotNameInput');
+    api.execScript({
+      frameName: frameName,
+      script: "setLotName('" + JSON.stringify(LotNameInput.value) + "');"
+    });
+
+    var parUrl = '';
+    GetMtrlListForWorkOrder(parUrl, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200 && ret.data && $util.isArray(ret.data.MtrlList)) {
+        PalletModel = ret.data;
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+
+
+  function UploadData() {
+
+    if (!OrderInfo) {
+      api.toast({
+        msg: '请先扫描制令单二维码',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var parDic = {
+      WorkOrderNo: OrderInfo.WorkOrderNo
+    }
+
+    FinishKitting(parDic, function (ret) {
+      if (ret.code == 200) {
+        setTimeout(function () {
+          api.closeWin();
+        }, 1000);
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle',
+        global: true
+      });
+      api.hideProgress();
+    }, function (err) {
+      api.toast({
+        msg: '备料完成失败',
+        duration: 1500,
+        location: 'middle'
+      });
+      api.hideProgress();
+    });
+  }
+
+  // ===============数据处理=======================
+
+  function fillLotInfo(LotInfo) {
+
+    var LotName = $api.byId('LotName');
+    LotName.innerHTML = LotInfo.LotName;
+
+    var LotId = $api.byId('LotId');
+    LotId.innerHTML = LotInfo.LotId;
+
+    var Product = $api.byId('Product');
+    Product.innerHTML = LotInfo.Product;
+
+    var LotPublish = $api.byId('LotPublish');
+    LotPublish.innerHTML = LotInfo.LotPublish;
+
+    var LotType = $api.byId('LotType');
+    LotType.innerHTML = LotInfo.LotType;
+
+    var LotStatus = $api.byId('LotStatus');
+    LotStatus.innerHTML = LotInfo.LotStatus;
+
+    var Facility = $api.byId('Facility');
+    Facility.innerHTML = LotInfo.Facility;
+
+    var Project = $api.byId('Project');
+    Project.innerHTML = LotInfo.Project;
+
+    var AfterProject = $api.byId('AfterProject');
+    AfterProject.innerHTML = LotInfo.AfterProject;
+
+    var BaseLot = $api.byId('BaseLot');
+    BaseLot.innerHTML = LotInfo.BaseLot;
+  }
+
+  function fillOrderInfo(OrderInfo) {
+    var OrderNo = $api.byId('OrderNo');
+    OrderNo.innerHTML = OrderInfo.OrderNo;
+
+    var OrderQty = $api.byId('OrderQty');
+    OrderQty.innerHTML = OrderInfo.OrderQty;
+
+    var PlanTime = $api.byId('PlanTime');
+    PlanTime.innerHTML = OrderInfo.PlanTime;
+
+    var PlanOrder = $api.byId('PlanOrder');
+    PlanOrder.innerHTML = OrderInfo.PlanOrder;
+
+    var MarketOrder = $api.byId('MarketOrder');
+    MarketOrder.innerHTML = OrderInfo.MarketOrder;
+
+    var Vendor = $api.byId('Vendor');
+    Vendor.innerHTML = OrderInfo.Vendor;
+
+    var FinishQty = $api.byId('FinishQty');
+    FinishQty.innerHTML = OrderInfo.FinishQty;
+
+    var BadnessQty = $api.byId('BadnessQty');
+    BadnessQty.innerHTML = OrderInfo.BadnessQty;
+
+    var Percentage = $api.byId('Percentage');
+    Percentage.innerHTML = OrderInfo.Percentage;
+
+    var OrderStatus = $api.byId('OrderStatus');
+    OrderStatus.innerHTML = OrderInfo.OrderStatus;
+  }
+
+
+  function c(flag) {
+    var listView = $api.byId('productListView');
+    if (flag) {
+      listView.style.display = 'block';
+    } else {
+      listView.style.display = 'none';
+    }
+  }
+
+  function fillItemInfo() {
+    var MaterialDiv = $api.byId('MaterialDiv');
+    MaterialDiv.innerHTML = OrderInfo.ConsumableProductName;
+
+    var OrderNoDiv = $api.byId('OrderNo');
+    OrderNoDiv.innerHTML = OrderInfo.WorkOrderNo;
+
+    var QtyDiv = $api.byId('QtyDiv');
+    if (OrderInfo.RequestQty) {
+      QtyDiv.innerHTML = OrderInfo.RequestQty;
+    }
+
+    api.execScript({
+      frameName: frameName,
+      script: "setWorkOrderNo('" + OrderInfo.WorkOrderNo + "')"
+    })
+
+    setUnFocuse();
+  }
+
+  function setUnFocuse() {
+    api.setFocus({
+      inputId: 'ProductInput',
+      focus: false
+    });
+  }
+
+  function hideKeyBord() {
+    var dom = $api.byId('PalletInput');
+    dom.blur();
+  }
+
+  function refreshMaterialItem(SNInfo) {
+    if (MaterialList && MaterialList.length > 0) {
+      MaterialList.forEach(function (val, index) {
+        if (val.ConsumableProductCode == SNInfo.ConsumableProductCode) {
+          val.Qty += SNInfo.CurrentQty;
+          return;
+        }
+      });
+    }
+    // api.execScript({
+    //   frameName: frameName,
+    //   script: "refreshItemList('" + JSON.stringify(MaterialList) + "');"
+    // });
+  }
+
+  function createPallet(palletStr) {
+    var tempModel = JSON.parse(palletStr);
+    if (tempModel) {
+      PalletModel = tempModel;
+    }
+  }
+
+  function setPallet(tempModel) {
+    var rightBtn = $api.byId('rightBtn');
+    var PalletInput = $api.byId('PalletInput');
+
+    if (tempModel) {
+      PalletInput.value = tempModel.LabelNo;
+      $api.css(rightBtn, 'background-color: #9d9d9d9;color:#323232;');
+    } else {
+      $api.css(rightBtn, 'background-color: #f94d7e;color:#ffffff;')
+      PalletInput.value = '';
+
+      var BoxInput = $api.byId('BoxInput');
+      BoxInput.value = '';
+    }
+
+    PalletModel = tempModel;
+  }
+
+  // ===============点击事件=======================
+
+  function itemClick(index, event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (itemList.length > index) {
+
+      var ProductInput = $api.byId('ProductInput');
+      ProductInput.value = itemList[index];
+      ProductModel = itemList[index];
+    }
+    console.log(itemList.length);
+    console.log(index);
+
+    console.log(22211111);
+    SNClick();
+  }
+
+  function bodyTap() {
+  }
+
+  function ProductLisTap() {
+    event.stopPropagation();
+  }
+
+  function tapDownBtnClick() {
+    event.stopPropagation();
+
+    api.openWin({
+      name: 'eqpSelectedList_nav',
+      url: 'eqpSelectedList_win.html',
+      slidBackEnabled: false,
+      pageParam: {
+        winName: 'eqpRepairs_nav',
+        frameName: 'eqpRepairs'
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+    // itemSelect('Eqp');
+  }
+
+  function comfirmBtnClick() {
+    api.execScript({
+      frameName: frameName,
+      script: 'saveBtnClick();'
+    });
+  }
+
+  function rightBtnClick() {
+    var PalletInput = $api.byId('PalletInput');
+    if (!PalletInput.value || PalletInput.value.length < 0) {
+      api.toast({
+        msg: '请先输入/扫码物料二维码',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    api.openWin({
+      name: 'MaterialRecordList_nav',
+      url: 'MaterialRecordList_win.html',
+      slidBackEnabled: false,
+      reload: true,
+      pageParam: {
+        itemId: MaterialModel.Id
+      },
+      animation: {
+        type: 'movein',
+        subType: 'from_right'
+      }
+    });
+  }
+
+  function selectItemClick(controlType, tag) {
+    selectedType = controlType;
+    var items = $api.domAll('.operationType');
+    if (items) {
+      for (var i = 0; i < items.length; i++) {
+        if ($api.hasCls(items[i], 'selected')) {
+          $api.removeCls(items[i], 'selected');
+        }
+        $api.addCls(items[i], 'unSelected')
+      }
+    }
+
+    var node = $api.dom(tag, '.selectIcon');
+    if (node) {
+      if ($api.hasCls(node, 'unSelected')) {
+        $api.removeCls(node, 'unSelected');
+      }
+      console.log(222);
+      $api.addCls(node, 'selected')
+    }
+
+    selectItemClick
+    api.execScript({
+      frameName: frameName,
+      script: "setReceiveType('" + controlType + "');"
+    });
+  }
+
+  function SNClick() {
+    var input = $api.byId('ProductInput');
+    input.focus();
+    $api.attr(input, 'readOnly', true);
+    setTimeout(function () {
+      input.removeAttribute("readOnly")//延迟移除readonly属性
+    }, 80);
+  }
+
+  function OnInput(event, tag) {
+    console.log(tag.value);
+    if (event.target.value.length == 1) {
+      event.target.value = '';
+    }
+  }
+
+  function deleteBtnClick(inputName) {
+    var inputDiv = $api.byId(inputName);
+    inputDiv.value = '';
+  }
+
+  function itemSelect(itemType) {
+
+    console.log(23212312);
+    switch (itemType) {
+      case 'createType':
+        {
+          return;
+
+          if (DefaultArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              DefaultArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(DefaultArr, function (flag, tempModel) {
+            if (flag == true) {
+              var itemTypeDiv = $api.byId(itemType);
+              itemTypeDiv.innerHTML = tempModel.Value;
+              $api.css(itemTypeDiv, 'color:#323232;');
+              DefaultObj = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'printType':
+        {
+          return;
+          if (EqpArr.length <= 0) {
+            loadEqpArr(function (itemArr) {
+              EqpArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+          showSelector(EqpArr, function (flag, tempModel) {
+            if (flag == true) {
+              var itemTypeDiv = $api.byId('scanResualt');
+              itemTypeDiv.innerHTML = tempModel.EqpCode;
+              $api.css(itemTypeDiv, 'color:#323232;');
+              EqpObj = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function showSelector(itemArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 8,
+        col: 1,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempModel = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          var index = ret.selectedInfo.length;
+          tempModel = ret.selectedInfo[index - 1];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+
+      // if (ret.eventType != 'onChange') {
+      //   setTimeout(function () {
+      //     SNClick();
+      //   }, 200);
+      // }
+    });
+  }
+
+
+  function subNavTap(tapIndex) {
+    var Nodes = $api.domAll('.itemBtn');
+
+    var TapNode;
+    if (Nodes.length > 0) {
+      for (var index = 0; index < Nodes.length; index++) {
+        var node = Nodes[index];
+        if ($api.hasCls(node, 'active')) {
+          $api.removeCls(node, 'active');
+        }
+        if (tapIndex == (index + 1)) {
+          TapNode = node;
+        }
+      }
+    }
+    currentTap = index;
+    if (TapNode) {
+      $api.addCls(TapNode, 'active');
+    }
+
+    var LOTInfoDiv = $api.byId('LOTInfo');
+    var OrderInfoDiv = $api.byId('OrderInfo');
+    var HideFrame = true;
+
+    switch (tapIndex) {
+      case 1: {
+        LOTInfoDiv.style.display = 'block';
+        OrderInfoDiv.style.display = 'none';
+      }
+        break;
+      case 2: {
+        LOTInfoDiv.style.display = 'none';
+        OrderInfoDiv.style.display = 'block';
+      }
+        break;
+      case 3: {
+        HideFrame = false;
+      }
+        break;
+      case 4: {
+        HideFrame = false;
+      }
+        break;
+      case 5: {
+        HideFrame = false;
+      }
+        break;
+      default: {
+
+      }
+        break;
+    }
+
+    api.setFrameAttr({
+      name: frameName,
+      hidden: HideFrame
+    });
+
+    if (!HideFrame) {
+      api.execScript({
+        frameName: frameName,
+        script: "setCurrentIndex('" + currentTap + "');"
+      });
+    }
+
+    // api.execScript({
+    //   frameName: frameName,
+    //   script: "loadItemList();"
+    // });
+  }
+
+  function keyboardClick() {
+    api.execScript({
+      frameName: frameName,
+      script: "keyboardClick();"
+    });
+  }
+
+  function bottomBtnClick() {
+    api.execScript({
+      frameName: frameName,
+      script: "UpLoadData();"
+    });
+  }
+
+</script>
+
+</html>

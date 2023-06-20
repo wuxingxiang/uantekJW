@@ -1,0 +1,802 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>AUI快速完成布局</title>
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <link rel="stylesheet" type="text/css" href="../css/common.css" />
+  <link rel="stylesheet" type="text/css" href="../css/slideDelete.css" />
+
+  <style type="text/css">
+    body {
+      background-color: #fff;
+    }
+
+    #emptyDiv {
+      height: 100%;
+    }
+
+    .wrapper {
+      height: auto;
+      min-height: 2rem;
+    }
+
+    .deleteBtn {
+      width: 60px;
+    }
+
+    .container {
+      height: auto;
+    }
+
+    .list_item {
+      padding: 0.5rem 0.8rem;
+    }
+
+    .separate_line {
+      left: 0.8rem;
+      right: 0.8rem;
+    }
+
+    .Qty {
+      width: 4rem;
+    }
+
+    .packTime {
+      width: 7rem;
+      text-align: center;
+    }
+
+    .timeDiv {
+      width: 8rem;
+    }
+
+    .list_item {
+      padding: 0.35rem 0px;
+    }
+
+    textarea {
+      height: 5rem;
+      width: 100%;
+      padding: 3px;
+      font-size: 0.8rem;
+      border: 1px solid #d9d9d9;
+      border-radius: 0.2rem;
+    }
+
+    textarea::-webkit-input-placeholder {
+      color: #b9babe;
+      font-size: 0.8rem;
+    }
+
+    .inputView {
+      border: 1px solid #d9d9d9;
+      height: 1.6rem;
+      border-radius: 0.15rem;
+      padding-left: 0.2rem;
+    }
+
+    .QueryBtn {
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.15rem;
+      font-size: 0.7rem;
+      background-color: #1eb1ed;
+      color: #fff
+    }
+
+    .deleteIcon {
+      width: 1.6rem;
+      height: 1.6rem;
+      background: url(../image/common/closeBtn.png) no-repeat;
+      background-position: center;
+      background-size: 0.8rem;
+    }
+
+    .selectIcon {
+      width: 1.4rem;
+      height: 1.4rem;
+      background: url(../image/common/common_unSelected_icon.png) no-repeat;
+      background-position: center;
+      background-size: 0.8rem;
+    }
+
+    .selected {
+      background-image: url(../image/common/common_select.png);
+    }
+
+    .unSelected {
+      background-image: url(../image/common/common_unSelected_icon.png);
+    }
+
+    .itemTitle {
+      width: 3.6rem;
+    }
+
+  </style>
+</head>
+
+<body>
+  <section class="item_normal pt16">
+    <div class="item_row item_sub_left">
+      <div class="font_size_16 mr12">原件条码</div>
+      <div class="item_normal item_sub_left inputView item_row">
+        <input id="lotInput" autofocus="autofocus" class='font_size_16' value="" type="text" placeholder="请输入/扫描条码">
+        <div class="deleteIcon" onclick="deleteBtnClick('lotInput');"></div>
+      </div>
+      <div class="QueryBtn ml20" onclick="loadIemInfo(false);">查询</div>
+    </div>
+  </section>
+
+  <section class="" id="LOTInfo">
+    <div class="item_row mt4">
+      <div class="font_size_14 itemTitle">工单：</div>
+      <div class="font_size_14 color_darkgray" id="WorkorderNo"></div>
+    </div>
+    <div class="item_row mt4">
+      <div class="font_size_14 itemTitle">工程：</div>
+      <div class="font_size_14 color_darkgray" id="Process"></div>
+    </div>
+
+    <div class="item_row mt4">
+      <div class="font_size_14 itemTitle">产线：</div>
+      <div class="font_size_14 color_darkgray" id="Facility"></div>
+    </div>
+
+    <div class="item_row mt4">
+      <div class="font_size_14 itemTitle ">状态：</div>
+      <div class="font_size_14 item_sub_left item_sub_nowrap color_darkgray" id="State"></div>
+    </div>
+
+    <div class="item_row mt4">
+      <div class="font_size_14  itemTitle">后工程：</div>
+      <div class="font_size_14 item_sub_left  item_sub_nowrap color_darkgray" id="NextProcess"></div>
+    </div>
+  </section>
+
+  <section class="" id="selectedView">
+    <div class="item_row item_sub_left mt8 itemSelectView">
+      <div class="font_size_16 mr8">不良代码</div>
+      <div class="item_sub_center selectItem" id="DefectType" onclick="itemSelect('DefectType')">请选择不良代码</div>
+    </div>
+
+    <div class="item_row item_sub_left mt8" style="margin: 0px 1rem;box-sizing: border-box;">
+      <div class="item_sub_left item_center  mr16" onclick="selectItemClick('Repaire');">
+        <div class="item_row" style="width:4rem;">
+          <div id='Repaire' class="selectIcon selected operationType"></div>
+          <div class="font_size_16 ml8">修理</div>
+        </div>
+      </div>
+
+      <div class="item_sub_left font_size_16 item_center" onclick="selectItemClick('Scrapped');">
+        <div class="item_row" style="width:4rem;">
+          <div id='Scrapped' class="selectIcon unSelected operationType"></div>
+          <div class="font_size_16 ml8">废弃</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt16 item_row">
+    <div class="item_row item_sub_left">
+      <div class="font_size_16 mr8">不良部分</div>
+      <div class="item_normal item_sub_left inputView item_row">
+        <input id="defectPartInput" autofocus="autofocus" class='inputView font_size_16 item_sub_left' maxlength='100'
+          value="" type="text" placeholder="请输入不良部位">
+      </div>
+
+    </div>
+    <div class="separate Hide" id="separateView"></div>
+  </section>
+
+  <section class="mt10">
+    <div class="font_size_16 mr10 mb4">备注</div>
+    <textarea id="Description" name="txt" clos=",50" rows="5" maxlength="200" warp="virtual"
+      placeholder="请输入备注（最多200字）"></textarea>
+  </section>
+
+  <section class="item_row item_center" id="bottomViewParent">
+    <div class="bottomView item_row" id="submitBtnView" style="width: 60%;">
+      <div class="bottomBtn color_bg_blue item_sub_center" onclick="UpLoadData();">提交</div>
+    </div>
+    <div class="separate_line_top"></div>
+  </section>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/showErrorDiv.js"></script>
+<script type="text/javascript" src="../script/requst.js"></script>
+<script type="text/javascript" src="../script/util.js"></script>
+<script type="text/javascript" src="../script/upRefresh.js"></script>
+<script type="text/javascript" src="../script/doT.js"></script>
+<script type="text/javascript" src="../script/jquery.min.js"></script>
+<script type="text/javascript" src="../script/slideDelete.js"></script>
+
+<script type="text/javascript">
+  var itemList = [];
+  var LotName = '';
+  var CurrentIndex = 1;
+  var OldLOT = null;
+  var lotModel = null;
+
+  var DefaultObj = null;
+  var DefaultArr = [];
+  var QCType = 'Repaire';
+
+  var QCTypeObj = {
+    Value: '修理',
+    Code: 'repair'
+  };
+  var QCTypeArr = [{
+    Value: '修理',
+    Code: 'repair'
+  }, {
+    Value: '废弃',
+    Code: 'discard'
+  }];
+
+
+  var DefaultPartObj = null;
+  var DefaultPartArr = [];
+
+  apiready = function () {
+    keybordTap();
+
+    var selectedView = $api.byId('selectedView');
+    var btnView = $api.byId('submitBtnView');
+
+    var appType = api.getGlobalData({
+      key: 'APPTYPE'
+    });
+
+    var itemSelectViews = $api.domAll('.itemSelectView');
+
+    if (appType != 'PDA') {
+      if (selectedView) {
+        selectedView.style.display = 'flex';
+      }
+      $api.css(btnView, 'width:35%');
+
+      if (itemSelectViews && itemSelectViews.length > 0) {
+        for (var index = 0; index < itemSelectViews.length; index++) {
+          var element = itemSelectViews[index];
+          $api.css(element, 'padding-right: 20px;')
+        }
+      }
+      var separateView = $api.byId('separateView');
+      separateView.style.display = 'flex';
+    }
+
+  }
+
+  function keybordTap() {
+    //回车事件绑定
+    $('#lotInput').bind('keyup', function (event) {
+      if (event.keyCode == "13") {
+        loadIemInfo(true);
+      }
+    });
+  }
+
+  //===============网络处理===================
+  function loadIemInfo(scan) {
+    var lotInput = $api.byId('lotInput');
+    if ($util.isEmpty(lotInput.value)) {
+      api.toast({
+        msg: '请输入/扫描lot二维码',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+
+    var parDic = lotInput.value;
+    // if (scan) {
+      lotInput.value = '';
+    // }
+
+    SNClick();
+
+    isLoading = true;
+    GetLotInfo(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data) {
+          lotModel = ret.data;
+          fillItemInfo();
+        } else {
+          api.toast({
+            msg: ret.info,
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadNewLotName(loadName) {
+    var LotNameInput = $api.byId('NewLotInput');
+
+    if (!OldLOT) {
+      api.toast({
+        msg: '请先输入原件条码或扫码原件二维码',
+        duration: 1500,
+        location: 'middle'
+      });
+      LotNameInput.value = '';
+      return;
+    }
+    if (!LotNameInput.value || LotNameInput.value.length <= 0) {
+      api.toast({
+        msg: '请输入换件条码或扫码换件二维码',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var parDic = {
+      LotName: LotNameInput.value
+    }
+
+    GetLotInfo(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200 && ret.data) {
+        NewLOT = ret.data;
+      } else {
+        api.toast({
+          msg: ret.info,
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function loadItemArr(itemType, callBack) {
+    var parDic = itemType;
+    GetSeletItemList(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        if (ret.data && ret.data.length > 0) {
+          var tempArr = ret.data;
+          tempArr.forEach(function (val, index, arr) {
+            val.name = val.Value;
+          });
+          callBack(tempArr);
+        } else {
+          api.toast({
+            msg: '暂无数据',
+            duration: 1500,
+            location: 'middle'
+          });
+        }
+      } else {
+        api.toast({
+          msg: '获取失败',
+          duration: 1500,
+          location: 'middle'
+        });
+      }
+
+    }, function (err) {
+      api.toast({
+        msg: '加载失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  function UpLoadData() {
+
+    if (!lotModel) {
+      api.toast({
+        msg: '请输入/扫描lot二维码',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+
+    if (!DefaultObj) {
+      api.toast({
+        msg: '请选择不良类型',
+        duration: 1500,
+        location: 'middle'
+      });
+      return;
+    }
+
+    var Description = $api.byId('Description');
+    var defectPartInput = $api.byId('defectPartInput');
+
+
+    var parDic = {
+      SN: lotModel.LotName,
+      Description: Description.value,
+      DefectCode: DefaultObj.Code,
+      DefectQty: 1,
+      QCType: QCType,
+      DefectParts: defectPartInput.value,
+      DefectType: DefaultObj.Code,
+    };
+
+    postDefectComplete(parDic, function (ret) {
+      console.log(JSON.stringify(ret));
+      if (ret.code == 200) {
+        cleanItemInfo();
+      }
+      api.toast({
+        msg: ret.info,
+        duration: 1500,
+        location: 'middle'
+      });
+
+    }, function (err) {
+      api.toast({
+        msg: '修理失败',
+        duration: 1500,
+        location: 'middle'
+      });
+    });
+  }
+
+  // =============数据处理=====================
+
+  function cleanLotInfo() {
+
+    var ProductCode = $api.byId('ProductCode');
+    ProductCode.innerHTML = '';
+
+    var ProductName = $api.byId('ProductName');
+    ProductName.innerHTML = '';
+
+    var ProjectProduct = $api.byId('Project');
+    Project.innerHTML = '';
+
+    var LotType = $api.byId('LotType');
+    LotType.innerHTML = '';
+
+    var OldLotInput = $api.byId('OldLotInput');
+    OldLotInput.value = '';
+    OldLOT = null;
+
+    var NewLotInput = $api.byId('NewLotInput');
+    NewLotInput.value = '';
+
+    var BadnessDiv = $api.byId('DefectType');
+    BadnessDiv.innerHTML = '请选择不良代码';
+    $api.css(BadnessDiv, 'color:#666666;');
+
+    DefaultObj = null;
+    DefaultArr = [];
+
+    var Description = $api.byId('Description');
+    Description.value = '';
+
+
+    var defectPartInput = $api.byId('defectPartInput');
+    defectPartInpu.value = '';
+
+
+  }
+  function fillItemInfo() {
+    var OrderDiv = $api.byId('WorkorderNo');
+    OrderDiv.innerHTML = lotModel.WorkorderNo;
+
+    var lotInput = $api.byId('lotInput');
+    lotInput.value = lotModel.LotName;
+
+    var Process = $api.byId('Process');
+    Process.innerHTML = lotModel.CurrentProcessName;
+    
+    var Facility = $api.byId('Facility');
+    Facility.innerHTML = lotModel.FacilityName;
+
+    var State = $api.byId('State');
+    State.innerHTML = lotModel.LotStateName;
+
+    var NextProcess = $api.byId('NextProcess');
+    NextProcess.innerHTML = lotModel.ProcessName;
+
+    if (lotModel && lotModel.LotdefectList && lotModel.LotdefectList.length > 0) {
+      DefaultObj = lotModel.LotdefectList[0];
+
+      DefaultObj.Code  = DefaultObj.DefectCode;
+      DefaultObj.Value = DefaultObj.DefectName;
+      
+      fillItem('DefectType', DefaultObj);
+
+      var DescriptionDiv = $api.byId('Description');
+      DescriptionDiv.value = DefaultObj.Description;
+    }
+  }
+
+  function cleanItemInfo() {
+    var OrderDiv = $api.byId('WorkorderNo');
+    OrderDiv.innerHTML = '';
+
+    lotModel = null;
+    var lotInput = $api.byId('lotInput');
+    lotInput.value = '';
+
+    var State = $api.byId('State');
+    State.innerHTML = '';
+
+    var NextProcess = $api.byId('NextProcess');
+    NextProcess.innerHTML = '';
+
+    var Facility = $api.byId('Facility');
+    Facility.innerHTML = '';
+
+    var Process = $api.byId('Process');
+    Process.innerHTML = '';
+
+    var DescriptionDiv = $api.byId('Description');
+    DescriptionDiv.value = '';
+
+    DefaultObj = null;
+    cleanItem('DefectType', '请选择不良代码');
+
+    var defectPartInput = $api.byId('defectPartInput');
+    defectPartInput.value = '';
+  }
+
+  function SNClick() {
+    var input = $api.byId('lotInput');
+    input.focus();
+    $api.attr(input, 'readOnly', true);
+    setTimeout(function () {
+      input.removeAttribute("readOnly")//延迟移除readonly属性
+    }, 80);
+  }
+
+  function fillItem(itemNode, itemModel) {
+    var itemNodeDiv = $api.byId(itemNode);
+    itemNodeDiv.innerHTML = itemModel.Value;
+    $api.css(itemNodeDiv, 'color:#323232;');
+  }
+
+  function cleanItem(itemNode, hintText) {
+    var itemNodeDiv = $api.byId(itemNode);
+    itemNodeDiv.innerHTML = hintText;
+    $api.css(itemNodeDiv, 'color:#666666;');
+  }
+
+  // ================点击事件=========================
+
+  function selectItemClick(controlType) {
+
+    QCType = controlType;
+    var items = $api.domAll('.operationType');
+    if (items) {
+      for (var i = 0; i < items.length; i++) {
+        if ($api.hasCls(items[i], 'selected')) {
+          $api.removeCls(items[i], 'selected');
+        }
+        $api.addCls(items[i], 'unSelected')
+      }
+    }
+
+    var node = $api.byId(controlType);
+    if (node) {
+      if ($api.hasCls(node, 'unSelected')) {
+        $api.removeCls(node, 'unSelected');
+      }
+      $api.addCls(node, 'selected')
+    }
+  }
+
+
+  function keyboardClick() {
+    api.setFocus({
+      inputId: ActiveInput,
+      focus: true
+    })
+  }
+
+  function itemSelect(itemType) {
+    switch (itemType) {
+      case 'DefectType':
+        {
+          if (!lotModel) {
+            api.toast({
+              msg: '请输入/扫描lot二维码',
+              duration: 1500,
+              location: 'middle'
+            });
+            return;
+          }
+
+          if (DefaultArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              DefaultArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(DefaultArr, function (flag, tempModel) {
+            if (flag == true) {
+              fillItem(itemType, tempModel);
+
+              DefaultObj = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'DefectParts':
+        {
+          if (DefaultPartArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              DefaultPartArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(DefaultPartArr, function (flag, tempModel) {
+            if (flag == true) {
+              fillItem(itemType, tempModel);
+              DefaultPartObj = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      case 'QCType':
+        {
+          if (DefaultPartArr.length <= 0) {
+            loadItemArr(itemType, function (itemArr) {
+              DefaultPartArr = itemArr;
+              if (itemArr.length > 0) {
+                itemSelect(itemType);
+              }
+            });
+            return;
+          }
+
+          showSelector(DefaultPartArr, function (flag, tempModel) {
+            if (flag == true) {
+              fillItem(itemType, tempModel);
+              QCTypeObj = tempModel;
+            } else {
+              api.toast({
+                msg: '选取失败',
+                duration: 1000,
+                location: 'middle'
+              });
+            }
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  function showSelector(itemArr, callBack) {
+    var UIActionSelector = api.require('UIActionSelector');
+    if (!UIActionSelector) {
+      return;
+    }
+
+    UIActionSelector.open({
+      datas: itemArr,
+      layout: {
+        row: 8,
+        col: 1,
+        height: 44,
+        size: 16,
+        sizeActive: 16,
+        rowSpacing: 0,
+        colSpacing: 0,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#8c9098',
+        colorActive: '#10131b',
+        colorSelected: '#10131b'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: 18,
+        w: 80,
+        h: 35,
+        bgActive: '#8c9098',
+        colorActive: '#fff',
+        color: '#555555',
+        bg: '#d9d9d9'
+      },
+      ok: {
+        text: '确定',
+        size: 18,
+        w: 80,
+        h: 35,
+        color: '#fff',
+        bg: '#1eb1ed',
+        colorActive: '#fff',
+        bgActive: '#8c9098',
+      },
+      title: {
+        text: '请选择',
+        size: 18,
+        h: 60,
+        bg: '#fff',
+        color: '#10131b'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      console.log(JSON.stringify(ret));
+      var tempModel = null;
+
+      if (ret && ret.eventType == 'ok') {
+        if (ret.selectedInfo && ret.selectedInfo.length > 0) {
+          var index = ret.selectedInfo.length;
+          tempModel = ret.selectedInfo[index - 1];
+          callBack(true, tempModel);
+        } else {
+          callBack(false, tempModel);
+        }
+      }
+
+    });
+  }
+
+  function deleteBtnClick(inputName) {
+    var inputView = $api.byId(inputName);
+    inputView.value = '';
+  }
+
+  function fnLoadimage(el) {
+    $showErrorDiv.fnLoadimage(el);
+  }
+
+  function loadError() {
+    loadItemList();
+  }
+
+</script>
+
+</html>
